@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #070a0f;
+  --foreground: #ededed;
 }
 
 @theme inline {
@@ -12,15 +12,37 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* Custom utilities (migrated from the dental-den content sections) */
+.glass-nav {
+  background: rgba(2, 6, 23, 0.8);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.gradient-text,
+.text-gradient-hero {
+  background: linear-gradient(90deg, #FFFFFF 0%, #FFFFFF 30%, #F3E8FF 45%, #D8B4FE 60%, #C084FC 75%, #A855F7 88%, #7E22CE 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }

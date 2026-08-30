@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# unoptimized source GLBs (only the -optimized versions are loaded at runtime)
+/public/models/spine.glb
+/public/models/spinestaright.glb
