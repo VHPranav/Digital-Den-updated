@@ -11,17 +11,15 @@ interface SpinalCordBackgroundProps {
   progressRef?: React.RefObject<number> | { current: number };
 }
 
-/* ─── Same GPGPU curl-noise particle field as the Hero's ParticleField, ───
-   ─── re-pointed to fall in from the top instead of rise from the bottom ─── */
+/* ─── GPGPU dynamic particle field: dormant at start, spawns dynamically at ───
+   ─── hovered cursor locations and in localized random clusters around the spine ─── */
 const SIM_SIZE = 96;
 const PARTICLE_COUNT = SIM_SIZE * SIM_SIZE;
-const TOP_Y = 11.0;
-const BOTTOM_Y = -34.0;
-// Depth layer the particles fall through: in front of the spine model (z ≈ 0)
-// but well short of the camera (z = 20), reading as a layer between the spine
-// and the card content in front of it.
-const FRONT_Z_MIN = 6.0;
-const FRONT_Z_MAX = 11.0;
+const TOP_Y = 12.0;
+const BOTTOM_Y = -36.0;
+// Depth envelope surrounding the spinal cord (z ≈ 0) for rich volumetric immersion
+const FRONT_Z_MIN = -3.0;
+const FRONT_Z_MAX = 9.0;
 
 const spineSimulationShader = /* glsl */ `
 uniform float uTime;
@@ -95,49 +93,73 @@ void main() {
   float age = data.w;
 
   float seed = fract(sin(dot(uv, vec2(12.9898, 78.233))) * 43758.5453);
+  float seed2 = fract(sin(dot(uv, vec2(64.19, 27.91))) * 24634.63);
 
-  bool respawn = age < 0.0 || age >= 1.0;
+  bool isDormant = age < 0.0;
+  bool isDead = age >= 1.0;
 
-  if (respawn) {
-    // A fraction of respawns seek the cursor, same trail-on-hover behavior as the Hero field
-    float mouseRoll = fract(sin(dot(uv, vec2(71.34, 22.17)) + uTime * 0.11) * 5432.1);
-    bool spawnAtMouse = uMouseActive > 0.5 && mouseRoll < 0.3;
+  if (isDormant || isDead) {
+    // 1. Hover Trigger: If user is actively hovering, spawn concentrated particles around cursor
+    float mouseRoll = fract(sin(dot(uv, vec2(71.34, 22.17)) + uTime * 0.15) * 5432.1);
+    bool spawnAtMouse = uMouseActive > 0.5 && mouseRoll < 0.82;
 
     if (spawnAtMouse) {
       vec2 jitter = vec2(
         fract(sin(dot(uv, vec2(9.1, 3.7)) + uTime * 0.2) * 1000.0) - 0.5,
         fract(sin(dot(uv, vec2(4.3, 8.9)) + uTime * 0.2) * 1000.0) - 0.5
-      ) * 0.5;
-      pos = uMouse + vec3(jitter.x, 1.5, jitter.y + ${((FRONT_Z_MIN + FRONT_Z_MAX) / 2).toFixed(1)});
+      ) * 2.2;
+      float zJitter = (fract(sin(dot(uv, vec2(17.3, 53.1)) + uTime * 0.2) * 1000.0) - 0.5) * 3.0;
+      pos = uMouse + vec3(jitter.x, jitter.y + 0.2, zJitter);
+      age = 0.0;
     } else {
-      // Spawn spread across the full viewport width, right at the top of the spine column,
-      // in the depth layer between the spine and the cards
-      float rowX = (fract(sin(dot(uv, vec2(51.23, 17.91)) + uTime * 0.05) * 10000.0) - 0.5) * 2.0 * uViewportHalfWidth;
-      float rowZ = ${FRONT_Z_MIN.toFixed(1)} + fract(sin(dot(uv, vec2(33.71, 91.13)) + uTime * 0.05) * 10000.0) * ${(FRONT_Z_MAX - FRONT_Z_MIN).toFixed(1)};
-      pos = vec3(rowX, ${TOP_Y.toFixed(1)} + seed * 4.0, rowZ);
-    }
-    age = 0.0;
-  } else {
-    // Falling instead of the Hero field's rising buoyancy
-    vec3 fall = vec3(0.0, -0.009, 0.0);
-    vec3 turbulence = curlNoise(pos * 0.4 + uTime * 0.06) * 0.006;
+      // 2. Random Localized Cluster Emitters around the spinal cord
+      // Periodically trigger small localized bursts in discrete pockets
+      float timeSlot = floor(uTime * 0.6 + seed * 6.0);
+      float clusterTrigger = fract(sin(timeSlot * 127.1 + seed * 311.7) * 43758.5);
 
-    // Gentle horizontal pull back toward the spine's central axis (X only —
-    // leaves the particle's depth layer between the spine and cards untouched)
+      bool triggerCluster = clusterTrigger < 0.18;
+
+      if (triggerCluster) {
+        float clusterY = mix(${TOP_Y.toFixed(1)} - 2.0, ${BOTTOM_Y.toFixed(1)} + 4.0, fract(clusterTrigger * 7.31 + seed2 * 3.0));
+        float clusterX = (fract(sin(timeSlot * 43.1 + seed * 19.7) * 1000.0) - 0.5) * 7.0;
+        float clusterZ = mix(${FRONT_Z_MIN.toFixed(1)}, ${FRONT_Z_MAX.toFixed(1)}, fract(clusterTrigger * 13.9));
+
+        vec3 clusterCenter = vec3(clusterX, clusterY, clusterZ);
+        vec3 localOffset = vec3(
+          (fract(sin(dot(uv, vec2(33.1, 71.9)) + uTime * 0.1) * 1000.0) - 0.5) * 1.8,
+          (fract(sin(dot(uv, vec2(89.3, 12.7)) + uTime * 0.1) * 1000.0) - 0.5) * 1.2,
+          (fract(sin(dot(uv, vec2(47.5, 93.1)) + uTime * 0.1) * 1000.0) - 0.5) * 1.8
+        );
+
+        pos = clusterCenter + localOffset;
+        age = 0.0;
+      } else {
+        // Remain dormant until hovered or triggered
+        gl_FragColor = vec4(pos, -1.0);
+        return;
+      }
+    }
+  } else {
+    // Graceful downward cascade with fluid curl noise
+    vec3 fall = vec3(0.0, -0.028, 0.0);
+    vec3 turbulence = curlNoise(pos * 0.35 + uTime * 0.07) * 0.008;
+
+    // Gentle central spine alignment on X
     vec3 toAxis = vec3(-pos.x, 0.0, 0.0);
     vec3 attraction = toAxis * 0.0012;
 
+    // Interactive pointer deflection
     vec3 mouseDiff = pos - uMouse;
     float dist = length(mouseDiff);
     vec3 mouseForce = vec3(0.0);
-    if (dist < 1.6) {
-      mouseForce = normalize(mouseDiff + 0.0001) * (1.0 - dist / 1.6) * 0.03;
+    if (dist < 2.2) {
+      mouseForce = normalize(mouseDiff + 0.0001) * (1.0 - dist / 2.2) * 0.04;
     }
 
     pos += fall + turbulence + attraction + mouseForce;
-    age += 0.0018 + fract(sin(uv.x + uv.y) * 43758.5) * 0.0012;
+    age += 0.0020 + fract(sin(uv.x + uv.y) * 43758.5) * 0.0012;
 
-    // Force an early respawn once particles fall past the bottom of the column
+    // Force respawn / return to dormant once particles fall past bottom
     if (pos.y < ${BOTTOM_Y.toFixed(1)}) {
       age = 1.0;
     }
@@ -164,15 +186,17 @@ void main() {
   float fadeOut = smoothstep(1.0, 0.85, age);
   vLife = revealed * fadeIn * fadeOut;
 
-  // Same brand gradient as the Hero field: gold, through violet, to turquoise —
-  // remapped so turquoise sits at the top (freshly spawned) and gold at the bottom
-  vec3 gold = vec3(1.0, 0.72, 0.35);
-  vec3 violet = vec3(0.63, 0.45, 0.98);
+  // Exact Hero color palette spanning top to bottom of the spinal cord:
+  // Top: Turquoise Cyan (0.1, 0.85, 0.78)
+  // Mid: Lavender / Violet (0.63, 0.45, 0.98)
+  // Bottom: Warm Gold Ember (1.0, 0.72, 0.35)
   vec3 turquoise = vec3(0.1, 0.85, 0.78);
+  vec3 violet    = vec3(0.63, 0.45, 0.98);
+  vec3 gold      = vec3(1.0, 0.72, 0.35);
 
-  float t = smoothstep(${BOTTOM_Y.toFixed(1)}, ${TOP_Y.toFixed(1)}, pos.y);
-  vec3 col = mix(gold, violet, t);
-  col = mix(col, turquoise, smoothstep(-10.0, ${TOP_Y.toFixed(1)}, pos.y));
+  float t = smoothstep(${TOP_Y.toFixed(1)}, ${BOTTOM_Y.toFixed(1)}, pos.y);
+  vec3 col = mix(turquoise, violet, smoothstep(0.0, 0.50, t));
+  col = mix(col, gold, smoothstep(0.40, 1.0, t));
   vColor = col;
 
   vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
@@ -180,7 +204,8 @@ void main() {
 
   float depth = max(-mvPosition.z, 0.1);
   float sizeHash = fract(sin(dot(aSimUv, vec2(12.9, 78.2))) * 43758.5);
-  float baseSize = mix(3.0, 30.0, pow(sizeHash, 3.5));
+  // Prominent sizing scaled up for 3D camera distance
+  float baseSize = mix(20.0, 150.0, pow(sizeHash, 2.5));
   gl_PointSize = (baseSize * uPixelRatio * vLife) / depth;
 }
 `;
@@ -194,14 +219,15 @@ void main() {
   float dist = length(coord);
   if (dist > 0.5) discard;
 
+  // 3D Glass / Refractive Sphere normal calculation
   float z = sqrt(max(0.0, 0.25 - dist * dist)) * 2.0;
   float fresnel = pow(1.0 - z, 2.5);
 
   vec2 lightDir = normalize(vec2(0.3, 0.5));
   float specular = pow(max(0.0, dot(normalize(coord + 0.0001), lightDir)), 8.0) * z;
 
-  float alpha = (fresnel * 0.85 + specular * 1.5 + 0.1) * vLife;
-  vec3 finalColor = vColor * (1.2 + fresnel * 2.0 + specular * 3.0);
+  float alpha = (fresnel * 0.95 + specular * 2.2 + 0.25) * vLife;
+  vec3 finalColor = vColor * (1.6 + fresnel * 2.8 + specular * 4.0);
 
   gl_FragColor = vec4(finalColor, alpha);
 }
@@ -388,14 +414,19 @@ export default function SpinalCordBackground({ progress = 0, progressRef }: Spin
     const dtPosition = gpuComputation.createTexture();
     const posArray = dtPosition.image.data as Float32Array;
     for (let i = 0; i < posArray.length; i += 4) {
-      posArray[i] = 0;
-      posArray[i + 1] = TOP_Y;
-      posArray[i + 2] = (FRONT_Z_MIN + FRONT_Z_MAX) / 2;
-      // -1 = needs respawn: forces every particle through the respawn branch on the very
-      // first compute pass, which is what actually scatters them across the viewport width
-      // via the uv-based hash formulas. A random 0..1 age here was the bug — with identical
-      // starting positions and no respawn trigger, every particle followed the exact same
-      // deterministic physics and stayed clumped into what looked like a single invisible point.
+      const u = (i / 4) % SIM_SIZE;
+      const v = Math.floor(i / 4 / SIM_SIZE);
+      const seedX = Math.sin(u * 12.9898 + v * 78.233) * 43758.5453;
+      const randX = (seedX - Math.floor(seedX) - 0.5) * 12.0;
+      const seedY = Math.sin(u * 93.9898 + v * 67.345) * 24634.6345;
+      const randY = BOTTOM_Y + (seedY - Math.floor(seedY)) * (TOP_Y - BOTTOM_Y);
+      const seedZ = Math.sin(u * 33.71 + v * 91.13) * 10000.0;
+      const randZ = FRONT_Z_MIN + (seedZ - Math.floor(seedZ)) * (FRONT_Z_MAX - FRONT_Z_MIN);
+
+      posArray[i] = randX;
+      posArray[i + 1] = randY;
+      posArray[i + 2] = randZ;
+      // All particles start dormant (-1.0) so there is NO large initial cloud
       posArray[i + 3] = -1.0;
     }
 
