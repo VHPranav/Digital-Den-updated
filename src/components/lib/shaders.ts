@@ -112,36 +112,30 @@ export const waterRenderShader: string = `
     vec2 gradient = vec2(hR - hL, hU - hD);
     float gradLen = length(gradient);
 
-    // Normal vector calculation
-    vec3 normal = normalize(vec3(gradient * 4.0, 0.3));
+    // Normal vector calculation from heightmap gradient
+    vec3 normal = normalize(vec3(gradient * 3.2, 0.45));
 
-    // Dual-light specular highlights
+    // Dual-light specular highlights (Active Theory Liquid Glass Specular)
     vec3 lightDir1 = normalize(vec3(-0.4, 0.6, 0.8));
     vec3 lightDir2 = normalize(vec3(0.5, -0.3, 0.9));
 
-    float spec1 = pow(max(0.0, dot(normal, lightDir1)), 24.0);
-    float spec2 = pow(max(0.0, dot(normal, lightDir2)), 36.0);
-    float specular = spec1 * 0.7 + spec2 * 0.4;
+    float spec1 = pow(max(0.0, dot(normal, lightDir1)), 32.0);
+    float spec2 = pow(max(0.0, dot(normal, lightDir2)), 48.0);
+    float specular = spec1 * 0.65 + spec2 * 0.35;
 
-    // Chromatic dispersion (prismatic liquid edges)
-    float caR = gradLen * 2.5;
-    float caG = gradLen * 4.5;
-    float caB = gradLen * 7.0;
+    // Prismatic chromatic dispersion (Lavender & Soft Violet)
+    vec3 cLavender  = vec3(0.733, 0.616, 0.933); // #BB9DEE
+    vec3 cPastel    = vec3(0.878, 0.831, 0.988); // #E0D4FC
+    vec3 cViolet    = vec3(0.659, 0.333, 0.969); // #A855F7
 
-    // Animated caustic shimmer pattern
-    float caustic = abs(sin(gradient.x * 80.0 + uTime * 1.5))
-                  * abs(sin(gradient.y * 80.0 - uTime * 1.2));
-    caustic = pow(caustic, 3.0) * gradLen * 6.0;
+    // Soft liquid glass color reflection
+    vec3 liquidColor = cLavender * (gradLen * 1.8) +
+                       cViolet * (gradLen * 1.2) +
+                       cPastel * specular;
 
-    vec3 liquidColor;
-    liquidColor.r = caR * 0.35 + specular * 0.6 + caustic * 0.15;
-    liquidColor.g = caG * 0.75 + specular * 0.85 + caustic * 0.25;
-    liquidColor.b = caB * 1.2  + specular * 1.0  + caustic * 0.4;
-
-    // Dynamic opacity mask based on ripple intensity
-    float mask  = smoothstep(0.001, 0.06, gradLen);
-    float alpha = mask * 0.55 + specular * 0.5;
-    alpha = clamp(alpha, 0.0, 0.65);
+    // Subtle, elegant opacity mask (Active Theory minimal presence)
+    float mask = smoothstep(0.002, 0.045, gradLen);
+    float alpha = clamp(mask * 0.22 + specular * 0.32, 0.0, 0.38);
 
     gl_FragColor = vec4(liquidColor, alpha);
   }

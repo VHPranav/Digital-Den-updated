@@ -84,7 +84,7 @@ export default function SlantedSectionTransition({
           paddingTop: `${slantSlopeVw * 1.1}vw`,
         }}
       >
-        {/* ─── 2. Slanted HTML Page Content ─── */}
+        {/* ─── Slanted HTML Page Content ─── */}
         <div className="relative z-10 w-full">
           {children}
         </div>

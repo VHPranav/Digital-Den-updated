@@ -15,6 +15,7 @@ import SkipIntroButton from '@/components/SkipIntroButton';
 import ActionModal from '@/components/ActionModal';
 import Footer from '@/components/Footer';
 import SlantedSectionTransition from '@/components/SlantedSectionTransition';
+import ViewportBlur from '@/components/ViewportBlur';
 
 export default function Home() {
   const [isActionModalOpen, setIsActionModalOpen] = useState(false);
@@ -52,10 +53,10 @@ export default function Home() {
 
       {/* ─── 4. MAIN HOME PAGE SECTION (Slanted Transition & Hero Gateway) ─── */}
       <div id="main-content" className="scroll-mt-10">
-        <SlantedSectionTransition slantSlopeVw={6} showLaserSeam={true}>
-          <CanvasScrollSequence frameCount={600} containerHeight="h-[560vh]" onOpenAction={handleOpenAction}>
+        <SlantedSectionTransition slantSlopeVw={6}>
+          <CanvasScrollSequence frameCount={600} containerHeight="h-[620vh]" onOpenAction={handleOpenAction}>
             {() => (
-              <div className="relative z-10 space-y-28 sm:space-y-40 pt-0 pb-64 sm:pb-96 pointer-events-auto">
+              <div className="relative z-10 w-full flex flex-col items-center justify-center space-y-28 sm:space-y-40 pt-4 pb-64 sm:pb-96 pointer-events-auto mx-auto">
                 <HeroSection onOpenAction={handleOpenAction} />
                 <MissionStatementSection />
                 <VentureFeatureSection onOpenAction={handleOpenAction} />
@@ -76,6 +77,9 @@ export default function Home() {
 
       {/* Onboarding / Lead Capture Modal */}
       <ActionModal isOpen={isActionModalOpen} onClose={handleCloseAction} />
+
+      {/* Progressive Viewport Blur from Frames Section to Footer */}
+      <ViewportBlur />
     </main>
   );
 }

@@ -24,7 +24,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col bg-black text-white selection:bg-teal-500 selection:text-white">
         <PageTransitionProvider />
-        {/* <FluidCursorRipple /> */}
+        <FluidCursorRipple />
         <SmoothScroll>{children}</SmoothScroll>
       </body>
     </html>

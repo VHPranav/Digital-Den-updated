@@ -107,8 +107,17 @@ export default function HeroSection({ onOpenAction }: HeroSectionProps) {
   return (
     <section
       ref={sectionRef}
-      className="relative z-10 min-h-screen flex flex-col justify-center items-center py-12 px-4 sm:px-8 lg:px-16 max-w-6xl mx-auto w-full pointer-events-auto text-center overflow-visible"
+      className="relative z-10 min-h-screen flex flex-col justify-center items-center py-16 sm:py-24 px-4 sm:px-8 lg:px-16 max-w-6xl mx-auto w-full pointer-events-auto text-center overflow-visible"
     >
+      {/* Top Black Gradient Overlay (Disabled for now) */}
+      {/* <div
+        className="pointer-events-none absolute -top-32 sm:-top-44 left-1/2 -translate-x-1/2 w-screen h-[400px] sm:h-[550px] z-0"
+        style={{
+          background: 'linear-gradient(176.5deg, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.85) 25%, rgba(0, 0, 0, 0.4) 60%, transparent 100%)',
+        }}
+        aria-hidden="true"
+      /> */}
+
       {/* Radiant Background Aura / Transition Flare */}
       <div
         ref={glowRef}
@@ -119,7 +128,7 @@ export default function HeroSection({ onOpenAction }: HeroSectionProps) {
         }}
       />
 
-      <div className="w-full flex flex-col items-center justify-center space-y-6 text-center mx-auto relative z-10" style={{ perspective: '1000px' }}>
+      <div className="w-full max-w-5xl flex flex-col items-center justify-center space-y-6 text-center mx-auto relative z-10" style={{ perspective: '1000px' }}>
         {/* Eyebrow Pill */}
         <div
           ref={eyebrowRef}
@@ -134,22 +143,22 @@ export default function HeroSection({ onOpenAction }: HeroSectionProps) {
         <div className="w-full flex flex-col items-center justify-center text-center mx-auto" style={{ perspective: '1000px' }}>
           <h1
             ref={line1Ref}
-            className="font-['Plus_Jakarta_Sans',sans-serif] font-medium text-[40px] sm:text-[64px] md:text-[80px] lg:text-[100px] leading-[105%] text-center text-white tracking-tight drop-shadow-2xl max-w-[1050px] mx-auto block"
+            className="font-['Plus_Jakarta_Sans',sans-serif] font-medium text-[40px] sm:text-[64px] md:text-[80px] lg:text-[100px] leading-[105%] text-center text-white tracking-tight drop-shadow-2xl max-w-[1050px] mx-auto block w-full"
           >
             Your Gateway to
           </h1>
           <h1
             ref={line2Ref}
-            className="font-['Plus_Jakarta_Sans',sans-serif] font-medium text-[40px] sm:text-[64px] md:text-[80px] lg:text-[100px] leading-[105%] text-center text-white tracking-tight drop-shadow-2xl max-w-[1050px] mx-auto block bg-clip-text bg-gradient-to-r from-white via-[#f0f4ff] to-white/80"
+            className="font-['Plus_Jakarta_Sans',sans-serif] font-medium text-[40px] sm:text-[64px] md:text-[80px] lg:text-[100px] leading-[105%] text-center text-white tracking-tight drop-shadow-2xl max-w-[1050px] mx-auto block w-full bg-clip-text bg-gradient-to-r from-white via-[#f0f4ff] to-white/80"
           >
             Global Markets
           </h1>
         </div>
 
         {/* Bottom Controls Row (Centered) */}
-        <div className="pt-4 flex flex-col items-center justify-center gap-6 w-full max-w-2xl mx-auto">
+        <div className="pt-4 flex flex-col items-center justify-center gap-6 w-full max-w-2xl mx-auto text-center">
           {/* Centered Buttons */}
-          <div className="flex flex-wrap items-center justify-center gap-4 mx-auto">
+          <div className="flex flex-wrap items-center justify-center gap-4 mx-auto w-full">
             {/* Button 1: Apply as Startup */}
             <div ref={button1Ref}>
               <button

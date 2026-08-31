@@ -217,15 +217,14 @@ void main() {
   float fadeOut = mix(smoothstep(1.0, 0.85, age), 1.0, uSubmergeLevel);
   vLife = revealed * fadeIn * fadeOut;
 
-  // Brand-derived gradient: warm ember at the base, lavender through the
-  // middle, turquoise as particles rise (echoes the emblem's rim lighting)
-  vec3 gold = vec3(1.0, 0.72, 0.35);
-  vec3 violet = vec3(0.63, 0.45, 0.98);
-  vec3 turquoise = vec3(0.1, 0.85, 0.78);
+  // Brand-derived gradient: multi-shade purple from deep amethyst through signature lavender to pastel violet
+  vec3 deepAmethyst = vec3(0.486, 0.227, 0.929); // #7C3AED
+  vec3 signatureLavender = vec3(0.733, 0.616, 0.933); // #BB9DEE
+  vec3 pastelViolet = vec3(0.878, 0.831, 0.988); // #E0D4FC
 
   float t = smoothstep(-2.0, 1.0, pos.y);
-  vec3 col = mix(gold, violet, t);
-  col = mix(col, turquoise, smoothstep(0.5, 3.0, pos.y));
+  vec3 col = mix(deepAmethyst, signatureLavender, t);
+  col = mix(col, pastelViolet, smoothstep(0.5, 3.0, pos.y));
   vColor = col;
 
   vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);

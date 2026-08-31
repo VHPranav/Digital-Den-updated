@@ -47,10 +47,10 @@ function useCyberpunkBokehTexture(videoSrc: string = DEFAULT_BOKEH_VIDEO_PATH) {
       speedX: (Math.random() - 0.5) * 5.5,
       speedY: -2.2 - Math.random() * 6.0, // Fast upward streak
       color: [
-        "rgba(0, 240, 255, ",   // Cyberpunk Cyan
-        "rgba(255, 0, 128, ",   // Neon Magenta
-        "rgba(138, 43, 226, ",  // Electric Violet
-        "rgba(255, 215, 0, ",   // Amber Gold
+        "rgba(224, 212, 252, ", // Light Pastel Violet
+        "rgba(187, 157, 238, ", // Signature Lavender (#BB9DEE)
+        "rgba(168, 85, 247, ",  // Electric Orchid Purple (#A855F7)
+        "rgba(124, 58, 237, ",  // Deep Royal Amethyst (#7C3AED)
       ][Math.floor(Math.random() * 4)],
       alpha: 0.35 + Math.random() * 0.65,
       pulseSpeed: 1.2 + Math.random() * 3.5,

@@ -2,24 +2,27 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ExternalLink } from 'lucide-react';
-import dynamic from 'next/dynamic';
-import { TextAnimate } from './TextAnimate';
+import Image from 'next/image';
+import { ExternalLink, Globe, Sparkles } from 'lucide-react';
 import { FadeIn } from './FadeIn';
 
-const Map = dynamic(() => import('@/components/ui/map').then((mod) => mod.Map), { ssr: false });
-const MapMarker = dynamic(() => import('@/components/ui/map').then((mod) => mod.MapMarker), { ssr: false });
-const MapRoute = dynamic(() => import('@/components/ui/map').then((mod) => mod.MapRoute), { ssr: false });
-import { MarkerContent, MarkerTooltip } from '@/components/ui/map';
-
 export default function ProofOfGrowthSection() {
+  const hubs = [
+    { name: 'Podgorica', region: 'Montenegro', role: 'HQ & Western Balkans Hub' },
+    { name: 'New York', region: 'United States', role: 'US Capital & Market Gateway' },
+    { name: 'Brussels', region: 'Benelux', role: 'European Innovation Corridor' },
+    { name: 'Amman', region: 'Jordan', role: 'MENA Expansion Network' },
+  ];
+
   return (
     <section className="w-full max-w-[1450px] mx-auto px-4 sm:px-8 lg:px-12">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+        {/* Left Copy Column */}
         <div className="space-y-6 text-left">
           <div className="space-y-3">
             <FadeIn animation="fadeIn" delay={0.1}>
-              <span className="text-xs font-semibold uppercase tracking-widest text-purple-300 bg-purple-500/10 border border-purple-500/20 px-3.5 py-1.5 rounded-full inline-block">
+              <span className="text-xs font-semibold uppercase tracking-widest text-purple-300 bg-purple-500/10 border border-purple-500/20 px-3.5 py-1.5 rounded-full inline-flex items-center gap-2">
+                <Globe className="w-3.5 h-3.5 text-purple-400 animate-pulse" />
                 Proof of Growth & Beyond Borders
               </span>
             </FadeIn>
@@ -43,77 +46,53 @@ export default function ProofOfGrowthSection() {
             </p>
           </FadeIn>
 
+
           <div className="pt-2">
             <Link
               href="/portfolio"
-              className="px-6 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs uppercase tracking-wider border border-white/20 transition-all flex items-center gap-2 w-fit"
+              className="px-6 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs uppercase tracking-wider border border-white/20 transition-all flex items-center gap-2 w-fit group hover:border-purple-400/40 shadow-lg"
             >
               <span>Explore Full Portfolio</span>
-              <ExternalLink className="w-4 h-4 text-purple-300" />
+              <ExternalLink className="w-4 h-4 text-purple-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
             </Link>
           </div>
         </div>
 
-        <FadeIn animation="slideUp" delay={0.4} className="relative w-full h-[420px] overflow-hidden" as="div">
+        {/* Right Dark Theme Network Map Column */}
+        <FadeIn animation="slideUp" delay={0.4} className="relative w-full h-[400px] sm:h-[460px] overflow-hidden" as="div">
           <div
-            className="w-full h-full rounded-[27.9936px]"
+            className="w-full h-full rounded-[28px] relative overflow-hidden group"
             style={{
-              background: 'linear-gradient(180deg, rgba(0, 0, 0, 0.05) 0%, rgba(0, 0, 0, 0.1) 100%), rgba(0, 0, 0, 0.6)',
-              border: '1.1664px solid rgba(255, 255, 255, 0.2)',
-              boxShadow: 'inset 0px 13.9968px 46.656px -11.664px rgba(255, 255, 255, 0.2)',
-              backdropFilter: 'blur(4.32px)',
-              WebkitBackdropFilter: 'blur(4.32px)',
+              background: 'linear-gradient(180deg, rgba(14, 10, 24, 0.9) 0%, rgba(5, 3, 10, 0.95) 100%)',
+              border: '1.2px solid rgba(168, 85, 247, 0.25)',
+              boxShadow: 'inset 0px 14px 46px -12px rgba(168, 85, 247, 0.2), 0 25px 60px -15px rgba(0,0,0,0.9)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
             }}
           >
-          <Map center={[-73.98, 40.75]} zoom={12}>
-            <MapRoute
-              coordinates={[
-                [-74.006, 40.7128],
-                [-73.9857, 40.7484],
-                [-73.9772, 40.7527],
-                [-73.9654, 40.7829],
-              ]}
-              color="#3b82f6"
-              width={4}
-              opacity={0.8}
+            {/* Ambient Background Violet Glow */}
+            <div
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] rounded-full pointer-events-none opacity-40 group-hover:opacity-60 transition-opacity duration-700"
+              style={{
+                background: 'radial-gradient(circle, rgba(168, 85, 247, 0.25) 0%, rgba(124, 58, 237, 0.1) 50%, transparent 70%)',
+                filter: 'blur(50px)',
+              }}
             />
 
-            <MapMarker longitude={-74.006} latitude={40.7128}>
-              <MarkerContent>
-                <div className="flex w-6 h-6 items-center justify-center rounded-full border-2 border-white bg-blue-500 text-xs font-bold text-white shadow-lg shadow-blue-500/50">
-                  1
-                </div>
-              </MarkerContent>
-              <MarkerTooltip>City Hall</MarkerTooltip>
-            </MapMarker>
+            {/* Dark Theme Network Map Illustration */}
+            <Image
+              src="/images/global-network-map.jpg"
+              alt="Global Innovation Network Map - Podgorica, New York, Brussels, Amman"
+              fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              className="object-cover object-center group-hover:scale-[1.03] transition-transform duration-700 ease-out"
+              priority
+            />
 
-            <MapMarker longitude={-73.9857} latitude={40.7484}>
-              <MarkerContent>
-                <div className="flex w-6 h-6 items-center justify-center rounded-full border-2 border-white bg-blue-500 text-xs font-bold text-white shadow-lg shadow-blue-500/50">
-                  2
-                </div>
-              </MarkerContent>
-              <MarkerTooltip>Empire State Building</MarkerTooltip>
-            </MapMarker>
+            {/* Subtle Glassmorphic Overlay Gradient */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none" />
 
-            <MapMarker longitude={-73.9772} latitude={40.7527}>
-              <MarkerContent>
-                <div className="flex w-6 h-6 items-center justify-center rounded-full border-2 border-white bg-blue-500 text-xs font-bold text-white shadow-lg shadow-blue-500/50">
-                  3
-                </div>
-              </MarkerContent>
-              <MarkerTooltip>Grand Central Terminal</MarkerTooltip>
-            </MapMarker>
 
-            <MapMarker longitude={-73.9654} latitude={40.7829}>
-              <MarkerContent>
-                <div className="flex w-6 h-6 items-center justify-center rounded-full border-2 border-white bg-blue-500 text-xs font-bold text-white shadow-lg shadow-blue-500/50">
-                  4
-                </div>
-              </MarkerContent>
-              <MarkerTooltip>Central Park</MarkerTooltip>
-            </MapMarker>
-            </Map>
           </div>
         </FadeIn>
       </div>

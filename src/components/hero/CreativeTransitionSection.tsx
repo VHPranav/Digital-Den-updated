@@ -96,10 +96,10 @@ function useVideoTextureSource(videoSrc: string = VIDEO_PATH) {
       speedX: (Math.random() - 0.5) * 5.0,
       speedY: -2.0 - Math.random() * 5.0,
       color: [
-        "rgba(0, 240, 255, ",
-        "rgba(255, 0, 128, ",
-        "rgba(138, 43, 226, ",
-        "rgba(255, 215, 0, ",
+        "rgba(224, 212, 252, ", // Light Pastel Violet
+        "rgba(187, 157, 238, ", // Signature Lavender (#BB9DEE)
+        "rgba(168, 85, 247, ",  // Electric Orchid Purple (#A855F7)
+        "rgba(124, 58, 237, ",  // Deep Royal Amethyst (#7C3AED)
       ][Math.floor(Math.random() * 4)],
       alpha: 0.4 + Math.random() * 0.6,
       pulseSpeed: 1.2 + Math.random() * 3.0,
@@ -470,20 +470,23 @@ function Scene({
     <>
       <color attach="background" args={["#000000"]} />
 
-      {/* ─── Studio Lighting tailored to create chromatic glints on the glass emblem ─── */}
-      <ambientLight intensity={0.15} />
+      {/* ─── Curated Multi-Shade Purple & Lavender Lighting Rig on the Big Emblem ─── */}
+      <ambientLight intensity={0.2} color="#181028" />
 
-      {/* Top Rim Light (Bright white edge catch) */}
-      <directionalLight position={[0, 4.5, 1.5]} intensity={1.5} color="#ffffff" />
+      {/* Top-Left Signature Lavender Key Light */}
+      <directionalLight position={[-4, 4.0, 2.5]} intensity={2.4} color="#BB9DEE" />
 
-      {/* Top-Left Cyan Accent */}
-      <directionalLight position={[-4, 3.5, 2.5]} intensity={1.8} color="#00f5d4" />
+      {/* Top-Right Light Pastel Violet Key Light */}
+      <directionalLight position={[4, 3.5, 2.5]} intensity={2.2} color="#E0D4FC" />
 
-      {/* Bottom-Right Magenta / Violet Rim Light */}
-      <pointLight position={[3.8, -2.5, 2.2]} intensity={2.0} color="#c084fc" distance={10} />
+      {/* Bottom-Left Deep Royal Amethyst Fill Light */}
+      <directionalLight position={[-3.5, -3.5, 1.5]} intensity={1.8} color="#7C3AED" />
 
-      {/* Deep Blue Backlight for glass dispersion */}
-      <pointLight position={[1.5, 2.0, -2.8]} intensity={1.6} color="#3b82f6" distance={10} />
+      {/* Bottom-Right Electric Orchid Purple Accent Light */}
+      <pointLight position={[3.8, -2.5, 2.2]} intensity={2.4} color="#A855F7" distance={12} />
+
+      {/* Direct Back Ultraviolet Silhouette Light */}
+      <pointLight position={[0, 1.0, -3.5]} intensity={2.2} color="#9333EA" distance={12} />
 
       {/* ─── 3D Clean Text (Left-aligned, passing directly behind the glass ring, vertically centered) ─── */}
       <Text

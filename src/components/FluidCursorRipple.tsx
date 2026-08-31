@@ -16,14 +16,14 @@ export default function FluidCursorRipple() {
     const container = containerRef.current;
     if (!container) return;
 
-    // ─── Configuration ──────────────────────────────────────────────
+    // ─── Configuration (Active Theory Subtle Liquid Glass Profile) ──
     const isMobile = typeof window !== 'undefined' && (window.innerWidth < 768 || /Mobi|Android/i.test(navigator.userAgent));
     const SIM_SIZE = isMobile ? 384 : 768; // 4x fewer texel updates on mobile
-    const WAVE_SPEED = 1.42;
-    const DAMPING = 0.985;
-    const BRUSH_RADIUS = isMobile ? 0.08 : 0.04;
-    const MAX_STRENGTH = 0.35;
-    const MOUSE_LERP = 0.18;
+    const WAVE_SPEED = 0.92;
+    const DAMPING = 0.935;
+    const BRUSH_RADIUS = isMobile ? 0.035 : 0.022;
+    const MAX_STRENGTH = 0.12;
+    const MOUSE_LERP = 0.28;
 
     const width = window.innerWidth;
     const height = window.innerHeight;

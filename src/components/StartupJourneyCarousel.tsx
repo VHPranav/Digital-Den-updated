@@ -247,8 +247,8 @@ const journeyCards = [
 
 const TOTAL_CARDS = journeyCards.length;
 const ANGLE_STEP  = 60;  // 360° / 6 cards = 60° rotation per step along helix
-const RADIUS      = 420; // px — circular radius around spine
-const STEP_Y      = 160; // px — vertical step height along spine
+const RADIUS      = 460; // px — circular radius around spine (closer gap)
+const STEP_Y      = 180; // px — vertical step height along spine (closer vertical gap)
 
 export default function StartupJourneyCarousel() {
   const sectionRef  = useRef<HTMLDivElement>(null);
@@ -293,8 +293,8 @@ export default function StartupJourneyCarousel() {
         const dist = Math.abs(relPosition);
         const yOffset = relPosition * STEP_Y;
 
-        const scale = Math.max(0.55, 1 - dist * 0.2);
-        const opa   = Math.max(0.15, 1 - dist * 0.35);
+        const scale = Math.max(0.5, 1 - dist * 0.22);
+        const opa   = Math.max(0.08, 1 - dist * 0.42);
 
         // Realistic optical glass shadow + bevel reflections
         const baseShadow =
@@ -348,7 +348,7 @@ export default function StartupJourneyCarousel() {
             className="absolute inset-0 pointer-events-none opacity-30"
             style={{
               background:
-                'radial-gradient(circle at 18% 15%, rgba(0, 245, 212, 0.12) 0%, transparent 60%), radial-gradient(circle at 85% 85%, rgba(192, 132, 252, 0.10) 0%, transparent 50%)',
+                'radial-gradient(circle at 18% 15%, rgba(187, 157, 238, 0.14) 0%, transparent 60%), radial-gradient(circle at 85% 85%, rgba(124, 58, 237, 0.12) 0%, transparent 50%)',
             }}
           />
           <div
@@ -385,11 +385,11 @@ export default function StartupJourneyCarousel() {
                   position: 'absolute',
                   left: 0,
                   top: 0,
-                  width: '370px',
-                  height: '235px',
+                  width: '390px',
+                  height: '245px',
                   transformStyle: 'preserve-3d',
                   transform: `translateX(-50%) translateY(calc(-50% + ${i * STEP_Y}px)) rotateY(${i * ANGLE_STEP}deg) translateZ(${RADIUS}px)`,
-                  borderRadius: '32px',
+                  borderRadius: '26px',
                   overflow: 'hidden',
                   willChange: 'transform, opacity, box-shadow',
                   cursor: 'pointer',
@@ -465,10 +465,10 @@ export default function StartupJourneyCarousel() {
                   <h3
                     style={{
                       margin: 0,
-                      fontSize: '21px',
+                      fontSize: '21.5px',
                       fontWeight: 800,
                       color: '#ffffff',
-                      lineHeight: 1.1,
+                      lineHeight: 1.15,
                       letterSpacing: '-0.02em',
                       textShadow: '0 2px 14px rgba(0, 0, 0, 0.95)',
                       fontFamily: "'Plus Jakarta Sans', sans-serif",
@@ -485,9 +485,9 @@ export default function StartupJourneyCarousel() {
                       color: 'rgba(233, 213, 255, 0.9)',
                       fontSize: '11.5px',
                       fontWeight: 500,
-                      lineHeight: 1.35,
+                      lineHeight: 1.38,
                       fontFamily: "'Plus Jakarta Sans', sans-serif",
-                      maxWidth: '310px',
+                      maxWidth: '320px',
                       textShadow: '0 1px 8px rgba(0, 0, 0, 0.9)',
                     }}
                   >
@@ -499,8 +499,8 @@ export default function StartupJourneyCarousel() {
                     <p
                       style={{
                         margin: '2px 0 0',
-                        fontSize: '10px',
-                        color: 'rgba(0, 245, 212, 0.85)',
+                        fontSize: '10.5px',
+                        color: 'rgba(0, 245, 212, 0.9)',
                         fontFamily: "'Plus Jakarta Sans', sans-serif",
                         fontStyle: 'italic',
                       }}
@@ -510,20 +510,20 @@ export default function StartupJourneyCarousel() {
                   )}
 
                   {card.tags && (
-                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', justifyContent: 'center', marginTop: '4px' }}>
+                    <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap', justifyContent: 'center', marginTop: '4px' }}>
                       {card.tags.map((tag, idx) => (
                         <span
                           key={idx}
                           style={{
                             fontSize: '9.5px',
-                            padding: '2px 8px',
+                            padding: '2.5px 9px',
                             borderRadius: '12px',
-                            background: 'rgba(192, 132, 252, 0.12)',
-                            border: '1px solid rgba(0, 245, 212, 0.3)',
+                            background: 'rgba(192, 132, 252, 0.15)',
+                            border: '1px solid rgba(0, 245, 212, 0.35)',
                             color: '#E9D5FF',
                             fontWeight: 600,
                             fontFamily: "'Plus Jakarta Sans', sans-serif",
-                            boxShadow: 'inset 0 0 6px rgba(0, 245, 212, 0.15)',
+                            boxShadow: 'inset 0 0 6px rgba(0, 245, 212, 0.2)',
                           }}
                         >
                           {tag}
@@ -538,18 +538,18 @@ export default function StartupJourneyCarousel() {
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{
-                        marginTop: '8px',
+                        marginTop: '7px',
                         padding: '6px 18px',
-                        borderRadius: '20px',
-                        background: 'linear-gradient(135deg, rgba(0, 245, 212, 0.25) 0%, rgba(192, 132, 252, 0.3) 100%)',
-                        border: '1px solid rgba(0, 245, 212, 0.5)',
+                        borderRadius: '18px',
+                        background: 'linear-gradient(135deg, rgba(0, 245, 212, 0.3) 0%, rgba(192, 132, 252, 0.35) 100%)',
+                        border: '1px solid rgba(0, 245, 212, 0.6)',
                         color: '#ffffff',
                         fontSize: '11px',
                         fontWeight: 700,
                         fontFamily: "'Plus Jakarta Sans', sans-serif",
                         textDecoration: 'none',
                         backdropFilter: 'blur(10px)',
-                        boxShadow: '0 4px 18px rgba(0, 245, 212, 0.25)',
+                        boxShadow: '0 4px 16px rgba(0, 245, 212, 0.25)',
                         display: 'inline-flex',
                         alignItems: 'center',
                         gap: '6px',

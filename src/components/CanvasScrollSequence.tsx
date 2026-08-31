@@ -46,86 +46,57 @@ export default function CanvasScrollSequence({
     return `/frames/ezgif-frame-${frameNum}.jpg`;
   }, []);
 
-  // Preload Images (Optimized for instant mobile first-paint)
+  // Preload Images with High-Speed Concurrent Pool & Priority Fetching
+  const loadSingleImage = useCallback((index: number, onDone?: () => void) => {
+    if (index < 0 || index >= frameCount) return;
+    if (imagesRef.current[index]) {
+      if (onDone) onDone();
+      return;
+    }
+    const img = new Image();
+    img.decoding = 'async';
+    img.src = getFramePath(index);
+    img.onload = () => {
+      imagesRef.current[index] = img;
+      setImagesLoadedCount((prev) => prev + 1);
+      if (index < 5) setIsInitialReady(true);
+      if (onDone) onDone();
+    };
+    img.onerror = () => {
+      setImagesLoadedCount((prev) => prev + 1);
+      if (onDone) onDone();
+    };
+  }, [frameCount, getFramePath]);
+
   useEffect(() => {
     let isMounted = true;
-    const images: HTMLImageElement[] = new Array(frameCount);
-    imagesRef.current = images;
+    imagesRef.current = new Array(frameCount);
 
-    let loadedCounter = 0;
-    const isMobile = typeof window !== 'undefined' && (window.innerWidth < 768 || /Mobi|Android/i.test(navigator.userAgent));
-    const urgentCount = isMobile ? 3 : 10; // Instantly show page after 3 frames on mobile!
-    let urgentLoaded = 0;
-
-    const loadSingleImage = (index: number, onDone?: () => void) => {
-      if (images[index]) {
-        if (onDone) onDone();
-        return;
-      }
-      const img = new Image();
-      img.decoding = 'async';
-      img.src = getFramePath(index);
-      img.onload = () => {
-        if (!isMounted) return;
-        images[index] = img;
-        loadedCounter++;
-        setImagesLoadedCount(loadedCounter);
-
-        if (index < urgentCount) {
-          urgentLoaded++;
-          if (urgentLoaded >= urgentCount) {
-            setIsInitialReady(true);
-          }
-        }
-        if (onDone) onDone();
-      };
-      img.onerror = () => {
-        if (!isMounted) return;
-        loadedCounter++;
-        setImagesLoadedCount(loadedCounter);
-        if (onDone) onDone();
-      };
-    };
-
-    // 1. Immediately load initial urgent frames for fast initial paint
-    for (let i = 0; i < urgentCount; i++) {
+    // 1. Immediately load first 12 urgent frames
+    for (let i = 0; i < Math.min(12, frameCount); i++) {
       loadSingleImage(i);
     }
 
-    // 2. Stagger remaining frame downloads in small batches to preserve mobile network bandwidth & CPU
-    let batchIndex = urgentCount;
-    const batchSize = isMobile ? 5 : 15;
+    // 2. High-speed concurrent worker queue (16 concurrent connections) to load all 600 frames rapidly
+    const CONCURRENCY = 16;
+    let nextIdx = 12;
 
-    const loadNextBatch = () => {
-      if (!isMounted || batchIndex >= frameCount) return;
-      const end = Math.min(batchIndex + batchSize, frameCount);
-      let countInBatch = 0;
-      const totalInBatch = end - batchIndex;
-
-      for (let i = batchIndex; i < end; i++) {
-        loadSingleImage(i, () => {
-          countInBatch++;
-          if (countInBatch >= totalInBatch) {
-            batchIndex = end;
-            if ('requestIdleCallback' in window) {
-              window.requestIdleCallback(loadNextBatch, { timeout: 200 });
-            } else {
-              setTimeout(loadNextBatch, 50);
-            }
-          }
-        });
-      }
+    const worker = () => {
+      if (!isMounted || nextIdx >= frameCount) return;
+      const current = nextIdx++;
+      loadSingleImage(current, () => {
+        if (isMounted) worker();
+      });
     };
 
-    const timer = setTimeout(() => {
-      loadNextBatch();
-    }, 150);
+    for (let c = 0; c < CONCURRENCY; c++) {
+      worker();
+    }
 
     return () => {
       isMounted = false;
-      clearTimeout(timer);
     };
-  }, [frameCount, getFramePath]);
+  }, [frameCount, loadSingleImage]);
 
   // WebGL Active Theory Navier-Stokes Fluid Distortion Physics Setup
   useEffect(() => {
@@ -151,116 +122,10 @@ export default function CanvasScrollSequence({
 
     // 1. Fluid Velocity FBO Targets (Ping-Pong grid optimized for device)
     const fboSize = isMobileGPU ? 128 : 256;
-    const fboOptions = {
-      type: THREE.HalfFloatType,
-      minFilter: THREE.LinearFilter,
-      magFilter: THREE.LinearFilter,
-      depthBuffer: false,
-      stencilBuffer: false,
-    };
-
-    let fboVelRead = new THREE.WebGLRenderTarget(fboSize, fboSize, fboOptions);
-    let fboVelWrite = new THREE.WebGLRenderTarget(fboSize, fboSize, fboOptions);
-
-    // Clear render targets initially to avoid random GPU memory noise
-    renderer.setRenderTarget(fboVelRead);
-    renderer.clear();
-    renderer.setRenderTarget(fboVelWrite);
-    renderer.clear();
-    renderer.setRenderTarget(null);
-
     const quadGeo = new THREE.PlaneGeometry(2, 2);
     const orthoCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
 
-    // 2. Splat Shader (Injects Mouse Motion Velocity Force into Fluid Grid)
-    const splatMat = new THREE.ShaderMaterial({
-      vertexShader: `
-        varying vec2 vUv;
-        void main() { vUv = uv; gl_Position = vec4(position, 1.0); }
-      `,
-      fragmentShader: `
-        precision highp float;
-        uniform sampler2D uTarget;
-        uniform vec2 uPoint;
-        uniform vec2 uForce;
-        uniform float uRadius;
-        uniform float uAspect;
-        varying vec2 vUv;
-
-        void main() {
-          vec2 p = vUv - uPoint;
-          p.x *= uAspect;
-          float splat = exp(-dot(p, p) / uRadius);
-          vec2 base = texture2D(uTarget, vUv).xy;
-          gl_FragColor = vec4(base + uForce * splat, 0.0, 1.0);
-        }
-      `,
-      uniforms: {
-        uTarget: { value: null },
-        uPoint: { value: new THREE.Vector2(0.5, 0.5) },
-        uForce: { value: new THREE.Vector2(0, 0) },
-        uRadius: { value: 0.0035 },
-        uAspect: { value: window.innerWidth / window.innerHeight },
-      },
-      depthWrite: false,
-      depthTest: false,
-    });
-    const splatScene = new THREE.Scene();
-    splatScene.add(new THREE.Mesh(quadGeo, splatMat));
-
-    // 3. Advection & Spatial Smoothing Shader (Fluid Flow, Velocity Smoothing, and Quick Decay)
-    const advectionMat = new THREE.ShaderMaterial({
-      vertexShader: `
-        varying vec2 vUv;
-        void main() { vUv = uv; gl_Position = vec4(position, 1.0); }
-      `,
-      fragmentShader: `
-        precision highp float;
-        uniform sampler2D uVelocity;
-        uniform float uDissipation;
-        varying vec2 vUv;
-
-        void main() {
-          vec2 px = vec2(0.0039, 0.0039); // 1.0 / 256.0
-          vec2 velC = texture2D(uVelocity, vUv).xy;
-          vec2 velL = texture2D(uVelocity, vUv - vec2(px.x, 0.0)).xy;
-          vec2 velR = texture2D(uVelocity, vUv + vec2(px.x, 0.0)).xy;
-          vec2 velB = texture2D(uVelocity, vUv - vec2(0.0, px.y)).xy;
-          vec2 velT = texture2D(uVelocity, vUv + vec2(0.0, px.y)).xy;
-
-          // 5-point spatial velocity smoothing filter to eliminate pixelated stair-step noise
-          vec2 smoothedVel = (velC * 4.0 + velL + velR + velB + velT) / 8.0;
-
-          vec2 coord = vUv - smoothedVel * 0.006;
-          vec2 advectedVel = texture2D(uVelocity, coord).xy;
-          
-          // Vorticity curl calculation
-          float L = velL.y;
-          float R = velR.y;
-          float B = velB.x;
-          float T = velT.x;
-          float curl = (R - L) - (T - B);
-          vec2 vorticity = vec2(curl, -curl) * 0.12;
-
-          vec2 nextVel = (advectedVel + vorticity) * uDissipation;
-          if (length(nextVel) < 0.001) {
-            nextVel = vec2(0.0);
-          }
-
-          gl_FragColor = vec4(nextVel, 0.0, 1.0);
-        }
-      `,
-      uniforms: {
-        uVelocity: { value: null },
-        uDissipation: { value: 0.85 },
-      },
-      depthWrite: false,
-      depthTest: false,
-    });
-    const advectionScene = new THREE.Scene();
-    advectionScene.add(new THREE.Mesh(quadGeo, advectionMat));
-
-    // 4. Video Frame Display Shader (Distorts Video with Smooth Liquid Physics)
+    // Direct High-Definition Video Frame Display Shader (No cursor distortion)
     const texture = new THREE.Texture();
     texture.minFilter = THREE.LinearFilter;
     texture.magFilter = THREE.LinearFilter;
@@ -274,7 +139,6 @@ export default function CanvasScrollSequence({
       fragmentShader: `
         precision highp float;
         uniform sampler2D uTexture;
-        uniform sampler2D uVelocity;
         uniform vec2 uResolution;
         uniform vec2 uImageResolution;
         varying vec2 vUv;
@@ -290,89 +154,23 @@ export default function CanvasScrollSequence({
         }
 
         void main() {
-          vec2 baseUv = getCoverUv(vUv, uResolution, uImageResolution);
-          
-          // Sample HD liquid fluid velocity vector
-          vec2 vel = texture2D(uVelocity, vUv).xy;
-          float velLen = length(vel);
-          
-          // Smoothstep fade factor so low/decayed velocities drop to EXACT 0 displacement.
-          // This guarantees 100% exact return to original crisp video pixels!
-          float fade = smoothstep(0.003, 0.025, velLen);
-          vec2 displacement = vel * 0.075 * fade;
-          vec2 distortedUv = clamp(baseUv - displacement, 0.0, 1.0);
-          
-          // Active Theory Liquid Glass Refraction & Chromatic Aberration
-          float r = texture2D(uTexture, clamp(distortedUv + displacement * 0.4, 0.0, 1.0)).r;
-          float g = texture2D(uTexture, distortedUv).g;
-          float b = texture2D(uTexture, clamp(distortedUv - displacement * 0.4, 0.0, 1.0)).b;
-
-          gl_FragColor = vec4(r, g, b, 1.0);
+          vec2 uv = getCoverUv(vUv, uResolution, uImageResolution);
+          gl_FragColor = texture2D(uTexture, uv);
         }
       `,
       uniforms: {
         uTexture: { value: texture },
-        uVelocity: { value: null },
         uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
-        uImageResolution: { value: new THREE.Vector2(1920, 1080) },
+        uImageResolution: { value: new THREE.Vector2(1280, 720) },
       },
       depthWrite: false,
       depthTest: false,
     });
+
     const displayScene = new THREE.Scene();
     displayScene.add(new THREE.Mesh(quadGeo, displayMat));
 
     webglStateRef.current = { renderer, scene: displayScene, camera: orthoCam, material: displayMat, texture };
-
-    // Mouse Tracking & Splat Forces
-    let lastMouseX = 0.5;
-    let lastMouseY = 0.5;
-
-    const addSplat = (x: number, y: number, forceX: number, forceY: number) => {
-      splatMat.uniforms.uTarget.value = fboVelRead.texture;
-      splatMat.uniforms.uPoint.value.set(x, y);
-      splatMat.uniforms.uForce.value.set(forceX, forceY);
-      splatMat.uniforms.uAspect.value = window.innerWidth / window.innerHeight;
-
-      renderer.setRenderTarget(fboVelWrite);
-      renderer.render(splatScene, orthoCam);
-
-      // Swap FBOs
-      const tmp = fboVelRead;
-      fboVelRead = fboVelWrite;
-      fboVelWrite = tmp;
-    };
-
-    const handleMouseMove = (e: MouseEvent) => {
-      const x = e.clientX / window.innerWidth;
-      const y = 1.0 - e.clientY / window.innerHeight;
-      const dx = x - lastMouseX;
-      const dy = y - lastMouseY;
-
-      if (Math.abs(dx) > 0.0001 || Math.abs(dy) > 0.0001) {
-        addSplat(x, y, dx * 95.0, dy * 95.0);
-      }
-
-      lastMouseX = x;
-      lastMouseY = y;
-    };
-
-    const handleTouchMove = (e: TouchEvent) => {
-      if (e.touches.length > 0) {
-        const touch = e.touches[0];
-        const x = touch.clientX / window.innerWidth;
-        const y = 1.0 - touch.clientY / window.innerHeight;
-        const dx = x - lastMouseX;
-        const dy = y - lastMouseY;
-
-        if (Math.abs(dx) > 0.0001 || Math.abs(dy) > 0.0001) {
-          addSplat(x, y, dx * 35.0, dy * 35.0);
-        }
-
-        lastMouseX = x;
-        lastMouseY = y;
-      }
-    };
 
     const handleResize = () => {
       const width = window.innerWidth;
@@ -380,62 +178,54 @@ export default function CanvasScrollSequence({
       renderer.setSize(width, height);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
       displayMat.uniforms.uResolution.value.set(width, height);
+      renderer.render(displayScene, orthoCam);
     };
 
-    window.addEventListener('mousemove', handleMouseMove, { passive: true });
-    window.addEventListener('touchmove', handleTouchMove, { passive: true });
     window.addEventListener('resize', handleResize);
 
-    // Continuous Animation Frame loop for Advection & Liquid Flow Physics
-    let animId: number;
-    const animate = () => {
-      // 1. Run Advection & Vorticity Pass
-      advectionMat.uniforms.uVelocity.value = fboVelRead.texture;
-      renderer.setRenderTarget(fboVelWrite);
-      renderer.render(advectionScene, orthoCam);
-
-      const tmp = fboVelRead;
-      fboVelRead = fboVelWrite;
-      fboVelWrite = tmp;
-
-      // 2. Render Final Video Display to Screen with Liquid Velocity Displacement
-      displayMat.uniforms.uVelocity.value = fboVelRead.texture;
-      renderer.setRenderTarget(null);
-      renderer.render(displayScene, orthoCam);
-
-      animId = requestAnimationFrame(animate);
-    };
-    animId = requestAnimationFrame(animate);
-
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('touchmove', handleTouchMove);
       window.removeEventListener('resize', handleResize);
-      cancelAnimationFrame(animId);
       quadGeo.dispose();
-      splatMat.dispose();
-      advectionMat.dispose();
       displayMat.dispose();
       texture.dispose();
-      fboVelRead.dispose();
-      fboVelWrite.dispose();
       renderer.dispose();
       webglStateRef.current = null;
     };
   }, []);
 
-  // Update WebGL frame texture
+  // Update WebGL frame texture (with nearest-frame fallback & on-demand trigger)
   const renderFrame = useCallback((frameIndex: number) => {
-    const img = imagesRef.current[frameIndex] || imagesRef.current[0];
-    if (!img || !img.complete || img.naturalWidth === 0) return;
+    let img = imagesRef.current[frameIndex];
+    if (!img || !img.complete || img.naturalWidth === 0) {
+      // Trigger on-demand priority load if missing
+      loadSingleImage(frameIndex);
 
+      // Look for the closest ready frame so the canvas never stalls or blinks
+      for (let offset = 1; offset < 40; offset++) {
+        const prev = imagesRef.current[frameIndex - offset];
+        if (prev && prev.complete && prev.naturalWidth > 0) {
+          img = prev;
+          break;
+        }
+        const next = imagesRef.current[frameIndex + offset];
+        if (next && next.complete && next.naturalWidth > 0) {
+          img = next;
+          break;
+        }
+      }
+    }
+
+    if (!img || !img.complete || img.naturalWidth === 0) {
+      img = imagesRef.current[0];
+    }
     if (webglStateRef.current) {
-      const { texture, material } = webglStateRef.current;
+      const { renderer, scene, camera, texture, material } = webglStateRef.current;
       texture.image = img;
       texture.needsUpdate = true;
       material.uniforms.uImageResolution.value.set(img.naturalWidth, img.naturalHeight);
+      renderer.render(scene, camera);
     }
-  }, []);
+  }, [loadSingleImage]);
 
   // Update canvas on frame change
   const requestDrawFrame = useCallback((frameIndex: number) => {
@@ -447,36 +237,6 @@ export default function CanvasScrollSequence({
     });
   }, [renderFrame]);
 
-  // Idle water movement at top (scrollY < 20) and logo flicker at bottom (near scroll end)
-  useEffect(() => {
-    if (!isInitialReady) return;
-
-    let topFrameTracker = 0;
-    let bottomFrameTracker = 540;
-
-    const animateIdle = () => {
-      const isNearBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 150;
-
-      if (window.scrollY < 20) {
-        topFrameTracker = (topFrameTracker + 0.35) % 60;
-        renderFrame(Math.floor(topFrameTracker));
-      } else if (isNearBottom) {
-        bottomFrameTracker = bottomFrameTracker + 0.35;
-        if (bottomFrameTracker > 599) {
-          bottomFrameTracker = 540;
-        }
-        renderFrame(Math.floor(bottomFrameTracker));
-      }
-      idleAnimIdRef.current = requestAnimationFrame(animateIdle);
-    };
-
-    idleAnimIdRef.current = requestAnimationFrame(animateIdle);
-
-    return () => {
-      if (idleAnimIdRef.current) cancelAnimationFrame(idleAnimIdRef.current);
-    };
-  }, [isInitialReady, renderFrame]);
-
   // Handle Window Scroll
   useEffect(() => {
     const handleScroll = () => {
@@ -487,12 +247,15 @@ export default function CanvasScrollSequence({
       if (totalScrollableHeight <= 0) return;
 
       const progress = Math.max(0, Math.min(1, -rect.top / totalScrollableHeight));
-      const targetFrame = Math.min(frameCount - 1, Math.floor(progress * frameCount));
+
+      // Map all 600 frames smoothly across 0% to 80% scroll progress so entire video plays completely
+      const videoProgress = Math.max(0, Math.min(1, progress / 0.80));
+      const targetFrame = Math.min(frameCount - 1, Math.floor(videoProgress * (frameCount - 1)));
 
       setScrollProgress(progress);
       setCurrentFrameIndex(targetFrame);
 
-      if (window.scrollY >= 20 && targetFrame !== currentFrameRef.current) {
+      if (targetFrame !== currentFrameRef.current) {
         currentFrameRef.current = targetFrame;
         requestDrawFrame(targetFrame);
       }
@@ -522,19 +285,19 @@ export default function CanvasScrollSequence({
     }
   }, [isInitialReady, renderFrame]);
 
-  // Dynamic scale-down transition: Video stays 100% full-bleed through sections 1-4.
-  // ONLY after FourPillars cards fully exit viewport (scrollProgress > 0.82) does it scale down.
-  const scaleProgress = Math.max(0, Math.min(1, (scrollProgress - 0.82) / 0.10));
+  // Dynamic scale-down transition: Video stays 100% full-bleed from 0 to 0.78.
+  // Scales down smoothly into rounded card from 0.78 to 0.86.
+  const scaleProgress = Math.max(0, Math.min(1, (scrollProgress - 0.78) / 0.08));
   const canvasScale = 1 - scaleProgress * 0.12;
   const canvasRadius = scaleProgress * 36;
   const overlayOpacity = scaleProgress * 0.75;
   const paddingClass = scaleProgress > 0.2 ? 'p-4 sm:p-8' : 'p-0';
 
-  // Card content opacity starts fading in ONLY after video scaling is 100% complete (scaleProgress > 0.85)
-  const cardTextOpacity = Math.max(0, Math.min(1, (scaleProgress - 0.85) / 0.15));
+  // Card content fades in between 0.83 and 0.88, staying fully pinned and readable until 0.99
+  const cardTextOpacity = Math.max(0, Math.min(1, (scrollProgress - 0.83) / 0.06));
 
-  // Position mode: fixed while in scroll sequence, absolute bottom-0 when sequence ends so card section naturally scrolls up
-  const isPastSequence = scrollProgress >= 0.98;
+  // Position mode: fixed while in scroll sequence, absolute bottom-0 only when reaching 0.99
+  const isPastSequence = scrollProgress >= 0.99;
   const positionClass = isPastSequence ? 'absolute bottom-0 left-0 w-full h-screen' : 'fixed top-0 left-0 w-full h-screen';
 
   return (
@@ -555,6 +318,15 @@ export default function CanvasScrollSequence({
           <canvas
             ref={canvasRef}
             className="w-full h-full block object-cover"
+          />
+
+          {/* Pure Black Slanted Gradient (Directly Over the Video Frame, Below the Text Content, 150vh Span) */}
+          <div
+            className="absolute top-0 inset-x-0 h-[150vh] pointer-events-none z-[2]"
+            style={{
+              background: 'linear-gradient(176.5deg, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.92) 20%,  rgba(0, 0, 0, 0) 100%)',
+            }}
+            aria-hidden="true"
           />
 
           {/* Dark shade overlay over video frame when scaled into card mode */}
