@@ -255,7 +255,7 @@ function VolumetricStreak() {
 import { useGLTF } from "@react-three/drei";
 import { ModelErrorBoundary } from "./ModelErrorBoundary";
 
-export const EMBLEM_MODEL_PATH = "/models/emblem.glb";
+export const EMBLEM_MODEL_PATH = "/models/emblem-opt.glb";
 
 /**
  * Big Emblem loaded directly from the real emblem.glb 3D asset

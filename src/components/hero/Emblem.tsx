@@ -6,7 +6,7 @@ import { useFrame } from "@react-three/fiber";
 import { useGLTF, MeshTransmissionMaterial } from "@react-three/drei";
 import { useIntroTimeline } from "@/hooks/useIntroTimeline";
 
-export const EMBLEM_MODEL_PATH = "/models/emblem.glb";
+export const EMBLEM_MODEL_PATH = "/models/emblem-opt.glb";
 export const DEFAULT_BOKEH_VIDEO_PATH = "/videos/cyberpunk-nightcity.mp4";
 
 /**

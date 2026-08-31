@@ -392,14 +392,14 @@ export default function SpinalCordBackground({
       side: THREE.DoubleSide,
     });
 
-    /* ─── Load Custom Spine GLB Model (/models/spinenw.glb) ─── */
+    /* ─── Load Custom Spine GLB Model (/models/spinenw-opt.glb) ─── */
     const gltfLoader = new GLTFLoader();
     const dracoLoader = new DRACOLoader();
     dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
     gltfLoader.setDRACOLoader(dracoLoader);
 
     gltfLoader.load(
-      '/models/spinenw.glb',
+      '/models/spinenw-opt.glb',
       (gltf) => {
         const model = gltf.scene;
         const bbox = new THREE.Box3().setFromObject(model);

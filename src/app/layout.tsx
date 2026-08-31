@@ -22,6 +22,20 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${plusJakarta.className} ${plusJakarta.variable} h-full antialiased`}
     >
+      <head>
+        <link
+          rel="preload"
+          href="/models/emblem-opt.glb"
+          as="fetch"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preload"
+          href="/models/spinenw-opt.glb"
+          as="fetch"
+          crossOrigin="anonymous"
+        />
+      </head>
       <body className="min-h-full flex flex-col bg-black text-white selection:bg-teal-500 selection:text-white">
         <PageTransitionProvider />
         <FluidCursorRipple />
