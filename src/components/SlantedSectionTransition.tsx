@@ -34,7 +34,7 @@ export default function SlantedSectionTransition({
       if (!containerRef.current) return;
       const rect = containerRef.current.getBoundingClientRect();
       const windowH = window.innerHeight;
-      
+
       // Calculate reveal progress as section approaches and overlaps viewport
       const totalDist = rect.height + windowH;
       const currentDist = windowH - rect.top;
@@ -84,6 +84,15 @@ export default function SlantedSectionTransition({
           paddingTop: `${slantSlopeVw * 1.1}vw`,
         }}
       >
+        {/* ─── 2. Seamless Slanted Black Dissolve Gradient Overlay (Joined with Slant Angle) ─── */}
+        <div
+          className="absolute top-0 inset-x-0 h-[50vh] sm:h-[100vh] pointer-events-none z-[12]"
+          style={{
+            background: `linear-gradient(${180 - angleDeg}deg, #000000 0%, #000000 ${slantSlopeVw * 0.9}vw, rgba(0, 0, 0, 0.96) ${slantSlopeVw + 6}vw, rgba(0, 0, 0, 0.75) ${slantSlopeVw + 16}vw, rgba(0, 0, 0, 0.3) ${slantSlopeVw + 28}vw, transparent 100%)`,
+          }}
+          aria-hidden="true"
+        />
+
         {/* ─── Slanted HTML Page Content ─── */}
         <div className="relative z-10 w-full">
           {children}

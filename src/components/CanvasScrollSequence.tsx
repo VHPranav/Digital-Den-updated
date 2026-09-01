@@ -196,28 +196,34 @@ export default function CanvasScrollSequence({
   // Update WebGL frame texture (with nearest-frame fallback & on-demand trigger)
   const renderFrame = useCallback((frameIndex: number) => {
     let img = imagesRef.current[frameIndex];
-    if (!img || !img.complete || img.naturalWidth === 0) {
+    if (!img || !img.complete || !img.naturalWidth || img.naturalWidth === 0) {
       // Trigger on-demand priority load if missing
       loadSingleImage(frameIndex);
 
       // Look for the closest ready frame so the canvas never stalls or blinks
       for (let offset = 1; offset < 40; offset++) {
         const prev = imagesRef.current[frameIndex - offset];
-        if (prev && prev.complete && prev.naturalWidth > 0) {
+        if (prev && prev.complete && prev.naturalWidth && prev.naturalWidth > 0) {
           img = prev;
           break;
         }
         const next = imagesRef.current[frameIndex + offset];
-        if (next && next.complete && next.naturalWidth > 0) {
+        if (next && next.complete && next.naturalWidth && next.naturalWidth > 0) {
           img = next;
           break;
         }
       }
     }
 
-    if (!img || !img.complete || img.naturalWidth === 0) {
+    if (!img || !img.complete || !img.naturalWidth || img.naturalWidth === 0) {
       img = imagesRef.current[0];
     }
+
+    // Safety check: Do not attempt WebGL render if no valid image is ready yet
+    if (!img || !img.complete || !img.naturalWidth || img.naturalWidth === 0) {
+      return;
+    }
+
     if (webglStateRef.current) {
       const { renderer, scene, camera, texture, material } = webglStateRef.current;
       texture.image = img;
@@ -321,13 +327,13 @@ export default function CanvasScrollSequence({
           />
 
           {/* Pure Black Slanted Gradient (Directly Over the Video Frame, Below the Text Content, 150vh Span) */}
-          <div
-            className="absolute top-0 inset-x-0 h-[150vh] pointer-events-none z-[2]"
+          {/* <div
+            className="absolute top-0 inset-x-0 h-[100vh] pointer-events-none z-[2]"
             style={{
-              background: 'linear-gradient(176.5deg, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.92) 20%,  rgba(0, 0, 0, 0) 100%)',
+              background: 'linear-gradient(176.5deg, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.92) 20%, rgba(0, 0, 0, 0.6) 40%,  rgba(0, 0, 0, 0) 100%)',
             }}
             aria-hidden="true"
-          />
+          /> */}
 
           {/* Dark shade overlay over video frame when scaled into card mode */}
           <div

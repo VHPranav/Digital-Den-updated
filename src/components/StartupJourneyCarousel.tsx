@@ -8,7 +8,7 @@ const SpinalCordBackground = dynamic(() => import('./SpinalCordBackground'), { s
 /* ─── Procedural 60 FPS Ambient Motion Canvas Background (Zero 403 / Network Errors) ─── */
 function AutoPlayVideo({ src, step }: { src?: string; step: string; poster?: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const videoRef  = useRef<HTMLVideoElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const [videoLoaded, setVideoLoaded] = useState(false);
 
   // Try video first; if video fails or is 403, fallback seamlessly to procedural ambient loop
@@ -43,7 +43,7 @@ function AutoPlayVideo({ src, step }: { src?: string; step: string; poster?: str
     const stepNum = parseInt(step, 10) || 1;
 
     const resize = () => {
-      canvas.width  = canvas.clientWidth  || 440;
+      canvas.width = canvas.clientWidth || 440;
       canvas.height = canvas.clientHeight || 275;
     };
     resize();
@@ -127,7 +127,7 @@ function AutoPlayVideo({ src, step }: { src?: string; step: string; poster?: str
         // Step 04 & 05: Telemetry Dashboard Pulsing Ring & Bars
         const centerX = w * 0.5;
         const centerY = h * 0.5;
-        const radius  = 45 + Math.sin(time * 2) * 8;
+        const radius = 45 + Math.sin(time * 2) * 8;
 
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
         ctx.lineWidth = 2;
@@ -246,22 +246,22 @@ const journeyCards = [
 ];
 
 const TOTAL_CARDS = journeyCards.length;
-const ANGLE_STEP  = 60;  // 360° / 6 cards = 60° rotation per step along helix
-const RADIUS      = 460; // px — circular radius around spine (closer gap)
-const STEP_Y      = 180; // px — vertical step height along spine (closer vertical gap)
+const ANGLE_STEP = 60;  // 360° / 6 cards = 60° rotation per step along helix
+const RADIUS = 460; // px — circular radius around spine (closer gap)
+const STEP_Y = 180; // px — vertical step height along spine (closer vertical gap)
 
 export default function StartupJourneyCarousel() {
-  const sectionRef  = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLDivElement>(null);
   const carouselRef = useRef<HTMLDivElement>(null);
-  const cardRefs    = useRef<(HTMLDivElement | null)[]>([]);
-  const rawRef      = useRef(0); // target float index
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const rawRef = useRef(0); // target float index
   const progressRef = useRef(0); // smoothed float index passed to WebGL
   const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
     let smooth = 0;
     let lastSnapped = -1;
-    let rafId  = 0;
+    let rafId = 0;
 
     /* ── Read scroll position ── */
     const onScroll = () => {
@@ -294,7 +294,7 @@ export default function StartupJourneyCarousel() {
         const yOffset = relPosition * STEP_Y;
 
         const scale = Math.max(0.5, 1 - dist * 0.22);
-        const opa   = Math.max(0.08, 1 - dist * 0.42);
+        const opa = Math.max(0.08, 1 - dist * 0.42);
 
         // Realistic optical glass shadow + bevel reflections
         const baseShadow =
@@ -303,7 +303,7 @@ export default function StartupJourneyCarousel() {
           ? 'inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.55), inset 0 -1.5px 1px 0 rgba(0, 0, 0, 0.6), 0 30px 60px -12px rgba(0, 0, 0, 0.95)'
           : baseShadow;
 
-        card.style.opacity   = String(opa);
+        card.style.opacity = String(opa);
         card.style.boxShadow = activeShadow;
         card.style.transform =
           `translateX(-50%) translateY(calc(-50% + ${yOffset}px)) rotateY(${i * ANGLE_STEP}deg) translateZ(${RADIUS}px) scale(${scale})`;
@@ -359,6 +359,15 @@ export default function StartupJourneyCarousel() {
             }}
           />
         </div>
+
+        {/* ── Seamless Slanted Black Dissolve Gradient Overlay (Top of Spine) ── */}
+        {/* <div
+          className="absolute top-0 inset-x-0 h-[50vh] sm:h-[80vh] pointer-events-none z-[5]"
+          style={{
+            background: `linear-gradient(${180 - Math.atan2(8.5, 100) * (180 / Math.PI)}deg, #000000 0%, #000000 7.5vw, rgba(0, 0, 0, 0.96) 15vw, rgba(0, 0, 0, 0.75) 25vw, rgba(0, 0, 0, 0.3) 38vw, transparent 100%)`,
+          }}
+          aria-hidden="true"
+        /> */}
 
         {/* ── 3-D Helical Carousel Stage ── */}
         <div
@@ -587,6 +596,15 @@ export default function StartupJourneyCarousel() {
           ))}
         </div>
       </div>
+
+      {/* ── Seamless Slanted Black Dissolve Gradient Overlay (Bottom of Section — Appears only at end of scroll) ── */}
+      <div
+        className="absolute bottom-0 inset-x-0 h-[40vh] sm:h-[65vh] pointer-events-none z-30"
+        style={{
+          background: `linear-gradient(${Math.atan2(6, 100) * (180 / Math.PI)}deg, #000000 0%, transparent 100%)`,
+        }}
+        aria-hidden="true"
+      />
     </section>
   );
 }
