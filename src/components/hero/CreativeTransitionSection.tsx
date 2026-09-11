@@ -7,12 +7,13 @@ import { Text, MeshTransmissionMaterial, Environment } from "@react-three/drei";
 import { EffectComposer, Bloom, Noise } from "@react-three/postprocessing";
 import { RectAreaLightUniformsLib } from "three/examples/jsm/lights/RectAreaLightUniformsLib.js";
 import { gsap } from "@/lib/gsap";
+import { useTabVisible } from "@/hooks/useTabVisible";
 
-export const VIDEO_PATH = "/videos/cyberpunk-nightcity.mp4";
+const EMBLEM_GLOW_VIDEO_PATH = "/videos/emblem-glow-nebula.mp4";
 
 /**
  * Computes planar UV projection mapped onto the XY bounds of the geometry
- * so the video texture displays seamlessly without stretching.
+ * so the glow texture displays seamlessly without stretching.
  */
 function applyPlanarUVs(geometry: THREE.BufferGeometry) {
   geometry.computeBoundingBox();
@@ -80,31 +81,17 @@ function buildEmblemGeometry() {
 }
 
 /**
- * Video / Dynamic Texture for the inner "a" glyph
+ * Emissive glow texture for the inner "a" glyph.
+ * - Plays `/videos/emblem-glow-nebula.mp4` (a color-graded turquoise/violet nebula loop,
+ *   on-theme with the site's lavender/violet/turquoise palette) with full autoplay/muted/loop.
+ * - If the video is loading or blocked by autoplay policy, falls back to a procedural
+ *   canvas bokeh field in the same palette, so the emblem is never left without a glow.
  */
-function useVideoTextureSource(videoSrc: string = VIDEO_PATH) {
+function useEmblemGlowTexture(videoSrc: string = EMBLEM_GLOW_VIDEO_PATH) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const textureRef = useRef<THREE.CanvasTexture | null>(null);
   const [videoTexture, setVideoTexture] = useState<THREE.VideoTexture | null>(null);
   const isVideoPlaying = useRef(false);
-
-  const particles = useMemo(() => {
-    return Array.from({ length: 40 }, () => ({
-      x: Math.random() * 512,
-      y: Math.random() * 512,
-      radius: 12 + Math.random() * 32,
-      speedX: (Math.random() - 0.5) * 5.0,
-      speedY: -2.0 - Math.random() * 5.0,
-      color: [
-        "rgba(224, 212, 252, ", // Light Pastel Violet
-        "rgba(187, 157, 238, ", // Signature Lavender (#BB9DEE)
-        "rgba(168, 85, 247, ",  // Electric Orchid Purple (#A855F7)
-        "rgba(124, 58, 237, ",  // Deep Royal Amethyst (#7C3AED)
-      ][Math.floor(Math.random() * 4)],
-      alpha: 0.4 + Math.random() * 0.6,
-      pulseSpeed: 1.2 + Math.random() * 3.0,
-    }));
-  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -136,18 +123,48 @@ function useVideoTextureSource(videoSrc: string = VIDEO_PATH) {
       isVideoPlaying.current = false;
     });
 
+    // Stop decoding while the tab is backgrounded — pausing the R3F canvas frameloop
+    // alone doesn't stop the underlying <video> element's own background decode work.
+    const onVisibility = () => {
+      if (document.hidden) video.pause();
+      else video.play().catch(() => {});
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+
     setVideoTexture(tex);
 
     return () => {
       isCancelled = true;
       video.removeEventListener("playing", onPlay);
       video.removeEventListener("loadeddata", onPlay);
+      document.removeEventListener("visibilitychange", onVisibility);
       video.pause();
       video.removeAttribute("src");
       video.load();
       tex.dispose();
     };
   }, [videoSrc]);
+
+  const particles = useMemo(() => {
+    return Array.from({ length: 40 }, () => ({
+      x: Math.random() * 512,
+      y: Math.random() * 512,
+      radius: 12 + Math.random() * 32,
+      speedX: (Math.random() - 0.5) * 5.0,
+      speedY: -2.0 - Math.random() * 5.0,
+      color:
+        Math.random() < 0.15
+          ? "rgba(0, 245, 212, " // Subtle Turquoise accent (#00F5D4)
+          : [
+              "rgba(224, 212, 252, ", // Light Pastel Violet
+              "rgba(187, 157, 238, ", // Signature Lavender (#BB9DEE)
+              "rgba(168, 85, 247, ",  // Electric Orchid Purple (#A855F7)
+              "rgba(124, 58, 237, ",  // Deep Royal Amethyst (#7C3AED)
+            ][Math.floor(Math.random() * 4)],
+      alpha: 0.4 + Math.random() * 0.6,
+      pulseSpeed: 1.2 + Math.random() * 3.0,
+    }));
+  }, []);
 
   const canvasTexture = useMemo(() => {
     if (typeof window === "undefined") return null;
@@ -260,7 +277,7 @@ export const EMBLEM_MODEL_PATH = "/models/emblem-opt.glb";
 /**
  * Big Emblem loaded directly from the real emblem.glb 3D asset
  */
-function GLBBigEmblem({ videoTex }: { videoTex: THREE.Texture | null }) {
+function GLBBigEmblem({ glowTex }: { glowTex: THREE.Texture | null }) {
   const { scene } = useGLTF(EMBLEM_MODEL_PATH);
 
   const geometry = useMemo(() => {
@@ -296,7 +313,7 @@ function GLBBigEmblem({ videoTex }: { videoTex: THREE.Texture | null }) {
         side={THREE.DoubleSide}
         emissive="#ffffff"
         emissiveIntensity={1.0}
-        emissiveMap={videoTex || undefined}
+        emissiveMap={glowTex || undefined}
         toneMapped={true}
       />
     </mesh>
@@ -308,7 +325,7 @@ useGLTF.preload(EMBLEM_MODEL_PATH);
 /**
  * Procedural Fallback Emblem if the GLB is loading or missing
  */
-function ProceduralBigEmblem({ videoTex }: { videoTex: THREE.Texture | null }) {
+function ProceduralBigEmblem({ glowTex }: { glowTex: THREE.Texture | null }) {
   const { ringGeometry, letterGeometry } = useMemo(() => buildEmblemGeometry(), []);
 
   return (
@@ -339,7 +356,7 @@ function ProceduralBigEmblem({ videoTex }: { videoTex: THREE.Texture | null }) {
           roughness={0.12}
           emissive="#ffffff"
           emissiveIntensity={1.0}
-          emissiveMap={videoTex || undefined}
+          emissiveMap={glowTex || undefined}
           toneMapped={true}
         />
       </mesh>
@@ -374,7 +391,7 @@ function BigEmblem({
   scrollProgress: React.RefObject<number>;
 }) {
   const groupRef = useRef<THREE.Group>(null);
-  const videoTex = useVideoTextureSource(VIDEO_PATH);
+  const glowTex = useEmblemGlowTexture();
 
   useFrame((state) => {
     if (!groupRef.current) return;
@@ -413,9 +430,9 @@ function BigEmblem({
 
   return (
     <group ref={groupRef} position={[0, 7.2, 0]} scale={1.30} rotation={[0.5, Math.PI * 2 - 0.78, 0.04]}>
-      <ModelErrorBoundary fallback={<ProceduralBigEmblem videoTex={videoTex} />}>
-        <Suspense fallback={<ProceduralBigEmblem videoTex={videoTex} />}>
-          <GLBBigEmblem videoTex={videoTex} />
+      <ModelErrorBoundary fallback={<ProceduralBigEmblem glowTex={glowTex} />}>
+        <Suspense fallback={<ProceduralBigEmblem glowTex={glowTex} />}>
+          <GLBBigEmblem glowTex={glowTex} />
         </Suspense>
       </ModelErrorBoundary>
     </group>
@@ -515,6 +532,7 @@ export default function CreativeTransitionSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const mousePos = useRef({ x: 0, y: 0 });
   const scrollProgress = useRef(0);
+  const isTabVisible = useTabVisible();
 
   const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -527,7 +545,7 @@ export default function CreativeTransitionSection() {
     <section
       ref={sectionRef}
       onMouseMove={handleMouseMove}
-      className="relative z-[25] w-full min-h-[200vh] bg-black select-none -mt-[8.5vw] overflow-visible"
+      className="relative z-[25] w-full min-h-[220vh] bg-black select-none -mt-[8.5vw] overflow-visible"
       style={{
         clipPath: "polygon(0 8.5vw, 100% 0, 100% 100%, 0 100%)",
         WebkitClipPath: "polygon(0 8.5vw, 100% 0, 100% 100%, 0 100%)",
@@ -541,6 +559,7 @@ export default function CreativeTransitionSection() {
             camera={{ position: [0, 0, 4.4], fov: 38 }}
             dpr={[1, 1.5]}
             gl={{ antialias: false, powerPreference: "high-performance" }}
+            frameloop={isTabVisible ? "always" : "never"}
           >
             <Suspense fallback={null}>
               <Scene

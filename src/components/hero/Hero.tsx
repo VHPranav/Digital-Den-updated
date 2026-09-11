@@ -13,10 +13,7 @@ export default function Hero() {
       <div className="sticky top-0 h-screen w-full overflow-hidden">
         {/* 3D emblem + GPU particle field, unified in one scene */}
         <div className="absolute inset-0 z-0">
-          <HeroScene
-            triggerRef={sectionRef}
-            videoSrc="/videos/cyberpunk-nightcity.mp4"
-          />
+          <HeroScene triggerRef={sectionRef} />
         </div>
       </div>
     </section>

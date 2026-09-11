@@ -7,7 +7,7 @@ import { useGLTF, MeshTransmissionMaterial } from "@react-three/drei";
 import { useIntroTimeline } from "@/hooks/useIntroTimeline";
 
 export const EMBLEM_MODEL_PATH = "/models/emblem-opt.glb";
-export const DEFAULT_BOKEH_VIDEO_PATH = "/videos/cyberpunk-nightcity.mp4";
+export const EMBLEM_GLOW_VIDEO_PATH = "/videos/emblem-glow-nebula.mp4";
 
 /**
  * Glass properties for the outer refractive ring/housing.
@@ -26,38 +26,19 @@ const GLASS_PROPS = {
 } as const;
 
 /**
- * Generates or plays a high-velocity Cyberpunk Bokeh Video Texture.
- * - Loads `/videos/cyberpunk-nightcity.mp4` seamlessly with full autoplay/muted/loop flags.
- * - If the video is loading or unsupported, dynamically generates a 60fps procedural
- *   cyberpunk bokeh canvas (neon cyan, electric magenta, violet, and gold light disks)
- *   as a zero-downtime fallback.
+ * Generates the emblem's emissive glow texture.
+ * - Plays `/videos/emblem-glow-nebula.mp4` (a color-graded turquoise/violet nebula loop,
+ *   on-theme with the site's lavender/violet/turquoise palette) with full autoplay/muted/loop.
+ * - If the video is loading or blocked by autoplay policy, falls back to a procedural
+ *   canvas bokeh field in the same palette, so the emblem is never left without a glow.
  */
-function useCyberpunkBokehTexture(videoSrc: string = DEFAULT_BOKEH_VIDEO_PATH) {
+function useEmblemGlowTexture(videoSrc: string = EMBLEM_GLOW_VIDEO_PATH) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const textureRef = useRef<THREE.CanvasTexture | null>(null);
   const [videoTexture, setVideoTexture] = useState<THREE.VideoTexture | null>(null);
   const isVideoPlaying = useRef(false);
 
-  // 1. Procedural Cyberpunk Bokeh Particles Setup
-  const particles = useMemo(() => {
-    return Array.from({ length: 48 }, () => ({
-      x: Math.random() * 512,
-      y: Math.random() * 512,
-      radius: 10 + Math.random() * 34,
-      speedX: (Math.random() - 0.5) * 5.5,
-      speedY: -2.2 - Math.random() * 6.0, // Fast upward streak
-      color: [
-        "rgba(224, 212, 252, ", // Light Pastel Violet
-        "rgba(187, 157, 238, ", // Signature Lavender (#BB9DEE)
-        "rgba(168, 85, 247, ",  // Electric Orchid Purple (#A855F7)
-        "rgba(124, 58, 237, ",  // Deep Royal Amethyst (#7C3AED)
-      ][Math.floor(Math.random() * 4)],
-      alpha: 0.35 + Math.random() * 0.65,
-      pulseSpeed: 1.2 + Math.random() * 3.5,
-    }));
-  }, []);
-
-  // 2. HTML Video & Texture Creation
+  // HTML video & texture creation
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -85,9 +66,17 @@ function useCyberpunkBokehTexture(videoSrc: string = DEFAULT_BOKEH_VIDEO_PATH) {
     video.addEventListener("playing", onPlay);
     video.addEventListener("loadeddata", onPlay);
     video.play().catch(() => {
-      // Browser autoplay policy catch: fallback seamlessly to procedural canvas
+      // Browser autoplay policy catch: fall back seamlessly to the procedural canvas
       isVideoPlaying.current = false;
     });
+
+    // Stop decoding while the tab is backgrounded — pausing the R3F canvas frameloop
+    // alone doesn't stop the underlying <video> element's own background decode work.
+    const onVisibility = () => {
+      if (document.hidden) video.pause();
+      else video.play().catch(() => {});
+    };
+    document.addEventListener("visibilitychange", onVisibility);
 
     setVideoTexture(tex);
 
@@ -95,6 +84,7 @@ function useCyberpunkBokehTexture(videoSrc: string = DEFAULT_BOKEH_VIDEO_PATH) {
       isCancelled = true;
       video.removeEventListener("playing", onPlay);
       video.removeEventListener("loadeddata", onPlay);
+      document.removeEventListener("visibilitychange", onVisibility);
       video.pause();
       video.removeAttribute("src");
       video.load();
@@ -102,7 +92,29 @@ function useCyberpunkBokehTexture(videoSrc: string = DEFAULT_BOKEH_VIDEO_PATH) {
     };
   }, [videoSrc]);
 
-  // 3. Canvas texture initialization
+  // Procedural glow bokeh particles setup (autoplay-blocked fallback)
+  const particles = useMemo(() => {
+    return Array.from({ length: 48 }, () => ({
+      x: Math.random() * 512,
+      y: Math.random() * 512,
+      radius: 10 + Math.random() * 34,
+      speedX: (Math.random() - 0.5) * 5.5,
+      speedY: -2.2 - Math.random() * 6.0, // Fast upward streak
+      color:
+        Math.random() < 0.15
+          ? "rgba(0, 245, 212, " // Subtle Turquoise accent (#00F5D4)
+          : [
+              "rgba(224, 212, 252, ", // Light Pastel Violet
+              "rgba(187, 157, 238, ", // Signature Lavender (#BB9DEE)
+              "rgba(168, 85, 247, ",  // Electric Orchid Purple (#A855F7)
+              "rgba(124, 58, 237, ",  // Deep Royal Amethyst (#7C3AED)
+            ][Math.floor(Math.random() * 4)],
+      alpha: 0.35 + Math.random() * 0.65,
+      pulseSpeed: 1.2 + Math.random() * 3.5,
+    }));
+  }, []);
+
+  // Canvas texture initialization
   const canvasTexture = useMemo(() => {
     if (typeof window === "undefined") return null;
     const canvas = document.createElement("canvas");
@@ -119,7 +131,6 @@ function useCyberpunkBokehTexture(videoSrc: string = DEFAULT_BOKEH_VIDEO_PATH) {
     return tex;
   }, []);
 
-  // Frame tick: update canvas when video is not actively rendering
   useFrame((state) => {
     if (isVideoPlaying.current && videoTexture) {
       videoTexture.needsUpdate = true;
@@ -133,7 +144,7 @@ function useCyberpunkBokehTexture(videoSrc: string = DEFAULT_BOKEH_VIDEO_PATH) {
 
     const t = state.clock.elapsedTime;
 
-    // Dark cyberpunk backdrop with subtle motion trail fade
+    // Dark backdrop with subtle motion trail fade
     ctx.fillStyle = "rgba(4, 6, 12, 0.28)";
     ctx.fillRect(0, 0, 512, 512);
 
@@ -170,7 +181,7 @@ function useCyberpunkBokehTexture(videoSrc: string = DEFAULT_BOKEH_VIDEO_PATH) {
 
 /**
  * Computes planar UV projection mapped onto the XY bounds of the geometry
- * so the video texture displays without distortion.
+ * so the glow texture displays without distortion.
  */
 function applyPlanarUVs(geometry: THREE.BufferGeometry) {
   geometry.computeBoundingBox();
@@ -194,14 +205,11 @@ function applyPlanarUVs(geometry: THREE.BufferGeometry) {
   geometry.setAttribute("uv", uvAttribute);
 }
 
-/** Loads the real emblem.glb and renders with emissive video texture mapping. */
-export const Emblem = forwardRef<THREE.Group, { videoSrc?: string }>(function Emblem(
-  { videoSrc },
-  ref
-) {
+/** Loads the real emblem.glb and renders with emissive ambient glow texture mapping. */
+export const Emblem = forwardRef<THREE.Group>(function Emblem(_props, ref) {
   const innerRef = useRef<THREE.Group>(null);
   const { scene } = useGLTF(EMBLEM_MODEL_PATH);
-  const bokehTexture = useCyberpunkBokehTexture(videoSrc);
+  const bokehTexture = useEmblemGlowTexture();
 
   useIntroTimeline(innerRef);
 
@@ -242,7 +250,7 @@ useGLTF.preload(EMBLEM_MODEL_PATH);
 
 /**
  * Procedural stand-in for emblem.glb: an outer transmissive ring plus an extruded "a"
- * glyph with planar UV mapping and self-illuminating emissive video texture.
+ * glyph with planar UV mapping and self-illuminating emissive glow texture.
  */
 function buildPlaceholderGeometry() {
   const bowlOuterR = 0.5;
@@ -283,18 +291,18 @@ function buildPlaceholderGeometry() {
   return { ringGeometry, letterGeometry };
 }
 
-export const PlaceholderEmblem = forwardRef<THREE.Group, { videoSrc?: string }>(
-  function PlaceholderEmblem({ videoSrc }, ref) {
+export const PlaceholderEmblem = forwardRef<THREE.Group>(
+  function PlaceholderEmblem(_props, ref) {
     const innerRef = useRef<THREE.Group>(null);
     const { ringGeometry, letterGeometry } = useMemo(() => buildPlaceholderGeometry(), []);
-    const bokehTexture = useCyberpunkBokehTexture(videoSrc);
+    const bokehTexture = useEmblemGlowTexture();
 
     useIntroTimeline(innerRef);
 
     return (
       <group ref={ref}>
         <group ref={innerRef}>
-          {/* 1. Outer Glass Lens / Ring (Physically refracts the inner video glow) */}
+          {/* 1. Outer Glass Lens / Ring (Physically refracts the inner ambient glow) */}
           <mesh geometry={ringGeometry} rotation={[Math.PI / 2, 0, 0]} castShadow receiveShadow>
             <MeshTransmissionMaterial {...GLASS_PROPS} backside side={THREE.DoubleSide} />
           </mesh>

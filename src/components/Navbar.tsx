@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { createPortal } from 'react-dom';
@@ -87,9 +88,12 @@ export default function Navbar({ onOpenAction }: NavbarProps) {
                   }`}
               >
                 <Link href="/" className="flex items-center gap-3 group">
-                  <img
+                  <Image
                     src="/logoden.svg"
                     alt="Digital Den Logo"
+                    width={257}
+                    height={52}
+                    priority
                     className="h-6 sm:h-7 md:h-7 w-auto object-contain group-hover:scale-105 transition-transform duration-300"
                   />
                 </Link>
@@ -111,9 +115,11 @@ export default function Navbar({ onOpenAction }: NavbarProps) {
                     }`}
                 >
                   <Link href="/" className="flex items-center gap-2 group">
-                    <img
+                    <Image
                       src="/logoden.svg"
                       alt="Digital Den Logo"
+                      width={257}
+                      height={52}
                       className="h-6 w-auto object-contain group-hover:scale-105 transition-transform duration-300"
                     />
                   </Link>

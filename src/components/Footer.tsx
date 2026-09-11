@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import {
   MapPin,
@@ -64,9 +65,11 @@ export default function Footer() {
           {/* Column 1: Brand Info, Socials & Community Stats */}
           <div className="lg:col-span-4 space-y-6">
             <Link href="/" className="inline-flex items-center gap-3 group">
-              <img
+              <Image
                 src="/logoden.svg"
                 alt="Digital Den Logo"
+                width={257}
+                height={52}
                 className="h-8 w-auto object-contain brightness-0 invert opacity-95 group-hover:opacity-100 transition-opacity"
               />
             </Link>

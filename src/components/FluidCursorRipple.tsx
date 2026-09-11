@@ -20,9 +20,13 @@ export default function FluidCursorRipple() {
     const isMobile = typeof window !== 'undefined' && (window.innerWidth < 768 || /Mobi|Android/i.test(navigator.userAgent));
     const SIM_SIZE = isMobile ? 384 : 768; // 4x fewer texel updates on mobile
     const WAVE_SPEED = 1.42;
-    const DAMPING = 0.985;
+    // Faster decay (was 0.985) so ripples settle quickly instead of lingering/building up —
+    // reads as calmer and more premium rather than chaotic, per client feedback.
+    const DAMPING = 0.975;
     const BRUSH_RADIUS = isMobile ? 0.08 : 0.04;
-    const MAX_STRENGTH = 0.35;
+    // Reduced cap (was 0.35) — client asked for the mouse-driven movement to feel
+    // more subtle and premium rather than intense.
+    const MAX_STRENGTH = 0.2;
     const MOUSE_LERP = 0.18;
 
     const width = window.innerWidth;
@@ -142,6 +146,7 @@ export default function FluidCursorRipple() {
 
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
+      if (document.hidden) return; // skip the fluid sim (4 render passes/frame) while backgrounded
 
       const elapsed = clock.getElapsedTime();
       renderMaterial.uniforms.uTime.value = elapsed;
@@ -150,10 +155,12 @@ export default function FluidCursorRipple() {
       prevMouse.copy(mouse);
       mouse.lerp(targetMouse, MOUSE_LERP);
 
-      // Velocity-based force injection (faster cursor = stronger ripple)
+      // Velocity-based force injection (faster cursor = stronger ripple).
+      // Multiplier reduced from 3.5 — normal mouse movement now injects noticeably
+      // gentler force, matching the client's request for a more subtle, premium feel.
       velocity.subVectors(mouse, prevMouse);
       const speed = velocity.length();
-      const strength = Math.min(speed * 3.5, MAX_STRENGTH);
+      const strength = Math.min(speed * 2.2, MAX_STRENGTH);
       simMaterial.uniforms.uStrength.value = strength;
 
       // ── Multi-step simulation for better propagation distance ──

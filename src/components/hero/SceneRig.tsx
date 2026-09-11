@@ -11,14 +11,13 @@ import { useScrollTimeline, type ScrollState } from "@/hooks/useScrollTimeline";
 
 type SceneRigProps = {
   triggerRef: RefObject<HTMLElement | null>;
-  videoSrc?: string;
 };
 
 // Composition framing: centered in the viewport
 const RIG_SCALE = 0.65;
 const RIG_Y_OFFSET = 0.0;
 
-export function SceneRig({ triggerRef, videoSrc }: SceneRigProps) {
+export function SceneRig({ triggerRef }: SceneRigProps) {
   const rigGroupRef = useRef<THREE.Group>(null);
   const scrollState = useRef<ScrollState>({
     rotY: 0,
@@ -48,9 +47,9 @@ export function SceneRig({ triggerRef, videoSrc }: SceneRigProps) {
     <>
       <group ref={rigGroupRef} scale={RIG_SCALE} position={[0, RIG_Y_OFFSET, 0]}>
         <RimLights />
-        <ModelErrorBoundary fallback={<PlaceholderEmblem videoSrc={videoSrc} />}>
+        <ModelErrorBoundary fallback={<PlaceholderEmblem />}>
           <Suspense fallback={null}>
-            <Emblem videoSrc={videoSrc} />
+            <Emblem />
           </Suspense>
         </ModelErrorBoundary>
       </group>

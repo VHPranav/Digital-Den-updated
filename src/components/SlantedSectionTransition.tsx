@@ -47,6 +47,9 @@ export default function SlantedSectionTransition({
     };
 
     const updatePhysics = () => {
+      rafId = requestAnimationFrame(updatePhysics);
+      if (document.hidden) return; // skip while the tab is backgrounded
+
       // Smooth lerp velocity decay
       currentVel *= 0.88;
       if (Math.abs(currentVel) > 0.01) {
@@ -54,7 +57,6 @@ export default function SlantedSectionTransition({
       } else {
         setScrollVelocity(0);
       }
-      rafId = requestAnimationFrame(updatePhysics);
     };
 
     window.addEventListener('scroll', onScroll, { passive: true });

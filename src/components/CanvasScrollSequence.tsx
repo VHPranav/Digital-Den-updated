@@ -30,6 +30,7 @@ export default function CanvasScrollSequence({
   const [isInitialReady, setIsInitialReady] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [currentFrameIndex, setCurrentFrameIndex] = useState(0);
+  const [shouldLoad, setShouldLoad] = useState(false);
 
   // WebGL Active Theory Liquid Fluid Physics State Refs
   const webglStateRef = useRef<{
@@ -68,7 +69,28 @@ export default function CanvasScrollSequence({
     };
   }, [frameCount, getFramePath]);
 
+  // Defer the (heavy, 600-image / ~33MB) frame prefetch until this section is actually
+  // approaching the viewport, instead of racing the hero/models for bandwidth on every page load.
   useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShouldLoad(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '150% 0px' }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!shouldLoad) return;
+
     let isMounted = true;
     imagesRef.current = new Array(frameCount);
 
@@ -96,7 +118,7 @@ export default function CanvasScrollSequence({
     return () => {
       isMounted = false;
     };
-  }, [frameCount, loadSingleImage]);
+  }, [frameCount, loadSingleImage, shouldLoad]);
 
   // WebGL Active Theory Navier-Stokes Fluid Distortion Physics Setup
   useEffect(() => {

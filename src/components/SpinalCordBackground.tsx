@@ -115,7 +115,10 @@ void main() {
   vec3 baseCore = mix(cDarkObsidian, vColor, 0.35) + cDeepAmeth * (diff3 * 0.18);
   vec3 purpleSheen = cLavender * (diff1 * 0.28 + diff2 * 0.16);
   vec3 rim = cLavender * (fresnel * 0.60);
-  vec3 wetGlint = (cPastel * spec1 * 0.90 + cLavender * spec2 * 0.50) + cPastel * (specBroad * 0.25);
+  // Toned down from the original 0.90/0.50/0.25 weights — that intensity clipped a large
+  // fraction of the 95k particles to near-white at any given viewing/light angle, reading
+  // as "small white bubbles" instead of glinting coral beads.
+  vec3 wetGlint = (cPastel * spec1 * 0.55 + cLavender * spec2 * 0.32) + cPastel * (specBroad * 0.14);
 
   vec3 finalColor = baseCore + purpleSheen + rim + wetGlint;
   float edgeAlpha = smoothstep(0.5, 0.28, dist);
@@ -153,7 +156,7 @@ export default function SpinalCordBackground({
       0.1,
       100,
     );
-    camera.position.set(0, 0, 19.0); // Zoomed out for smaller, comfortable spine sizing
+    camera.position.set(0, 0, 23.0); // Pulled back further to offset the denser-looking spine after the particle count reduction
 
     const renderer = new THREE.WebGLRenderer({
       canvas,
@@ -171,9 +174,9 @@ export default function SpinalCordBackground({
     composer.addPass(new RenderPass(scene, camera));
     const bloomPass = new UnrealBloomPass(
       new THREE.Vector2(canvas.clientWidth, canvas.clientHeight),
-      0.09, // strength — subtle, elegant soft halo
+      0.07, // strength — subtle, elegant soft halo (reduced so fewer specular hotspots bloom into visible glow bubbles)
       0.5,  // radius
-      0.88, // threshold
+      0.93, // threshold — only the very brightest highlights bloom now
     );
     composer.addPass(bloomPass);
     const outputPass = new OutputPass();
@@ -408,13 +411,14 @@ export default function SpinalCordBackground({
         bbox.getSize(size);
         bbox.getCenter(center);
 
-        const targetHeight = 36.0;
+        const targetHeight = 44.0;
         const scaleFactor = size.y > 0 ? targetHeight / size.y : 1.0;
         model.scale.setScalar(scaleFactor);
 
         model.position.x = -center.x * scaleFactor;
         model.position.z = -center.z * scaleFactor;
-        model.position.y = 5.0 - (bbox.max.y * scaleFactor);
+        // Position top of spinal cord well above viewport top (viewport top is ~9.5, spine top is 14.5)
+        model.position.y = 14.5 - (bbox.max.y * scaleFactor);
 
         model.traverse((child) => {
           if ((child as THREE.Mesh).isMesh) {
@@ -452,7 +456,7 @@ export default function SpinalCordBackground({
     );
 
     /* ─── Generate Dense Volumetric Floral / Nebula Particle Clusters (Sticky to Spine) ─── */
-    const TOTAL_PARTICLES = 95000;
+    const TOTAL_PARTICLES = 50000; // further reduced density per client feedback
     const NUM_COLONIES = 14;
 
     /* ─── Volumetric Sticky Particle Cluster Colonies (Toggled by enableParticles) ─── */
@@ -489,7 +493,7 @@ export default function SpinalCordBackground({
       for (let k = 0; k < NUM_COLONIES; k++) {
         // Stagger colonies down the spine height
         const t = k / (NUM_COLONIES - 1);
-        const y = 5.5 - t * 36.0 + (Math.sin(k * 2.7) * 1.2);
+        const y = 14.5 - t * 44.0 + (Math.sin(k * 2.7) * 1.2);
 
         // Organic spiral distribution hugging vertebrae with expansive radial reach
         const angle = k * 1.45 + Math.sin(k * 2.3) * 0.7;
@@ -700,6 +704,8 @@ export default function SpinalCordBackground({
 
     function animate() {
       rafId = requestAnimationFrame(animate);
+      if (document.hidden) return; // skip rendering while the tab is backgrounded
+
       const time = clock.getElapsedTime();
 
       // Velocity decay

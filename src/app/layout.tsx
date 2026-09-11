@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
+import { Plus_Jakarta_Sans, Syne, Space_Mono } from "next/font/google";
 import SmoothScroll from "@/components/SmoothScroll";
 import PageTransitionProvider from "@/components/PageTransitionProvider";
 import FluidCursorRipple from "@/components/FluidCursorRipple";
@@ -11,6 +11,18 @@ const plusJakarta = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta",
 });
 
+const syne = Syne({
+  subsets: ["latin"],
+  weight: ["700", "800"],
+  variable: "--font-syne",
+});
+
+const spaceMono = Space_Mono({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  variable: "--font-space-mono",
+});
+
 export const metadata: Metadata = {
   title: "Digital Den",
   description: "Digital Den",
@@ -20,7 +32,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${plusJakarta.className} ${plusJakarta.variable} h-full antialiased`}
+      className={`${plusJakarta.className} ${plusJakarta.variable} ${syne.variable} ${spaceMono.variable} h-full antialiased`}
     >
       <head>
         <link
