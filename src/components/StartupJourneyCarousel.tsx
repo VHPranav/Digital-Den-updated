@@ -60,12 +60,12 @@ function CardVideo({ src, isActive }: { src: string; isActive: boolean }) {
 
 /* ─── 6 Journey Orbit Cards (Dark Pillars & Sci-Fi Neon Loops) ─── */
 const journeyCards = [
-  { step: '01', title: 'PROMETHEUS', videoUrl: '/videos/sci-loop-1.mp4', accentColor: '#00F5D4' },
-  { step: '02', title: 'RUB THE HUB', videoUrl: '/videos/sci-loop-2.mp4', accentColor: '#C084FC' },
-  { step: '03', title: 'GLOBAL CONNECTIONS', videoUrl: '/videos/sci-loop-3.mp4', accentColor: '#38BDF8' },
-  { step: '04', title: 'PORTFOLIO HIGHLIGHTS', videoUrl: '/videos/sci-alt-1.mp4', accentColor: '#2DD4BF' },
-  { step: '05', title: 'STRATEGIC ALLIANCES', videoUrl: '/videos/sci-alt-3.mp4', accentColor: '#BB9DEE' },
-  { step: '06', title: 'READY TO SCALE?', videoUrl: '/videos/sci-loop-6.mp4', accentColor: '#00F5D4' },
+  { step: '01', title: 'INCEPTION', videoUrl: '/videos/card-v1.mp4', accentColor: '#00F5D4' },
+  { step: '02', title: 'THE INCUBATOR', videoUrl: '/videos/card-v2.mp4', accentColor: '#C084FC' },
+  { step: '03', title: 'GLOBAL SYNDICATE', videoUrl: '/videos/card-v3.mp4', accentColor: '#38BDF8' },
+  { step: '04', title: 'BREAKTHROUGH LABS', videoUrl: '/videos/card-v4.mp4', accentColor: '#2DD4BF' },
+  { step: '05', title: 'STRATEGIC CAPITAL', videoUrl: '/videos/card-v5.mp4', accentColor: '#BB9DEE' },
+  { step: '06', title: 'HYPER-SCALE', videoUrl: '/videos/card-v6.mp4', accentColor: '#00F5D4' },
 ];
 
 const TOTAL_CARDS = journeyCards.length;
@@ -300,15 +300,15 @@ export default function StartupJourneyCarousel() {
                     'inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.3), inset 0 -1.5px 2px 0 rgba(0, 0, 0, 0.6), 0 20px 50px -10px rgba(0, 0, 0, 0.8)',
                 }}
               >
-                {/* ── 1. Low-Opacity Sci-Fi Motion Video Overlay (Matching AA VFX Dark Pillars) ── */}
+                {/* ── 1. Sci-Fi Motion Video Overlay (Vivid Glass Refraction) ── */}
                 <div
                   style={{
                     position: 'absolute',
                     inset: 0,
                     zIndex: 1,
-                    opacity: 0.20,
+                    opacity: 0.45,
                     mixBlendMode: 'screen',
-                    filter: 'contrast(1.15) brightness(1.05)',
+                    filter: 'contrast(1.2) brightness(1.1)',
                     pointerEvents: 'none',
                     overflow: 'hidden',
                   }}

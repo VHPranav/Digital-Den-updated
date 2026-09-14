@@ -43,3 +43,6 @@ next-env.d.ts
 # unoptimized source GLBs — only the -opt versions are loaded at runtime
 /public/models/*.glb
 !/public/models/*-opt.glb
+
+# uncompressed source videos
+/public/videos/cardsvideos/
