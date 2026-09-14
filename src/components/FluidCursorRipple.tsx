@@ -24,9 +24,9 @@ export default function FluidCursorRipple() {
 
     // ─── Configuration ──────────────────────────────────────────────
     const isMobile = typeof window !== 'undefined' && (window.innerWidth < 768 || /Mobi|Android/i.test(navigator.userAgent));
-    // Halved again from the previous pass (768/384) — this is a soft, blurred
-    // ripple, not a detail surface, so the resolution drop is not perceptible.
-    const SIM_SIZE = isMobile ? 256 : 512;
+    // Trimmed a bit further (was 320/160) — this is a soft, blurred ripple,
+    // not a detail surface, so the resolution drop is not perceptible.
+    const SIM_SIZE = isMobile ? 128 : 256;
     const WAVE_SPEED = 1.42;
     // Faster decay (was 0.985) so ripples settle quickly instead of lingering/building up —
     // reads as calmer and more premium rather than chaotic, per client feedback.
@@ -47,9 +47,9 @@ export default function FluidCursorRipple() {
       powerPreference: 'high-performance',
     });
     // The final composite pass is a full-viewport shader, so DPR directly
-    // multiplies its fragment cost — 1.5 is visually indistinguishable from 2
-    // for a soft ripple but is ~44% fewer fragments on a retina display.
-    renderer.setPixelRatio(isMobile ? 1.0 : Math.min(window.devicePixelRatio, 1.5));
+    // multiplies its fragment cost — trimmed again (was 1.5) for another cut
+    // to the most expensive pass, still soft enough not to look pixelated.
+    renderer.setPixelRatio(isMobile ? 1.0 : Math.min(window.devicePixelRatio, 1.25));
     renderer.setSize(width, height);
     renderer.setClearColor(0x000000, 0);
     container.appendChild(renderer.domElement);

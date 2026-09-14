@@ -33,8 +33,9 @@ export default function Home() {
       {/* Floating Navigation Bar */}
       <Navbar onOpenAction={handleOpenAction} />
 
-      {/* Floating Skip Intro Button (Skips the opening intro sections) */}
-      <SkipIntroButton targetId="main-content" />
+      {/* Floating Skip Intro Button (Skips the opening intro sections, landing
+          centered on the "Venturing Beyond Borders" gateway content) */}
+      <SkipIntroButton targetId="hero-gateway-section" />
 
       {/* ─── 1. 3D EMBLEM HERO (our own build — first thing shown) ─── */}
       <div className="relative z-20 w-full bg-black">

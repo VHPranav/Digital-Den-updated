@@ -6,7 +6,11 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { GPUComputationRenderer, type Variable } from "three/examples/jsm/misc/GPUComputationRenderer.js";
 import type { ScrollState } from "@/hooks/useScrollTimeline";
 
-const SIM_SIZE = 96;
+// Reduced from 96 (9216 particles) — a denser field read as busy/cluttered
+// rather than premium; this keeps the effect present without overwhelming
+// the emblem, and is a solid GPU-compute win as a side effect (particle
+// count scales with the square of this value).
+const SIM_SIZE = 64;
 const PARTICLE_COUNT = SIM_SIZE * SIM_SIZE;
 
 // Fraction of scroll progress over which particles finish revealing / spreading out
@@ -18,11 +22,11 @@ const SPREAD_MAX = 3.6;
 // frame isn't completely empty (matches the reference's sparse-but-present start)
 const AMBIENT_REVEAL_FLOOR = 0.06;
 
-// From 50% scroll, spawning fans out from one central column into multiple
-// emitter points spread across the full viewport width (emitter count itself
-// is a GLSL-side const in the shader below)
-const EMITTER_SPREAD_START = 0.5;
-const EMITTER_SPREAD_END = 0.65;
+// Spawning fans out across multiple emitter points spread across the full
+// viewport width from the very start (emitter count itself is a GLSL-side
+// const in the shader below), instead of a single central column that only
+// widens later — bubbles rise from across the whole bottom of the viewport
+// throughout the section.
 
 // Past this point the emblem is pinned (see PIN_AT in useScrollTimeline) and the
 // field surges upward to visually submerge it instead of the emblem moving away
@@ -299,7 +303,7 @@ export function ParticleField({ scrollState, attractorPosition }: ParticleFieldP
       uEmblemPos: { value: new THREE.Vector3(0, 0, 0) },
       uReveal: { value: 0 },
       uSpread: { value: SPREAD_MIN },
-      uEmitterSpread: { value: 0 },
+      uEmitterSpread: { value: 1 },
       uViewportHalfWidth: { value: 4.0 },
       uSubmergeLevel: { value: 0 },
       uMouseActive: { value: 0 },
@@ -377,11 +381,6 @@ export function ParticleField({ scrollState, attractorPosition }: ParticleFieldP
     uniforms.uReveal.value = THREE.MathUtils.lerp(AMBIENT_REVEAL_FLOOR, 1, revealRamp);
     uniforms.uSpread.value = THREE.MathUtils.lerp(SPREAD_MIN, SPREAD_MAX, Math.min(progress / SPREAD_RANGE, 1));
 
-    uniforms.uEmitterSpread.value = THREE.MathUtils.clamp(
-      (progress - EMITTER_SPREAD_START) / (EMITTER_SPREAD_END - EMITTER_SPREAD_START),
-      0,
-      1
-    );
     uniforms.uSubmergeLevel.value = THREE.MathUtils.clamp((progress - SUBMERGE_START) / (1 - SUBMERGE_START), 0, 1);
     material.uniforms.uSubmergeLevel.value = uniforms.uSubmergeLevel.value;
 

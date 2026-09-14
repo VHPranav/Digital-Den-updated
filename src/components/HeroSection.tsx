@@ -107,6 +107,7 @@ export default function HeroSection({ onOpenAction }: HeroSectionProps) {
   return (
     <section
       ref={sectionRef}
+      id="hero-gateway-section"
       className="relative z-10 min-h-screen flex flex-col justify-center items-center py-16 sm:py-24 px-4 sm:px-8 lg:px-16 max-w-6xl mx-auto w-full pointer-events-auto text-center overflow-visible"
     >
       {/* Top Black Gradient Overlay (Disabled for now) */}

@@ -35,7 +35,10 @@ export default function SkipIntroButton({
   const handleSkip = () => {
     const targetEl = document.getElementById(targetId);
     if (targetEl) {
-      targetEl.scrollIntoView({ behavior: 'smooth' });
+      // Center the target vertically in the viewport (rather than the default
+      // "align to top") — this section's content is meant to be read centered,
+      // not pinned to the top edge.
+      targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   };
 

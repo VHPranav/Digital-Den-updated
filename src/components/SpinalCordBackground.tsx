@@ -156,7 +156,7 @@ export default function SpinalCordBackground({
       0.1,
       100,
     );
-    camera.position.set(0, 0, 23.0); // Pulled back further to offset the denser-looking spine after the particle count reduction
+    camera.position.set(0, 0, 26.0); // Pulled back a bit further for a slightly wider, less cropped view of the spine
 
     const renderer = new THREE.WebGLRenderer({
       canvas,
