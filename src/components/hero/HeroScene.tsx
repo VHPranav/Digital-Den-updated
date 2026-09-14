@@ -5,6 +5,7 @@ import { Canvas } from "@react-three/fiber";
 import { EffectComposer, Bloom, Noise } from "@react-three/postprocessing";
 import { SceneRig } from "./SceneRig";
 import { useTabVisible } from "@/hooks/useTabVisible";
+import { useInViewport } from "@/hooks/useInViewport";
 
 export default function HeroScene({
   triggerRef,
@@ -12,6 +13,7 @@ export default function HeroScene({
   triggerRef: RefObject<HTMLElement | null>;
 }) {
   const isTabVisible = useTabVisible();
+  const isInViewport = useInViewport(triggerRef);
 
   return (
     <Canvas
@@ -19,7 +21,7 @@ export default function HeroScene({
       dpr={[1, 1.5]}
       gl={{ antialias: false, powerPreference: "high-performance" }}
       camera={{ position: [0, 0.3, 8.5], fov: 32 }}
-      frameloop={isTabVisible ? "always" : "never"}
+      frameloop={isTabVisible && isInViewport ? "always" : "never"}
     >
       <color attach="background" args={["#000000"]} />
       <SceneRig triggerRef={triggerRef} />

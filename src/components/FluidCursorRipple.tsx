@@ -16,9 +16,17 @@ export default function FluidCursorRipple() {
     const container = containerRef.current;
     if (!container) return;
 
+    // Skip the effect entirely for users who've asked for reduced motion —
+    // also a free performance win since nothing mounts at all.
+    if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return;
+    }
+
     // ─── Configuration ──────────────────────────────────────────────
     const isMobile = typeof window !== 'undefined' && (window.innerWidth < 768 || /Mobi|Android/i.test(navigator.userAgent));
-    const SIM_SIZE = isMobile ? 384 : 768; // 4x fewer texel updates on mobile
+    // Halved again from the previous pass (768/384) — this is a soft, blurred
+    // ripple, not a detail surface, so the resolution drop is not perceptible.
+    const SIM_SIZE = isMobile ? 256 : 512;
     const WAVE_SPEED = 1.42;
     // Faster decay (was 0.985) so ripples settle quickly instead of lingering/building up —
     // reads as calmer and more premium rather than chaotic, per client feedback.
@@ -38,7 +46,10 @@ export default function FluidCursorRipple() {
       antialias: false,
       powerPreference: 'high-performance',
     });
-    renderer.setPixelRatio(isMobile ? 1.0 : Math.min(window.devicePixelRatio, 2));
+    // The final composite pass is a full-viewport shader, so DPR directly
+    // multiplies its fragment cost — 1.5 is visually indistinguishable from 2
+    // for a soft ripple but is ~44% fewer fragments on a retina display.
+    renderer.setPixelRatio(isMobile ? 1.0 : Math.min(window.devicePixelRatio, 1.5));
     renderer.setSize(width, height);
     renderer.setClearColor(0x000000, 0);
     container.appendChild(renderer.domElement);
@@ -50,11 +61,14 @@ export default function FluidCursorRipple() {
     const planeGeo = new THREE.PlaneGeometry(2, 2);
 
     // ─── Render Targets (ping-pong) ─────────────────────────────────
+    // Only .r/.g are ever read (see waveSimulationShader) — half-float has
+    // ample precision for a damped height field and halves texture bandwidth
+    // versus the previous full FloatType targets.
     const rtOptions: THREE.RenderTargetOptions = {
       minFilter: THREE.LinearFilter,
       magFilter: THREE.LinearFilter,
       format: THREE.RGBAFormat,
-      type: THREE.FloatType,
+      type: THREE.HalfFloatType,
       wrapS: THREE.ClampToEdgeWrapping,
       wrapT: THREE.ClampToEdgeWrapping,
     };
@@ -107,12 +121,17 @@ export default function FluidCursorRipple() {
 
     // ─── Input Tracking ─────────────────────────────────────────────
     let isInteracting = false;
+    let lastMoveTime = performance.now();
+    // Wave amplitude decays ~7.5%/frame (DAMPING^SIM_STEPS_PER_FRAME) — fully
+    // settled well within 2s of the last input, so the sim can idle after that.
+    const IDLE_TIMEOUT_MS = 2000;
 
     const updateMousePos = (clientX: number, clientY: number) => {
       const nx = clientX / window.innerWidth;
       const ny = 1.0 - clientY / window.innerHeight;
       prevTargetMouse.copy(targetMouse);
       targetMouse.set(nx, ny);
+      lastMoveTime = performance.now();
       if (!isInteracting) {
         mouse.copy(targetMouse);
         prevMouse.copy(targetMouse);
@@ -141,12 +160,31 @@ export default function FluidCursorRipple() {
     let animationFrameId: number;
     const clock = new THREE.Clock();
 
-    // Run multiple simulation steps per frame for faster wave propagation
-    const SIM_STEPS_PER_FRAME = 3;
+    // Run multiple simulation steps per frame for faster wave propagation.
+    // Reduced from 3 — at the smaller SIM_SIZE above, 2 steps still propagates
+    // fast enough to feel responsive while cutting a third of the sim passes.
+    const SIM_STEPS_PER_FRAME = 2;
+
+    let wasIdle = false;
 
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
       if (document.hidden) return; // skip the fluid sim (4 render passes/frame) while backgrounded
+
+      // Once the ripple has fully damped and the cursor has been still for a
+      // while (e.g. the user is just scrolling), skip the 4 GPU render passes
+      // entirely instead of simulating a flat, invisible ripple every frame.
+      const idle = performance.now() - lastMoveTime > IDLE_TIMEOUT_MS;
+      if (idle) {
+        if (!wasIdle) {
+          // One last render to settle on a fully-decayed frame before pausing.
+          wasIdle = true;
+        } else {
+          return;
+        }
+      } else {
+        wasIdle = false;
+      }
 
       const elapsed = clock.getElapsedTime();
       renderMaterial.uniforms.uTime.value = elapsed;

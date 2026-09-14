@@ -401,9 +401,13 @@ export default function SpinalCordBackground({
     dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
     gltfLoader.setDRACOLoader(dracoLoader);
 
+    let isUnmounted = false;
+    let loadedSpineModel: THREE.Group | null = null;
+
     gltfLoader.load(
       '/models/spinenw-opt.glb',
       (gltf) => {
+        if (isUnmounted) return; // component unmounted before load resolved
         const model = gltf.scene;
         const bbox = new THREE.Box3().setFromObject(model);
         const size = new THREE.Vector3();
@@ -447,6 +451,7 @@ export default function SpinalCordBackground({
           }
         });
 
+        loadedSpineModel = model;
         spineMasterGroup.add(model);
       },
       undefined,
@@ -698,13 +703,24 @@ export default function SpinalCordBackground({
     };
     window.addEventListener('scroll', onScrollVel, { passive: true });
 
+    /* Pause the whole render loop once the carousel scrolls off-screen —
+       this scene otherwise keeps rendering 50k particles + bloom forever. */
+    let isInViewport = true;
+    const viewportObserver = new IntersectionObserver(
+      ([entry]) => {
+        isInViewport = entry.isIntersecting;
+      },
+      { rootMargin: '50% 0px 50% 0px' },
+    );
+    viewportObserver.observe(canvas);
+
     /* ─── Animation Loop ─── */
     const clock = new THREE.Clock();
     let rafId = 0;
 
     function animate() {
       rafId = requestAnimationFrame(animate);
-      if (document.hidden) return; // skip rendering while the tab is backgrounded
+      if (document.hidden || !isInViewport) return; // skip rendering while backgrounded or off-screen
 
       const time = clock.getElapsedTime();
 
@@ -783,7 +799,9 @@ export default function SpinalCordBackground({
     animate();
 
     return () => {
+      isUnmounted = true;
       cancelAnimationFrame(rafId);
+      viewportObserver.disconnect();
       window.removeEventListener('resize', onResize);
       window.removeEventListener('scroll', onScrollVel);
       window.removeEventListener('mousemove', onPointerMove);
@@ -794,6 +812,17 @@ export default function SpinalCordBackground({
       vertebraMaterial.dispose();
       if (clusterGeometry) clusterGeometry.dispose();
       if (clusterMaterial) clusterMaterial.dispose();
+      if (loadedSpineModel) {
+        loadedSpineModel.traverse((child) => {
+          const mesh = child as THREE.Mesh;
+          if (mesh.isMesh) {
+            mesh.geometry?.dispose();
+            const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+            mats.forEach((mat) => mat?.dispose());
+          }
+        });
+      }
+      dracoLoader.dispose();
     };
   }, []);
 

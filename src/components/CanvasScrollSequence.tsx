@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import * as THREE from 'three';
 import { ArrowRight, Calendar, MapPin, Building2, Sparkles } from 'lucide-react';
 
@@ -22,6 +22,12 @@ export default function CanvasScrollSequence({
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imagesRef = useRef<HTMLImageElement[]>([]);
+  const loadingSetRef = useRef<Set<number>>(new Set());
+  // Wherever the user currently is in the sequence — the background loader
+  // keeps re-centering on this so a fast or deep scroll always pulls the
+  // frames actually needed to the front of the queue instead of blindly
+  // continuing a front-to-back fill.
+  const priorityFrameRef = useRef(0);
   const currentFrameRef = useRef<number>(0);
   const animationFrameIdRef = useRef<number | null>(null);
   const idleAnimIdRef = useRef<number | null>(null);
@@ -41,10 +47,14 @@ export default function CanvasScrollSequence({
     texture: THREE.Texture;
   } | null>(null);
 
-  // Helper to get frame path
+  // Helper to get frame path — WebP (q80) instead of the original JPGs: ~58%
+  // smaller (33MB -> 13.4MB total across all 600 frames), so the sequence
+  // finishes downloading/decoding far sooner and is less likely to still be
+  // loading by the time the user scrolls to a given frame. Originals are kept
+  // in public/frames/*.jpg as a backup, unreferenced by the app.
   const getFramePath = useCallback((index: number) => {
     const frameNum = String(index + 1).padStart(3, '0');
-    return `/frames/ezgif-frame-${frameNum}.jpg`;
+    return `/frames/ezgif-frame-${frameNum}.webp`;
   }, []);
 
   // Preload Images with High-Speed Concurrent Pool & Priority Fetching
@@ -54,19 +64,54 @@ export default function CanvasScrollSequence({
       if (onDone) onDone();
       return;
     }
+    if (loadingSetRef.current.has(index)) {
+      // Already being fetched (by the background queue or a prior on-demand
+      // call) — don't spawn a duplicate request for the same frame, which
+      // otherwise happens repeatedly while scrolling through an unloaded
+      // region and starves the frames actually queued up next.
+      return;
+    }
+    loadingSetRef.current.add(index);
     const img = new Image();
     img.decoding = 'async';
     img.src = getFramePath(index);
-    img.onload = () => {
+
+    const markReady = () => {
+      loadingSetRef.current.delete(index);
       imagesRef.current[index] = img;
       setImagesLoadedCount((prev) => prev + 1);
       if (index < 5) setIsInitialReady(true);
       if (onDone) onDone();
     };
-    img.onerror = () => {
+    const markFailed = () => {
+      loadingSetRef.current.delete(index);
       setImagesLoadedCount((prev) => prev + 1);
       if (onDone) onDone();
     };
+
+    // `onload`/`img.complete` only guarantee the bytes finished downloading —
+    // NOT that the browser has finished decoding pixels, especially with
+    // `decoding="async"`. Grabbing the image as a WebGL texture source in
+    // that gap is exactly what produces a corrupted/half-rendered frame.
+    // `decode()` resolves only once the image is truly safe to paint, so
+    // frames are never marked ready (and never handed to the GPU) until
+    // decode has actually finished.
+    if (typeof img.decode === 'function') {
+      img.decode().then(markReady).catch(() => {
+        // decode() can reject on a network error, or in rare cases on some
+        // browsers even for an image that did finish loading — fall back to
+        // the load event rather than dropping the frame outright.
+        if (img.complete && img.naturalWidth > 0) {
+          markReady();
+        } else {
+          markFailed();
+        }
+      });
+    } else {
+      // Old-browser fallback where HTMLImageElement.decode() is unavailable.
+      img.onload = markReady;
+      img.onerror = markFailed;
+    }
   }, [frameCount, getFramePath]);
 
   // Defer the (heavy, 600-image / ~33MB) frame prefetch until this section is actually
@@ -99,14 +144,34 @@ export default function CanvasScrollSequence({
       loadSingleImage(i);
     }
 
-    // 2. High-speed concurrent worker queue (16 concurrent connections) to load all 600 frames rapidly
+    // 2. High-speed concurrent worker pool (16 connections) — but instead of a
+    // blind front-to-back fill, each worker always grabs whichever unloaded
+    // frame is CLOSEST to the user's current scroll position. That way a fast
+    // or deep scroll re-centers the whole queue immediately, so the frames
+    // about to be needed are always what's loading next — not whatever was
+    // next in line from a linear scan that may be hundreds of frames behind.
     const CONCURRENCY = 16;
-    let nextIdx = 12;
+
+    const findNextPriorityIndex = (): number => {
+      const center = priorityFrameRef.current;
+      for (let offset = 0; offset < frameCount; offset++) {
+        const forward = center + offset;
+        if (forward < frameCount && !imagesRef.current[forward] && !loadingSetRef.current.has(forward)) {
+          return forward;
+        }
+        const backward = center - offset;
+        if (offset > 0 && backward >= 0 && !imagesRef.current[backward] && !loadingSetRef.current.has(backward)) {
+          return backward;
+        }
+      }
+      return -1;
+    };
 
     const worker = () => {
-      if (!isMounted || nextIdx >= frameCount) return;
-      const current = nextIdx++;
-      loadSingleImage(current, () => {
+      if (!isMounted) return;
+      const nextIdx = findNextPriorityIndex();
+      if (nextIdx === -1) return; // everything loaded (or already in flight)
+      loadSingleImage(nextIdx, () => {
         if (isMounted) worker();
       });
     };
@@ -205,8 +270,37 @@ export default function CanvasScrollSequence({
 
     window.addEventListener('resize', handleResize);
 
+    // ─── WebGL Context Loss Recovery ─────────────────────────────────
+    // With several always-mounted WebGL scenes elsewhere on the page (Hero,
+    // CreativeTransitionSection, the spine carousel) holding GPU memory for
+    // their full lifetime — pausing their render loop when off-screen frees
+    // no GPU memory — total GPU usage keeps climbing as the user scrolls, and
+    // can peak by the time they reach this section. Under that pressure the
+    // browser can forcibly evict ("lose") a WebGL context to reclaim memory.
+    // Without handling it, this canvas would stay corrupted/blank forever
+    // after that point. `preventDefault()` on the loss event is required for
+    // the browser to attempt restoration at all.
+    const handleContextLost = (event: Event) => {
+      event.preventDefault();
+      console.warn('CanvasScrollSequence: WebGL context lost — will recover on restore.');
+    };
+    const handleContextRestored = () => {
+      console.warn('CanvasScrollSequence: WebGL context restored — re-uploading current frame.');
+      const img = imagesRef.current[currentFrameRef.current];
+      if (img && img.complete && img.naturalWidth > 0) {
+        texture.image = img;
+        texture.needsUpdate = true;
+        displayMat.uniforms.uImageResolution.value.set(img.naturalWidth, img.naturalHeight);
+      }
+      renderer.render(displayScene, orthoCam);
+    };
+    canvas.addEventListener('webglcontextlost', handleContextLost, false);
+    canvas.addEventListener('webglcontextrestored', handleContextRestored, false);
+
     return () => {
       window.removeEventListener('resize', handleResize);
+      canvas.removeEventListener('webglcontextlost', handleContextLost);
+      canvas.removeEventListener('webglcontextrestored', handleContextRestored);
       quadGeo.dispose();
       displayMat.dispose();
       texture.dispose();
@@ -267,7 +361,7 @@ export default function CanvasScrollSequence({
 
   // Handle Window Scroll
   useEffect(() => {
-    const handleScroll = () => {
+    const computeScrollState = () => {
       if (!containerRef.current) return;
       const rect = containerRef.current.getBoundingClientRect();
       const totalScrollableHeight = rect.height - window.innerHeight;
@@ -282,6 +376,10 @@ export default function CanvasScrollSequence({
 
       setScrollProgress(progress);
       setCurrentFrameIndex(targetFrame);
+      // Re-center the background loader on wherever the user actually is,
+      // every scroll tick — not just when the drawn frame changes — so a
+      // fast fling immediately reprioritizes the frames now needed.
+      priorityFrameRef.current = targetFrame;
 
       if (targetFrame !== currentFrameRef.current) {
         currentFrameRef.current = targetFrame;
@@ -293,9 +391,22 @@ export default function CanvasScrollSequence({
       }
     };
 
+    // Coalesce bursts of scroll/resize events (e.g. fast trackpad input can fire
+    // several per animation frame) into a single getBoundingClientRect() read
+    // per frame instead of one per event — same computed values, less layout work.
+    let ticking = false;
+    const handleScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        ticking = false;
+        computeScrollState();
+      });
+    };
+
     window.addEventListener('scroll', handleScroll, { passive: true });
     window.addEventListener('resize', handleScroll);
-    handleScroll();
+    computeScrollState();
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
@@ -327,6 +438,16 @@ export default function CanvasScrollSequence({
   // Position mode: fixed while in scroll sequence, absolute bottom-0 only when reaching 0.99
   const isPastSequence = scrollProgress >= 0.99;
   const positionClass = isPastSequence ? 'absolute bottom-0 left-0 w-full h-screen' : 'fixed top-0 left-0 w-full h-screen';
+
+  // The page sections rendered here (Hero/Mission/Venture/FourPillars) are heavy,
+  // and don't need to re-render on every pixel of scroll — only re-invoke the
+  // render prop when the discrete frame index moves, not on every scrollProgress
+  // tick (which otherwise re-renders this whole subtree dozens of times/sec).
+  const renderedChildren = useMemo(
+    () => children?.(scrollProgress, currentFrameIndex),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [children, currentFrameIndex],
+  );
 
   return (
     <div ref={containerRef} className={`relative w-full ${containerHeight}`}>
@@ -470,7 +591,7 @@ export default function CanvasScrollSequence({
 
       {/* Render webpage content sections directly over the canvas */}
       <div className="relative z-10 w-full">
-        {children && children(scrollProgress, currentFrameIndex)}
+        {renderedChildren}
       </div>
     </div>
   );

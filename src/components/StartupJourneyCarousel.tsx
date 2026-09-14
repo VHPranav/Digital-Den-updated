@@ -90,7 +90,7 @@ export default function StartupJourneyCarousel() {
     let rafId = 0;
 
     /* ── Read scroll position ── */
-    const onScroll = () => {
+    const computeScrollTargets = () => {
       const el = sectionRef.current;
       if (!el) return;
       const rect = el.getBoundingClientRect();
@@ -117,6 +117,19 @@ export default function StartupJourneyCarousel() {
           Math.max(0, (cardScrolled / cardScrollable) * (TOTAL_CARDS - 1))
         );
       }
+    };
+
+    // Coalesce bursts of scroll events (fast trackpad/wheel input can fire several
+    // per animation frame) into one getBoundingClientRect() read per frame — the
+    // per-frame tick() below already reads these refs at most once per frame anyway.
+    let scrollTicking = false;
+    const onScroll = () => {
+      if (scrollTicking) return;
+      scrollTicking = true;
+      requestAnimationFrame(() => {
+        scrollTicking = false;
+        computeScrollTargets();
+      });
     };
 
     /* ── Animation ticker (60-120 fps butter-smooth DOM updates without React re-renders) ── */

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 /**
  * ViewportBlur
@@ -8,43 +8,66 @@ import React, { useEffect, useState } from 'react';
  * It creates a gradual, organic progressive blur & dark fade transition at both edges of the screen,
  * making content scroll smoothly into a gorgeous blurred fade-out from the frames section down to the footer.
  */
+const HIDE_DELAY_MS = 700; // matches the opacity transition duration below
+
 export default function ViewportBlur() {
   const [isVisible, setIsVisible] = useState(false);
+  // Fully unmount the backdrop-filter layers when not visible instead of just
+  // fading opacity — each layer forces the browser to sample/blur the backdrop
+  // every composited frame even at opacity 0, which otherwise runs for the
+  // entire Hero/CreativeTransition/Spine scroll range before this is needed.
+  const [shouldRender, setShouldRender] = useState(false);
+  const hideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    const handleScroll = () => {
+    let ticking = false;
+
+    const checkVisibility = () => {
+      ticking = false;
       const mainContent = document.getElementById('main-content');
-      if (!mainContent) {
-        setIsVisible(true);
-        return;
+      const nowVisible = mainContent ? mainContent.getBoundingClientRect().top <= window.innerHeight : true;
+
+      setIsVisible((prev) => (prev === nowVisible ? prev : nowVisible));
+
+      if (nowVisible) {
+        if (hideTimeoutRef.current) {
+          clearTimeout(hideTimeoutRef.current);
+          hideTimeoutRef.current = null;
+        }
+        setShouldRender(true);
+      } else if (hideTimeoutRef.current === null) {
+        hideTimeoutRef.current = setTimeout(() => {
+          setShouldRender(false);
+          hideTimeoutRef.current = null;
+        }, HIDE_DELAY_MS);
       }
-      const rect = mainContent.getBoundingClientRect();
-      // Activate as soon as the main-content (frames section) reaches or enters the viewport
-      if (rect.top <= window.innerHeight) {
-        setIsVisible(true);
-      } else {
-        setIsVisible(false);
-      }
+    };
+
+    const handleScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(checkVisibility);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
+    checkVisibility();
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
+      if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current);
     };
   }, []);
 
-  // Stacking layers of increasing blur with offset gradient masks creates an
-  // incredibly smooth, organic blur gradient (exponential-like curve).
+  if (!shouldRender) return null;
+
+  // Stacking layers of increasing blur with offset gradient masks creates a
+  // smooth, organic blur gradient (exponential-like curve). Kept to 4 layers
+  // (down from 7) — each is a separate backdrop-filter compositing pass.
   const layers = [
-    { blur: '1px', start: 0, end: 15 },
-    { blur: '2px', start: 10, end: 30 },
-    { blur: '4px', start: 25, end: 45 },
-    { blur: '8px', start: 40, end: 60 },
-    { blur: '16px', start: 55, end: 75 },
-    { blur: '24px', start: 70, end: 90 },
-    { blur: '32px', start: 85, end: 100 },
+    { blur: '2px', start: 0, end: 25 },
+    { blur: '6px', start: 20, end: 50 },
+    { blur: '16px', start: 45, end: 75 },
+    { blur: '32px', start: 70, end: 100 },
   ];
 
   return (

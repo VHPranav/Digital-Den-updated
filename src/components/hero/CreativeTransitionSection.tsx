@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Text, MeshTransmissionMaterial, Environment } from "@react-three/drei";
@@ -8,8 +8,8 @@ import { EffectComposer, Bloom, Noise } from "@react-three/postprocessing";
 import { RectAreaLightUniformsLib } from "three/examples/jsm/lights/RectAreaLightUniformsLib.js";
 import { gsap } from "@/lib/gsap";
 import { useTabVisible } from "@/hooks/useTabVisible";
-
-const EMBLEM_GLOW_VIDEO_PATH = "/videos/emblem-glow-nebula.mp4";
+import { useInViewport } from "@/hooks/useInViewport";
+import { useEmblemGlowTexture } from "@/hooks/useEmblemGlowTexture";
 
 /**
  * Computes planar UV projection mapped onto the XY bounds of the geometry
@@ -78,153 +78,6 @@ function buildEmblemGeometry() {
   const ringGeometry = new THREE.TorusGeometry(1.48, 0.115, 48, 140);
 
   return { ringGeometry, letterGeometry };
-}
-
-/**
- * Emissive glow texture for the inner "a" glyph.
- * - Plays `/videos/emblem-glow-nebula.mp4` (a color-graded turquoise/violet nebula loop,
- *   on-theme with the site's lavender/violet/turquoise palette) with full autoplay/muted/loop.
- * - If the video is loading or blocked by autoplay policy, falls back to a procedural
- *   canvas bokeh field in the same palette, so the emblem is never left without a glow.
- */
-function useEmblemGlowTexture(videoSrc: string = EMBLEM_GLOW_VIDEO_PATH) {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const textureRef = useRef<THREE.CanvasTexture | null>(null);
-  const [videoTexture, setVideoTexture] = useState<THREE.VideoTexture | null>(null);
-  const isVideoPlaying = useRef(false);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    let isCancelled = false;
-    const video = document.createElement("video");
-    video.src = videoSrc;
-    video.crossOrigin = "anonymous";
-    video.loop = true;
-    video.muted = true;
-    video.playsInline = true;
-    video.autoplay = true;
-
-    const tex = new THREE.VideoTexture(video);
-    tex.colorSpace = THREE.SRGBColorSpace;
-    tex.minFilter = THREE.LinearFilter;
-    tex.magFilter = THREE.LinearFilter;
-    tex.generateMipmaps = false;
-
-    const onPlay = () => {
-      if (!isCancelled) {
-        isVideoPlaying.current = true;
-      }
-    };
-
-    video.addEventListener("playing", onPlay);
-    video.addEventListener("loadeddata", onPlay);
-    video.play().catch(() => {
-      isVideoPlaying.current = false;
-    });
-
-    // Stop decoding while the tab is backgrounded — pausing the R3F canvas frameloop
-    // alone doesn't stop the underlying <video> element's own background decode work.
-    const onVisibility = () => {
-      if (document.hidden) video.pause();
-      else video.play().catch(() => {});
-    };
-    document.addEventListener("visibilitychange", onVisibility);
-
-    setVideoTexture(tex);
-
-    return () => {
-      isCancelled = true;
-      video.removeEventListener("playing", onPlay);
-      video.removeEventListener("loadeddata", onPlay);
-      document.removeEventListener("visibilitychange", onVisibility);
-      video.pause();
-      video.removeAttribute("src");
-      video.load();
-      tex.dispose();
-    };
-  }, [videoSrc]);
-
-  const particles = useMemo(() => {
-    return Array.from({ length: 40 }, () => ({
-      x: Math.random() * 512,
-      y: Math.random() * 512,
-      radius: 12 + Math.random() * 32,
-      speedX: (Math.random() - 0.5) * 5.0,
-      speedY: -2.0 - Math.random() * 5.0,
-      color:
-        Math.random() < 0.15
-          ? "rgba(0, 245, 212, " // Subtle Turquoise accent (#00F5D4)
-          : [
-              "rgba(224, 212, 252, ", // Light Pastel Violet
-              "rgba(187, 157, 238, ", // Signature Lavender (#BB9DEE)
-              "rgba(168, 85, 247, ",  // Electric Orchid Purple (#A855F7)
-              "rgba(124, 58, 237, ",  // Deep Royal Amethyst (#7C3AED)
-            ][Math.floor(Math.random() * 4)],
-      alpha: 0.4 + Math.random() * 0.6,
-      pulseSpeed: 1.2 + Math.random() * 3.0,
-    }));
-  }, []);
-
-  const canvasTexture = useMemo(() => {
-    if (typeof window === "undefined") return null;
-    const canvas = document.createElement("canvas");
-    canvas.width = 512;
-    canvas.height = 512;
-    canvasRef.current = canvas;
-
-    const tex = new THREE.CanvasTexture(canvas);
-    tex.colorSpace = THREE.SRGBColorSpace;
-    tex.minFilter = THREE.LinearFilter;
-    tex.magFilter = THREE.LinearFilter;
-    tex.generateMipmaps = false;
-    textureRef.current = tex;
-    return tex;
-  }, []);
-
-  useFrame((state) => {
-    if (isVideoPlaying.current && videoTexture) {
-      videoTexture.needsUpdate = true;
-      return;
-    }
-
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    const t = state.clock.elapsedTime;
-    ctx.fillStyle = "rgba(4, 7, 14, 0.28)";
-    ctx.fillRect(0, 0, 512, 512);
-    ctx.globalCompositeOperation = "screen";
-
-    particles.forEach((p) => {
-      p.x += p.speedX;
-      p.y += p.speedY;
-
-      if (p.x < -50) p.x = 562;
-      if (p.x > 562) p.x = -50;
-      if (p.y < -50) p.y = 562;
-
-      const dynamicAlpha = (p.alpha * (0.65 + 0.35 * Math.sin(t * p.pulseSpeed))).toFixed(2);
-      const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius);
-      grad.addColorStop(0, `${p.color}${dynamicAlpha})`);
-      grad.addColorStop(0.65, `${p.color}${(Number(dynamicAlpha) * 0.35).toFixed(2)})`);
-      grad.addColorStop(1, `${p.color}0)`);
-
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-      ctx.fillStyle = grad;
-      ctx.fill();
-    });
-
-    ctx.globalCompositeOperation = "source-over";
-    if (textureRef.current) {
-      textureRef.current.needsUpdate = true;
-    }
-  });
-
-  return (isVideoPlaying.current && videoTexture) ? videoTexture : (videoTexture || canvasTexture);
 }
 
 /**
@@ -533,6 +386,7 @@ export default function CreativeTransitionSection() {
   const mousePos = useRef({ x: 0, y: 0 });
   const scrollProgress = useRef(0);
   const isTabVisible = useTabVisible();
+  const isInViewport = useInViewport(sectionRef);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -559,7 +413,7 @@ export default function CreativeTransitionSection() {
             camera={{ position: [0, 0, 4.4], fov: 38 }}
             dpr={[1, 1.5]}
             gl={{ antialias: false, powerPreference: "high-performance" }}
-            frameloop={isTabVisible ? "always" : "never"}
+            frameloop={isTabVisible && isInViewport ? "always" : "never"}
           >
             <Suspense fallback={null}>
               <Scene
