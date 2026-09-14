@@ -24,9 +24,9 @@ export default function FluidCursorRipple() {
 
     // ─── Configuration ──────────────────────────────────────────────
     const isMobile = typeof window !== 'undefined' && (window.innerWidth < 768 || /Mobi|Android/i.test(navigator.userAgent));
-    // Trimmed a bit further (was 320/160) — this is a soft, blurred ripple,
+    // Trimmed a bit further (was 256/128) — this is a soft, blurred ripple,
     // not a detail surface, so the resolution drop is not perceptible.
-    const SIM_SIZE = isMobile ? 128 : 256;
+    const SIM_SIZE = isMobile ? 96 : 192;
     const WAVE_SPEED = 1.42;
     // Faster decay (was 0.985) so ripples settle quickly instead of lingering/building up —
     // reads as calmer and more premium rather than chaotic, per client feedback.
@@ -47,9 +47,9 @@ export default function FluidCursorRipple() {
       powerPreference: 'high-performance',
     });
     // The final composite pass is a full-viewport shader, so DPR directly
-    // multiplies its fragment cost — trimmed again (was 1.5) for another cut
-    // to the most expensive pass, still soft enough not to look pixelated.
-    renderer.setPixelRatio(isMobile ? 1.0 : Math.min(window.devicePixelRatio, 1.25));
+    // multiplies its fragment cost — dropped to the practical floor of 1.0
+    // (native resolution, no supersampling), matching what mobile already uses.
+    renderer.setPixelRatio(1.0);
     renderer.setSize(width, height);
     renderer.setClearColor(0x000000, 0);
     container.appendChild(renderer.domElement);
@@ -122,9 +122,10 @@ export default function FluidCursorRipple() {
     // ─── Input Tracking ─────────────────────────────────────────────
     let isInteracting = false;
     let lastMoveTime = performance.now();
-    // Wave amplitude decays ~7.5%/frame (DAMPING^SIM_STEPS_PER_FRAME) — fully
-    // settled well within 2s of the last input, so the sim can idle after that.
-    const IDLE_TIMEOUT_MS = 2000;
+    // Wave amplitude decays ~2.5%/frame (DAMPING^SIM_STEPS_PER_FRAME, now 1
+    // step) — slower than before now that steps-per-frame is halved below, so
+    // this window is widened to match (fully settled within ~3s at 60fps).
+    const IDLE_TIMEOUT_MS = 3000;
 
     const updateMousePos = (clientX: number, clientY: number) => {
       const nx = clientX / window.innerWidth;
@@ -160,10 +161,10 @@ export default function FluidCursorRipple() {
     let animationFrameId: number;
     const clock = new THREE.Clock();
 
-    // Run multiple simulation steps per frame for faster wave propagation.
-    // Reduced from 3 — at the smaller SIM_SIZE above, 2 steps still propagates
-    // fast enough to feel responsive while cutting a third of the sim passes.
-    const SIM_STEPS_PER_FRAME = 2;
+    // Run simulation steps per frame. Reduced 3 -> 2 -> 1: propagation is
+    // slower now, but at this point that reads as "calm" rather than
+    // "laggy" — and it halves the GPU sim passes again.
+    const SIM_STEPS_PER_FRAME = 1;
 
     let wasIdle = false;
 
