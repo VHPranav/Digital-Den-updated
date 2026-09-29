@@ -24,7 +24,7 @@ export default function Footer() {
   };
 
   return (
-    <footer className="w-full bg-black pt-10 pb-16 sm:pb-18 md:pb-26 px-4 sm:px-8 lg:px-14 relative z-30 font-['Inter',sans-serif]">
+    <footer className="w-full bg-black pt-10 pb-16 sm:pb-18 md:pb-26 px-4 sm:px-8 lg:px-14 relative z-30">
       {/* ─── Main Footer Card (3-Color Purple Gradient + Glassmorphism) ─── */}
       <div
         className="max-w-[1720px] mx-auto rounded-[40px] p-8 sm:p-12 lg:p-16 relative overflow-hidden"

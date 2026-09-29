@@ -14,7 +14,7 @@ export default function FourPillarsSection() {
       <div className="mb-4 max-w-[440px]">
         <FadeIn animation="fadeIn" delay={0.1}>
           <h2
-            className="font-['Inter',sans-serif] font-medium text-3xl sm:text-4xl lg:text-[42px] leading-[105%] lg:mb-10 tracking-tight"
+            className="font-medium text-3xl sm:text-4xl lg:text-[42px] leading-[105%] lg:mb-10 tracking-tight"
             style={{
               background: 'linear-gradient(90deg, #FFFFFF 0%, #FFFFFF 30%, #F3E8FF 45%, #D8B4FE 60%, #C084FC 75%, #A855F7 88%, #7E22CE 100%)',
               WebkitBackgroundClip: 'text',
@@ -42,7 +42,7 @@ export default function FourPillarsSection() {
               href="/platform"
               className="group block relative h-[450px] sm:h-[463px] bg-gradient-to-b from-white/[0.05] to-white/[0.1] bg-[#020b18]/70 backdrop-blur-[15px] p-7 flex flex-col justify-between overflow-hidden shadow-2xl rounded-[24px] h-full w-full"
             >
-              <div className="flex items-center justify-end gap-2 text-white font-['Inter',sans-serif] text-sm font-normal">
+              <div className="flex items-center justify-end gap-2 text-white text-sm font-normal">
                 <span className="opacity-90 group-hover:opacity-100 transition-opacity">See how we build</span>
                 <div className="w-8 h-8 rounded-full bg-white text-slate-950 flex items-center justify-center font-bold shadow-md group-hover:scale-105 transition-transform">
                   <ArrowUpRight className="w-4 h-4 text-slate-950" />
@@ -53,7 +53,7 @@ export default function FourPillarsSection() {
                 <h3 className="font-['Plus_Jakarta_Sans',sans-serif] font-semibold text-2xl sm:text-3xl text-white tracking-tight leading-[109%]">
                   Venture Building
                 </h3>
-                <p className="font-['Inter',sans-serif] font-normal text-sm sm:text-[15px] leading-[22px] text-white/90">
+                <p className="font-normal text-sm sm:text-[15px] leading-[22px] text-white/90">
                   We don&apos;t just invest; we co-build. Our platform provides the architectural support needed for startups to scale from prototype to exit.
                 </p>
               </div>
@@ -78,7 +78,7 @@ export default function FourPillarsSection() {
                 backgroundImage: `url('/images/firstimg.png')`,
               }}
             >
-              <div className="flex items-center justify-end gap-2 text-white font-['Inter',sans-serif] text-sm font-normal z-10">
+              <div className="flex items-center justify-end gap-2 text-white text-sm font-normal z-10">
                 <span className="opacity-90 group-hover:opacity-100 transition-opacity">Find your program</span>
                 <div className="w-8 h-8 rounded-full bg-white text-slate-950 flex items-center justify-center font-bold shadow-md group-hover:scale-105 transition-transform">
                   <ArrowUpRight className="w-4 h-4 text-slate-950" />
@@ -91,7 +91,7 @@ export default function FourPillarsSection() {
                 <h3 className="font-['Plus_Jakarta_Sans',sans-serif] font-semibold text-2xl sm:text-3xl text-white tracking-tight leading-[109%]">
                   Programs
                 </h3>
-                <p className="font-['Inter',sans-serif] font-normal text-sm sm:text-[15px] leading-[22px] text-white/90">
+                <p className="font-normal text-sm sm:text-[15px] leading-[22px] text-white/90">
                   Accelerating startups through tailored programs, designed to push founders beyond early-stage hurdles toward institutional capital.
                 </p>
               </div>
@@ -113,7 +113,7 @@ export default function FourPillarsSection() {
               href="/opportunities"
               className="group block relative h-[450px] sm:h-[463px] bg-gradient-to-b from-white/[0.05] to-white/[0.1] bg-[#020b18]/70 backdrop-blur-[15px] p-7 flex flex-col justify-between overflow-hidden shadow-2xl rounded-[24px] h-full w-full"
             >
-              <div className="flex items-center justify-end gap-2 text-white font-['Inter',sans-serif] text-sm font-normal">
+              <div className="flex items-center justify-end gap-2 text-white text-sm font-normal">
                 <span className="opacity-90 group-hover:opacity-100 transition-opacity">Discover opportunities</span>
                 <div className="w-8 h-8 rounded-full bg-white text-slate-950 flex items-center justify-center font-bold shadow-md group-hover:scale-105 transition-transform">
                   <ArrowUpRight className="w-4 h-4 text-slate-950" />
@@ -124,7 +124,7 @@ export default function FourPillarsSection() {
                 <h3 className="font-['Plus_Jakarta_Sans',sans-serif] font-semibold text-2xl sm:text-3xl text-white tracking-tight leading-[109%]">
                   Opportunities
                 </h3>
-                <p className="font-['Inter',sans-serif] font-normal text-sm sm:text-[15px] leading-[22px] text-white/90">
+                <p className="font-normal text-sm sm:text-[15px] leading-[22px] text-white/90">
                   Open calls for startups, grants, and specialized investment rounds.
                 </p>
               </div>
@@ -149,7 +149,7 @@ export default function FourPillarsSection() {
                 backgroundImage: `url('/images/secondimg.png')`,
               }}
             >
-              <div className="flex items-center justify-end gap-2 text-white font-['Inter',sans-serif] text-sm font-normal z-10">
+              <div className="flex items-center justify-end gap-2 text-white text-sm font-normal z-10">
                 <span className="opacity-90 group-hover:opacity-100 transition-opacity">Connect Globally</span>
                 <div className="w-8 h-8 rounded-full bg-white text-slate-950 flex items-center justify-center font-bold shadow-md group-hover:scale-105 transition-transform">
                   <ArrowUpRight className="w-4 h-4 text-slate-950" />
@@ -162,7 +162,7 @@ export default function FourPillarsSection() {
                 <h3 className="font-['Plus_Jakarta_Sans',sans-serif] font-semibold text-2xl sm:text-3xl text-white tracking-tight leading-[109%]">
                   Global <br /> Network
                 </h3>
-                <p className="font-['Inter',sans-serif] font-normal text-sm sm:text-[15px] leading-[22px] text-white/90">
+                <p className="font-normal text-sm sm:text-[15px] leading-[22px] text-white/90">
                   Connect with our partners in USA, Europe, and beyond.
                 </p>
               </div>

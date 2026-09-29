@@ -252,7 +252,7 @@ export default function Navbar({ onOpenAction }: NavbarProps) {
                                   </Link>
 
                                   <Link
-                                    href="/programs#fintech"
+                                    href="/opportunities#fintech"
                                     className="p-4 rounded-xl bg-white/[0.03] hover:bg-purple-600/10 transition-all border border-white/10 group flex gap-3.5 items-start"
                                   >
                                     <div className="w-9 h-9 rounded-lg bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-300 flex-shrink-0">

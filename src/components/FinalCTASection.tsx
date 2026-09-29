@@ -121,7 +121,7 @@ export default function FinalCTASection({ onOpenAction }: FinalCTASectionProps) 
 
             <FadeIn animation="fadeIn" delay={0.2}>
               <h2
-                className="font-['Inter',sans-serif] text-3xl sm:text-4xl lg:text-[48px] font-medium tracking-tight leading-[115%]"
+                className="text-3xl sm:text-4xl lg:text-[48px] font-medium tracking-tight leading-[115%]"
                 style={{
                   background: 'linear-gradient(90deg, #FFFFFF 0%, #FFFFFF 30%, #F3E8FF 45%, #D8B4FE 60%, #C084FC 75%, #A855F7 88%, #7E22CE 100%)',
                   WebkitBackgroundClip: 'text',
