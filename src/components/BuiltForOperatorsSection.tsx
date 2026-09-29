@@ -38,7 +38,7 @@ export default function BuiltForOperatorsSection({ }: BuiltForOperatorsSectionPr
       <div className="text-center max-w-3xl mx-auto space-y-3 mb-16 sm:mb-20">
         <FadeIn animation="fadeIn" delay={0.1}>
           <h2
-            className="font-['Inter',sans-serif] text-4xl sm:text-5xl lg:text-[56px] font-medium tracking-tight leading-[110%]"
+            className="text-4xl sm:text-5xl lg:text-[56px] font-medium tracking-tight leading-[110%]"
             style={{
               background: 'linear-gradient(90deg, #FFFFFF 0%, #FFFFFF 30%, #F3E8FF 45%, #D8B4FE 60%, #C084FC 75%, #A855F7 88%, #7E22CE 100%)',
               WebkitBackgroundClip: 'text',

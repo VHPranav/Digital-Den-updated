@@ -368,7 +368,7 @@ export default function StartupJourneyCarousel() {
                       textTransform: 'uppercase',
                       textShadow:
                         '0 2px 18px rgba(0, 0, 0, 0.95), 0 0 24px rgba(255, 255, 255, 0.4)',
-                      fontFamily: 'var(--font-syne), "Plus Jakarta Sans", sans-serif',
+                      fontFamily: 'var(--font-plus-jakarta), sans-serif',
                     }}
                   >
                     {card.title}

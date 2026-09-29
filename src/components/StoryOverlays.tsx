@@ -3,7 +3,6 @@
 import React from 'react';
 import ProofOfGrowthSection from './ProofOfGrowthSection';
 import BuiltForOperatorsSection from './BuiltForOperatorsSection';
-import EcosystemBentoSection from './EcosystemBentoSection';
 import FinalCTASection from './FinalCTASection';
 
 interface StoryOverlaysProps {
@@ -20,10 +19,7 @@ export default function StoryOverlays({ onOpenAction }: StoryOverlaysProps) {
       {/* Section 2: Built for Founders & Operators Architecture (Image 1) */}
       <BuiltForOperatorsSection onOpenAction={onOpenAction} />
 
-      {/* Section 3: Global Ecosystem & Live Hub Directory Bento Grid (Image 2) */}
-      <EcosystemBentoSection onOpenAction={onOpenAction} />
-
-      {/* Section 4: Final CTA */}
+      {/* Section 3: Final CTA */}
       <FinalCTASection onOpenAction={onOpenAction} />
     </div>
   );

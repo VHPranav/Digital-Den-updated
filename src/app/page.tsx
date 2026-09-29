@@ -8,7 +8,6 @@ import Hero from '@/components/hero/Hero';
 import CreativeTransitionSection from '@/components/hero/CreativeTransitionSection';
 import HeroSection from '@/components/HeroSection';
 import MissionStatementSection from '@/components/MissionStatementSection';
-import VentureFeatureSection from '@/components/VentureFeatureSection';
 import FourPillarsSection from '@/components/FourPillarsSection';
 import StoryOverlays from '@/components/StoryOverlays';
 import SkipIntroButton from '@/components/SkipIntroButton';
@@ -60,7 +59,6 @@ export default function Home() {
               <div className="relative z-10 w-full flex flex-col items-center justify-center space-y-28 sm:space-y-40 pt-4 pb-64 sm:pb-96 pointer-events-auto mx-auto">
                 <HeroSection onOpenAction={handleOpenAction} />
                 <MissionStatementSection />
-                <VentureFeatureSection onOpenAction={handleOpenAction} />
                 <FourPillarsSection />
               </div>
             )}
