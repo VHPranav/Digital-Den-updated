@@ -64,10 +64,10 @@ export default function Navbar({ onOpenAction }: NavbarProps) {
   const navItems = [
     { name: 'Platform', href: '/platform', hasDropdown: true, key: 'platform' },
     { name: 'Programs', href: '/programs', hasDropdown: true, key: 'programs' },
+    { name: 'Partners', href: '/partners' },
+    { name: 'Opportunities', href: '/opportunities' },
     { name: 'Projects', href: '/projects' },
     { name: 'Portfolio', href: '/portfolio' },
-    { name: 'Opportunities', href: '/opportunities' },
-    { name: 'Partners', href: '/partners' },
     { name: 'Events', href: '/events' },
   ];
 

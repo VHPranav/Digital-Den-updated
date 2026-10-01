@@ -11,10 +11,10 @@ import { ArrowRight, ArrowUp, ArrowUpRight } from 'lucide-react';
 const explore = [
   { href: '/platform', label: 'Platform', note: 'Venture Studio' },
   { href: '/programs', label: 'Programs', note: 'Incubation & Acceleration' },
+  { href: '/partners', label: 'Partners', note: 'Global Network' },
+  { href: '/opportunities', label: 'Opportunities', note: 'Matchmaking' },
   { href: '/projects', label: 'Projects', note: 'Project Activities' },
   { href: '/portfolio', label: 'Portfolio', note: 'Proof of Growth' },
-  { href: '/opportunities', label: 'Opportunities', note: 'Matchmaking' },
-  { href: '/partners', label: 'Partners', note: 'Global Network' },
   { href: '/events', label: 'Events', note: 'Summits & Loops' },
 ];
 
