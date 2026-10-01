@@ -30,17 +30,17 @@ export default function FluidCursorRipple() {
     const WAVE_SPEED = 1.42;
     // Faster decay (was 0.985 -> 0.975) so ripples settle quickly instead of
     // lingering/building up — reads as calmer and more premium rather than chaotic.
-    const DAMPING = 0.96;
-    const BRUSH_RADIUS = isMobile ? 0.08 : 0.04;
-    // Reduced cap (was 0.35 -> 0.2 -> 0.1 -> 0.06) — client asked for the mouse-driven movement
+    const DAMPING = 0.95;
+    const BRUSH_RADIUS = isMobile ? 0.07 : 0.035;
+    // Reduced cap (was 0.35 -> 0.2 -> 0.1 -> 0.06 -> 0.035) — client asked for the mouse-driven movement
     // to feel more subtle and premium rather than intense.
-    const MAX_STRENGTH = 0.06;
+    const MAX_STRENGTH = 0.035;
     const MOUSE_LERP = 0.18;
     // Lens look (see waterRenderShader): light focusing, chromatic split, and
     // how much the concave troughs darken what's underneath.
-    const LENS_STRENGTH = 9.0;
-    const LENS_DISPERSION = 0.3;
-    const LENS_SHADOW = 0.4;
+    const LENS_STRENGTH = 5.0;
+    const LENS_DISPERSION = 0.18;
+    const LENS_SHADOW = 0.25;
 
     const width = window.innerWidth;
     const height = window.innerHeight;
