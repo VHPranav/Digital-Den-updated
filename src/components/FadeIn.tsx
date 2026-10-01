@@ -55,6 +55,7 @@ export function FadeIn({
     Component,
     {
       ref,
+      "data-fadein": "",
       className: `transition-all ease-out ${className} ${
         isInView ? variant.animate : variant.initial
       }`,

@@ -63,3 +63,71 @@ html.lenis body {
 
 .no-scrollbar { scrollbar-width: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* ─── Inner pages: home-style gradient on h1/h2 ───
+   The gradient sits on the heading itself, so accent spans inside it drop
+   their own colour/background and show the shared sweep. Headings marked
+   data-plain (and the footer) keep their own styling. */
+main[data-inner] :is(h1, h2):not([data-plain]):not([data-footer] *) {
+  background: linear-gradient(90deg, #FFFFFF 0%, #FFFFFF 30%, #F3E8FF 45%, #D8B4FE 60%, #C084FC 75%, #A855F7 88%, #7E22CE 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  /* The gradient only paints inside the box; tight leading would clip descenders. */
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
+}
+main[data-inner] :is(h1, h2):not([data-plain]):not([data-footer] *) .gradient-text {
+  background: none;
+}
+/* Buttons placed inside a heading keep their own text colour. */
+main[data-inner] :is(h1, h2) button {
+  -webkit-text-fill-color: currentColor;
+}
+
+/* ─── Inner pages: body text intro (set by useTextReveal) ─── */
+[data-reveal='pending'] {
+  opacity: 0;
+  transform: translateY(18px);
+  filter: blur(6px);
+}
+[data-reveal='in'] {
+  opacity: 1;
+  transform: none;
+  filter: none;
+  transition:
+    opacity 0.9s cubic-bezier(0.2, 0.7, 0.1, 1) var(--reveal-delay, 0s),
+    transform 1s cubic-bezier(0.2, 0.7, 0.1, 1) var(--reveal-delay, 0s),
+    filter 0.9s cubic-bezier(0.2, 0.7, 0.1, 1) var(--reveal-delay, 0s);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}
+
+/* ─── Image intro (ImageReveal): curtain up + settle, as on the Events page ─── */
+[data-img-reveal]:not([data-img-state]) {
+  clip-path: inset(100% 0% 0% 0%);
+}
+[data-img-reveal]:not([data-img-state]) :is(img, video) {
+  transform: scale(1.18) !important;
+}
+[data-img-reveal][data-img-state='in'] {
+  clip-path: inset(0% 0% 0% 0%);
+  transition: clip-path 1.4s cubic-bezier(0.2, 0.7, 0.1, 1);
+}
+[data-img-reveal][data-img-state='in'] :is(img, video) {
+  transition: transform 1.8s cubic-bezier(0.2, 0.7, 0.1, 1), opacity 0.9s ease !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-img-reveal] {
+    clip-path: none !important;
+  }
+  [data-img-reveal] :is(img, video) {
+    transform: none !important;
+  }
+}

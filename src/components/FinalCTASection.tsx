@@ -56,6 +56,7 @@ export default function FinalCTASection({ onOpenAction }: FinalCTASectionProps) 
                 {column1.map((src, i) => (
                   <div
                     key={i}
+                    data-img-reveal
                     className="relative aspect-[4/5] rounded-2xl overflow-hidden border border-white/15 shadow-lg group transition-transform duration-500 hover:scale-105"
                   >
                     <Image
@@ -75,6 +76,7 @@ export default function FinalCTASection({ onOpenAction }: FinalCTASectionProps) 
                 {column2.map((src, i) => (
                   <div
                     key={i}
+                    data-img-reveal
                     className="relative aspect-[4/5] rounded-2xl overflow-hidden border border-white/15 shadow-lg group transition-transform duration-500 hover:scale-105"
                   >
                     <Image
@@ -94,6 +96,7 @@ export default function FinalCTASection({ onOpenAction }: FinalCTASectionProps) 
                 {column3.map((src, i) => (
                   <div
                     key={i}
+                    data-img-reveal
                     className="relative aspect-[4/5] rounded-2xl overflow-hidden border border-white/15 shadow-lg group transition-transform duration-500 hover:scale-105"
                   >
                     <Image

@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { ArrowUpRight } from 'lucide-react';
 import PageShell from '@/components/site/PageShell';
+import SplitWords from '@/components/site/SplitWords';
 import JoinForm from '@/components/site/JoinForm';
 import { Container, Figure, Label, PrimaryButton, Section, SectionHeader, TextLink, body, display, heading, lead } from '@/components/site/ui';
 import { FadeIn } from '@/components/FadeIn';
@@ -22,11 +23,11 @@ export default function VerticalPage({ slug }: { slug: string }) {
             <FadeIn animation="fadeIn">
               <Label>{v.eyebrow}</Label>
             </FadeIn>
-            <FadeIn animation="blurInUp" duration={1.1}>
-              <h1 className={`mt-10 max-w-6xl text-[3.25rem] sm:text-7xl lg:text-[7.5rem] ${display}`}>
-                {v.title} <span className="gradient-text">{v.titleAccent}</span>
+            <h1 className={`mt-10 max-w-6xl text-[3.25rem] sm:text-7xl lg:text-[7.5rem] ${display}`}>
+                <SplitWords>
+                  {v.title} <span className="gradient-text">{v.titleAccent}</span>
+                </SplitWords>
               </h1>
-            </FadeIn>
             <div className="mt-16 grid grid-cols-1 lg:grid-cols-12 gap-12">
               <FadeIn animation="slideUp" delay={0.25} className="lg:col-span-5">
                 <p className={lead}>{v.intro}</p>
@@ -137,7 +138,7 @@ export default function VerticalPage({ slug }: { slug: string }) {
             <Container className="grid grid-cols-1 lg:grid-cols-12 gap-16">
               <div className="lg:col-span-4">
                 <Label index="02">Apply</Label>
-                <h2 className={`mt-8 ${heading}`}>{v.form.title}</h2>
+                <h2 className={`mt-8 ${heading}`}><SplitWords>{v.form.title}</SplitWords></h2>
                 <p className={`mt-8 ${lead}`}>{v.form.body}</p>
               </div>
               <div className="lg:col-span-7 lg:col-start-6 lg:pt-4">

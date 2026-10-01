@@ -15,6 +15,7 @@ import ActionModal from '@/components/ActionModal';
 import Footer from '@/components/Footer';
 import SlantedSectionTransition from '@/components/SlantedSectionTransition';
 import ViewportBlur from '@/components/ViewportBlur';
+import FluidCursorRipple from '@/components/FluidCursorRipple';
 
 export default function Home() {
   const [isActionModalOpen, setIsActionModalOpen] = useState(false);
@@ -28,7 +29,10 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-black text-white font-sans selection:bg-purple-600 selection:text-white relative">
+    <main className="min-h-screen bg-black text-white font-sans selection:bg-purple-600 selection:text-white relative overflow-x-clip">
+      {/* Cursor liquid ripple: home page only */}
+      <FluidCursorRipple />
+
       {/* Floating Navigation Bar */}
       <Navbar onOpenAction={handleOpenAction} />
 

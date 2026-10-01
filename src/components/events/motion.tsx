@@ -39,50 +39,6 @@ export function useScrollProgress<T extends HTMLElement>(offset = { start: 0.9, 
   return [ref, progress] as const;
 }
 
-/** Full-screen intro: percentage counter, then the curtain lifts. */
-export function IntroLoader({ onDone }: { onDone: () => void }) {
-  const [pct, setPct] = useState(0);
-  const [leaving, setLeaving] = useState(false);
-  const [gone, setGone] = useState(false);
-
-  useEffect(() => {
-    const start = performance.now();
-    const duration = 1300;
-    let frame = 0;
-    const tick = (now: number) => {
-      const t = Math.min((now - start) / duration, 1);
-      setPct(Math.round(100 * (1 - Math.pow(1 - t, 2.2))));
-      if (t < 1) frame = requestAnimationFrame(tick);
-      else {
-        setLeaving(true);
-        onDone();
-        setTimeout(() => setGone(true), 1100);
-      }
-    };
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  if (gone) return null;
-  return (
-    <div
-      className="fixed inset-0 z-[200] flex items-end justify-between bg-black px-6 pb-8 lg:px-10"
-      style={{
-        transform: leaving ? 'translateY(-100%)' : 'translateY(0)',
-        transition: `transform 1s ${EASE}`,
-      }}
-      aria-hidden="true"
-    >
-      <span className="text-xs uppercase tracking-[0.3em] text-white/40">Digital Den · Events</span>
-      <span className="text-[18vw] lg:text-[12rem] font-light leading-none tracking-[-0.06em] tabular-nums">
-        {pct}
-        <span className="text-white/30">%</span>
-      </span>
-    </div>
-  );
-}
-
 /** Characters rise from a mask, staggered. Words never break mid-word. */
 export function CharReveal({
   text,
@@ -148,7 +104,8 @@ export function ScrubText({ parts, className = '' }: { parts: ScrubPart[]; class
 
   const lit = progress * tokens.length * 1.05;
   return (
-    <p ref={ref} className={className}>
+    // data-noreveal: this text has its own scroll-scrubbed animation.
+    <p ref={ref} data-noreveal className={className}>
       {tokens.map(({ node, key }, i) => {
         const o = Math.min(1, Math.max(0.16, lit - i + 0.16));
         return (

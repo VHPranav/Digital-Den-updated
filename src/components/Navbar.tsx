@@ -46,7 +46,7 @@ export default function Navbar({ onOpenAction }: NavbarProps) {
 
   // Glassmorphism inline styles for exact cross-browser support
   const glassStyle = {
-    background: 'rgba(2, 11, 24, 0.65)',
+    background: 'rgba(11, 11, 12, 0.3)',
     backdropFilter: 'blur(20px) saturate(180%)',
     WebkitBackdropFilter: 'blur(20px) saturate(180%)',
     boxShadow: '0 8px 32px 0 rgba(0,0,0,0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.15)',
@@ -54,7 +54,7 @@ export default function Navbar({ onOpenAction }: NavbarProps) {
   };
 
   const dropdownGlassStyle = {
-    background: 'rgba(2, 11, 24, 0.85)',
+    background: 'rgba(11, 11, 12, 0.85)',
     backdropFilter: 'blur(24px) saturate(180%)',
     WebkitBackdropFilter: 'blur(24px) saturate(180%)',
     boxShadow: '0 20px 50px 0 rgba(0,0,0,0.6), inset 0 1px 0 0 rgba(255, 255, 255, 0.15)',
@@ -64,9 +64,10 @@ export default function Navbar({ onOpenAction }: NavbarProps) {
   const navItems = [
     { name: 'Platform', href: '/platform', hasDropdown: true, key: 'platform' },
     { name: 'Programs', href: '/programs', hasDropdown: true, key: 'programs' },
-    { name: 'Portfolio', href: '/portfolio' },
-    { name: 'Opportunities', href: '/opportunities' },
     { name: 'Partners', href: '/partners' },
+    { name: 'Opportunities', href: '/opportunities' },
+    { name: 'Projects', href: '/projects' },
+    { name: 'Portfolio', href: '/portfolio' },
     { name: 'Events', href: '/events' },
   ];
 
@@ -76,7 +77,7 @@ export default function Navbar({ onOpenAction }: NavbarProps) {
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 pointer-events-none ${isVisible ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'
           }`}
       >
-        <nav className="w-full px-4 sm:px-8 md:px-12 lg:px-16 py-4 md:py-5">
+        <nav className="w-full px-4 sm:px-8 md:px-10 xl:px-16 py-4 md:py-5">
           <div className="w-full flex items-center justify-between h-16 md:h-20">
 
             {/* --- LEFT: LOGO (Viewport Left End) --- */}
@@ -94,7 +95,7 @@ export default function Navbar({ onOpenAction }: NavbarProps) {
                     width={257}
                     height={52}
                     priority
-                    className="h-6 sm:h-7 md:h-7 w-auto object-contain group-hover:scale-105 transition-transform duration-300"
+                    className="h-6 sm:h-7 md:h-7 w-auto max-w-none shrink-0 object-contain group-hover:scale-105 transition-transform duration-300"
                   />
                 </Link>
               </div>
@@ -103,7 +104,7 @@ export default function Navbar({ onOpenAction }: NavbarProps) {
             {/* --- CENTER: FLOATING GLASS PILL --- */}
             <div className="flex-none flex justify-center items-center">
               <div
-                className={`hidden md:flex items-center rounded-2xl transition-all duration-500 ease-in-out pointer-events-auto ${isScrolled ? 'px-5 py-3 scale-100' : 'px-7 py-3.5 scale-95'
+                className={`hidden md:flex items-center rounded-2xl transition-all duration-500 ease-in-out pointer-events-auto ${isScrolled ? 'px-5 py-3 scale-100' : 'px-5 xl:px-7 py-3.5 scale-95'
                   }`}
                 style={glassStyle}
               >
@@ -132,7 +133,7 @@ export default function Navbar({ onOpenAction }: NavbarProps) {
                 />
 
                 {/* Nav Links */}
-                <div className={`flex items-center ${isScrolled ? 'space-x-6' : 'space-x-6 lg:space-x-8'}`}>
+                <div className={`flex items-center ${isScrolled ? 'space-x-4 xl:space-x-6' : 'space-x-4 xl:space-x-8'}`}>
                   {navItems.map((item) => {
                     const isActive = pathname === item.href;
                     if (item.hasDropdown) {
@@ -145,7 +146,7 @@ export default function Navbar({ onOpenAction }: NavbarProps) {
                         >
                           <Link
                             href={item.href}
-                            className={`flex items-center gap-1 text-sm font-medium transition-colors cursor-pointer ${isActive
+                            className={`flex items-center gap-1 text-[13px] xl:text-sm font-medium transition-colors cursor-pointer ${isActive
                               ? 'text-purple-300 font-semibold'
                               : 'text-slate-200 hover:text-white'
                               }`}
@@ -279,7 +280,7 @@ export default function Navbar({ onOpenAction }: NavbarProps) {
                       <Link
                         key={item.name}
                         href={item.href}
-                        className={`text-sm font-medium transition-colors ${isActive
+                        className={`text-[13px] xl:text-sm font-medium transition-colors ${isActive
                           ? 'text-purple-300 font-semibold'
                           : 'text-slate-200 hover:text-white'
                           }`}
@@ -325,7 +326,7 @@ export default function Navbar({ onOpenAction }: NavbarProps) {
               <div className="md:hidden">
                 <button
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  className="p-2 rounded-xl bg-[#020b18]/80 backdrop-blur-xl border border-white/20 text-white hover:text-purple-300"
+                  className="p-2 rounded-xl bg-[#0b0b0c]/30 backdrop-blur-xl border border-white/20 text-white hover:text-purple-300"
                 >
                   {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                 </button>
@@ -340,7 +341,7 @@ export default function Navbar({ onOpenAction }: NavbarProps) {
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-40 md:hidden pointer-events-auto">
           <div className="fixed inset-0 bg-black/70 backdrop-blur-md" onClick={() => setMobileMenuOpen(false)} />
-          <div className="fixed top-20 left-4 right-4 bg-[#020b18]/95 border border-purple-500/30 rounded-3xl shadow-2xl overflow-y-auto p-6 flex flex-col justify-between space-y-6">
+          <div className="fixed top-20 left-4 right-4 bg-[#0b0b0c]/95 border border-purple-500/30 rounded-3xl shadow-2xl overflow-y-auto p-6 flex flex-col justify-between space-y-6">
             <div className="space-y-3">
               {navItems.map((item) => (
                 <Link

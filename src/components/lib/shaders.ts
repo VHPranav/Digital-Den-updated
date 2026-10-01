@@ -88,8 +88,11 @@ export const waveSimulationShader: string = `
 
 /**
  * Water Render & Visualization Fragment Shader
- * Renders liquid-glass reflections, specular lighting, chromatic aberration,
- * and caustic shimmer driven by the heightmap texture gradients.
+ * The overlay can't read the DOM beneath it, so instead of displacing pixels it
+ * reproduces what a lens does to light: convex parts of the surface focus light
+ * (brighter), concave parts spread it (darker), and each wavelength bends by a
+ * slightly different amount (thin chromatic fringes). That read as refraction
+ * far more naturally than a flat tinted glow.
  */
 export const waterRenderShader: string = `
   precision highp float;
@@ -97,47 +100,53 @@ export const waterRenderShader: string = `
   uniform sampler2D uSimTexture;
   uniform vec2  uResolution;
   uniform float uTime;
+  uniform float uLensStrength;   // how much light is focused / spread
+  uniform float uDispersion;     // chromatic split, in sim texels
+  uniform float uShadow;         // darkening in defocused (concave) areas
 
   varying vec2 vUv;
 
+  float h(vec2 uv) { return texture2D(uSimTexture, uv).r; }
+
+  // Curvature (negative Laplacian) = local lens power. Sampled over 1.5 texels
+  // so the bilinear-upscaled sim reads as a smooth surface, not a pixel grid.
+  float focus(vec2 uv, vec2 t) {
+    float c = h(uv);
+    float lap = h(uv - vec2(t.x, 0.0)) + h(uv + vec2(t.x, 0.0))
+              + h(uv - vec2(0.0, t.y)) + h(uv + vec2(0.0, t.y)) - 4.0 * c;
+    return -lap;
+  }
+
   void main() {
-    vec2 texel = 1.0 / uResolution;
+    vec2 t = 1.5 / uResolution;
 
-    // Surface gradient estimation from heightmap
-    float hL = texture2D(uSimTexture, vUv - vec2(texel.x, 0.0)).r;
-    float hR = texture2D(uSimTexture, vUv + vec2(texel.x, 0.0)).r;
-    float hD = texture2D(uSimTexture, vUv - vec2(0.0, texel.y)).r;
-    float hU = texture2D(uSimTexture, vUv + vec2(0.0, texel.y)).r;
+    vec2 grad = vec2(h(vUv + vec2(t.x, 0.0)) - h(vUv - vec2(t.x, 0.0)),
+                     h(vUv + vec2(0.0, t.y)) - h(vUv - vec2(0.0, t.y)));
 
-    vec2 gradient = vec2(hR - hL, hU - hD);
-    float gradLen = length(gradient);
+    // Per-channel refraction: red bends least, blue most.
+    vec2 disp = grad * uDispersion / uResolution * 60.0;
+    float fR = focus(vUv - disp, t);
+    float fG = focus(vUv, t);
+    float fB = focus(vUv + disp, t);
 
-    // Normal vector calculation from heightmap gradient
-    vec3 normal = normalize(vec3(gradient * 3.2, 0.45));
+    vec3 light = max(vec3(fR, fG, fB), 0.0) * uLensStrength;
+    // Very slight lavender cast to stay on-brand without looking like a paint stroke.
+    light *= vec3(0.96, 0.94, 1.0);
+    float shade = max(-fG, 0.0) * uLensStrength * uShadow;
 
-    // Dual-light specular highlights (Active Theory Liquid Glass Specular)
-    vec3 lightDir1 = normalize(vec3(-0.4, 0.6, 0.8));
-    vec3 lightDir2 = normalize(vec3(0.5, -0.3, 0.9));
+    // Small glassy glint on the steepest slopes.
+    vec3 n = normalize(vec3(grad * 6.0, 1.0));
+    float glint = pow(max(dot(n, normalize(vec3(-0.4, 0.6, 0.7))), 0.0), 60.0);
+    glint *= smoothstep(0.002, 0.02, length(grad));
+    light += glint * 0.25;
 
-    float spec1 = pow(max(0.0, dot(normal, lightDir1)), 32.0);
-    float spec2 = pow(max(0.0, dot(normal, lightDir2)), 48.0);
-    float specular = spec1 * 0.65 + spec2 * 0.35;
+    // Composite light (brighten) and shade (darken) into one straight-alpha colour.
+    float lightA = clamp(max(max(light.r, light.g), light.b), 0.0, 0.35);
+    float shadeA = clamp(shade, 0.0, 0.25);
+    float alpha  = clamp(lightA + shadeA, 0.0, 0.45);
+    vec3 color   = alpha > 0.0001 ? (light / max(lightA, 1e-4)) * (lightA / alpha) : vec3(0.0);
 
-    // Prismatic chromatic dispersion (Lavender & Soft Violet)
-    vec3 cLavender  = vec3(0.733, 0.616, 0.933); // #BB9DEE
-    vec3 cPastel    = vec3(0.878, 0.831, 0.988); // #E0D4FC
-    vec3 cViolet    = vec3(0.659, 0.333, 0.969); // #A855F7
-
-    // Soft liquid glass color reflection
-    vec3 liquidColor = cLavender * (gradLen * 1.8) +
-                       cViolet * (gradLen * 1.2) +
-                       cPastel * specular;
-
-    // Subtle, elegant opacity mask (Active Theory minimal presence)
-    float mask = smoothstep(0.002, 0.045, gradLen);
-    float alpha = clamp(mask * 0.22 + specular * 0.32, 0.0, 0.38);
-
-    gl_FragColor = vec4(liquidColor, alpha);
+    gl_FragColor = vec4(clamp(color, 0.0, 1.0), alpha);
   }
 `;
 

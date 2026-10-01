@@ -2,23 +2,23 @@
 
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
-import { ExternalLink, Globe, Sparkles } from 'lucide-react';
+import { ExternalLink, Globe } from 'lucide-react';
 import { FadeIn } from './FadeIn';
+import DottedWorldMap, { type City } from './partners/DottedWorldMap';
+
+// Countries/regions connected to the Montenegro hub on the dotted map.
+const HOME_HUBS: City[] = [
+  { name: 'United States', lat: 39.5, lng: -98.35 },
+  { name: 'Benelux', lat: 50.8, lng: 4.9 },
+  { name: 'Jordan', lat: 31.2, lng: 36.5, label: 'left-down' },
+];
 
 export default function ProofOfGrowthSection() {
-  const hubs = [
-    { name: 'Podgorica', region: 'Montenegro', role: 'HQ & Western Balkans Hub' },
-    { name: 'New York', region: 'United States', role: 'US Capital & Market Gateway' },
-    { name: 'Brussels', region: 'Benelux', role: 'European Innovation Corridor' },
-    { name: 'Amman', region: 'Jordan', role: 'MENA Expansion Network' },
-  ];
-
   return (
     <section className="w-full max-w-[1450px] mx-auto px-4 sm:px-8 lg:px-12">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
         {/* Left Copy Column */}
-        <div className="space-y-6 text-left">
+        <div className="space-y-6 text-left lg:col-span-5">
           <div className="space-y-3">
             <FadeIn animation="fadeIn" delay={0.1}>
               <span className="text-xs font-semibold uppercase tracking-widest text-purple-300 bg-purple-500/10 border border-purple-500/20 px-3.5 py-1.5 rounded-full inline-flex items-center gap-2">
@@ -58,42 +58,9 @@ export default function ProofOfGrowthSection() {
           </div>
         </div>
 
-        {/* Right Dark Theme Network Map Column */}
-        <FadeIn animation="slideUp" delay={0.4} className="relative w-full h-[400px] sm:h-[460px] overflow-hidden" as="div">
-          <div
-            className="w-full h-full rounded-[28px] relative overflow-hidden group"
-            style={{
-              background: 'linear-gradient(180deg, rgba(14, 10, 24, 0.9) 0%, rgba(5, 3, 10, 0.95) 100%)',
-              border: '1.2px solid rgba(168, 85, 247, 0.25)',
-              boxShadow: 'inset 0px 14px 46px -12px rgba(168, 85, 247, 0.2), 0 25px 60px -15px rgba(0,0,0,0.9)',
-              backdropFilter: 'blur(12px)',
-              WebkitBackdropFilter: 'blur(12px)',
-            }}
-          >
-            {/* Ambient Background Violet Glow */}
-            <div
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] rounded-full pointer-events-none opacity-40 group-hover:opacity-60 transition-opacity duration-700"
-              style={{
-                background: 'radial-gradient(circle, rgba(168, 85, 247, 0.25) 0%, rgba(124, 58, 237, 0.1) 50%, transparent 70%)',
-                filter: 'blur(50px)',
-              }}
-            />
-
-            {/* Dark Theme Network Map Illustration */}
-            <Image
-              src="/images/global-network-map.jpg"
-              alt="Global Innovation Network Map - Podgorica, New York, Brussels, Amman"
-              fill
-              sizes="(max-width: 1024px) 100vw, 50vw"
-              className="object-cover object-center group-hover:scale-[1.03] transition-transform duration-700 ease-out"
-              priority
-            />
-
-            {/* Subtle Glassmorphic Overlay Gradient */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none" />
-
-
-          </div>
+        {/* Right: live dotted network map */}
+        <FadeIn animation="fadeIn" delay={0.4} duration={1.4} className="relative w-full aspect-[2/1] lg:col-span-7">
+          <DottedWorldMap cities={HOME_HUBS} fit="contain" dotColor="rgba(178, 120, 255, 0.85)" parallax={false} className="absolute inset-0" />
         </FadeIn>
       </div>
     </section>
