@@ -108,3 +108,26 @@ main[data-inner] :is(h1, h2) button {
     filter: none !important;
   }
 }
+
+/* ─── Image intro (ImageReveal): curtain up + settle, as on the Events page ─── */
+[data-img-reveal]:not([data-img-state]) {
+  clip-path: inset(100% 0% 0% 0%);
+}
+[data-img-reveal]:not([data-img-state]) :is(img, video) {
+  transform: scale(1.18) !important;
+}
+[data-img-reveal][data-img-state='in'] {
+  clip-path: inset(0% 0% 0% 0%);
+  transition: clip-path 1.4s cubic-bezier(0.2, 0.7, 0.1, 1);
+}
+[data-img-reveal][data-img-state='in'] :is(img, video) {
+  transition: transform 1.8s cubic-bezier(0.2, 0.7, 0.1, 1), opacity 0.9s ease !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-img-reveal] {
+    clip-path: none !important;
+  }
+  [data-img-reveal] :is(img, video) {
+    transform: none !important;
+  }
+}

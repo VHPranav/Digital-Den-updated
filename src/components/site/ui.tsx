@@ -134,7 +134,7 @@ export function Figure({
   dim?: boolean;
 }) {
   return (
-    <div className={`relative overflow-hidden ${className}`}>
+    <div data-img-reveal className={`relative overflow-hidden ${className}`}>
       <Image
         src={src}
         alt={alt}

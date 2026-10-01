@@ -197,7 +197,7 @@ export default function ProjectsPage() {
 
                 <div className="hidden lg:col-span-4 lg:col-start-9 lg:block">
                   <div className="sticky top-32">
-                    <div className="relative aspect-[4/5] w-full overflow-hidden">
+                    <div data-img-reveal className="relative aspect-[4/5] w-full overflow-hidden">
                       {projects.map((p) => (
                         <Image
                           key={p.title}

@@ -134,7 +134,7 @@ function ProgramIndex({ onApply }: { onApply: () => void }) {
         {/* Sticky crossfading photo (desktop) */}
         <div className="hidden lg:col-span-5 lg:block">
           <div className="sticky top-28">
-            <div className="relative aspect-[4/5] overflow-hidden">
+            <div data-img-reveal className="relative aspect-[4/5] overflow-hidden">
               {programs.map((p) => (
                 <Image
                   key={p.id}

@@ -110,6 +110,7 @@ function PillarSlider() {
             <article
               id={p.id}
               data-card
+              data-img-reveal
               className="group relative aspect-[3/4] w-[78vw] scroll-mt-32 overflow-hidden sm:w-[46vw] lg:w-[calc((min(100vw,1480px)-5rem-3*1.25rem)/3.4)]"
             >
               <Image

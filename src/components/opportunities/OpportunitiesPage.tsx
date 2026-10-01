@@ -102,7 +102,7 @@ export default function OpportunitiesPage() {
           </Container>
 
           <FadeIn animation="fadeIn" duration={1.4}>
-            <div className="relative aspect-[16/10] w-full overflow-hidden sm:aspect-[21/9]">
+            <div data-img-reveal className="relative aspect-[16/10] w-full overflow-hidden sm:aspect-[21/9]">
               <BgVideo src="/videos/opportunities-featured.mp4" poster="/images/opportunities/featured-poster.jpg" />
             </div>
           </FadeIn>
