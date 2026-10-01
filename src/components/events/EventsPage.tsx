@@ -3,9 +3,11 @@
 import React, { useEffect, useState } from 'react';
 import { ArrowUpRight } from 'lucide-react';
 import PageShell from '@/components/site/PageShell';
+import SplitWords from '@/components/site/SplitWords';
 import { useInView } from '@/hooks/use-in-view';
 import FlutedShader from './FlutedShader';
-import { CharReveal, ClipImage, IntroLoader, ScrollMarquee, ScrubText, useScrollProgress } from './motion';
+import { CharReveal, ClipImage, ScrollMarquee, ScrubText, useScrollProgress } from './motion';
+import { useLoaderDone } from '@/components/site/SiteLoader';
 
 // Content sourced from the Stitch "Events" screen; layout and motion modelled
 // on an editorial portfolio (shader hero, scrubbed copy, oversized lists).
@@ -135,7 +137,14 @@ function Ruler({ progress }: { progress: number }) {
 const italic = 'italic font-light tracking-[-0.035em]';
 
 export default function EventsPage() {
+  // Hero type plays once the site loader has lifted (immediately on later visits).
+  const loaderDone = useLoaderDone();
   const [ready, setReady] = useState(false);
+  useEffect(() => {
+    if (!loaderDone) return;
+    const id = requestAnimationFrame(() => setReady(true));
+    return () => cancelAnimationFrame(id);
+  }, [loaderDone]);
   const [hovered, setHovered] = useState<number | null>(null);
   const [subscribed, setSubscribed] = useState(false);
   const [scrubRef, scrubProgress] = useScrollProgress<HTMLDivElement>({ start: 0.85, end: 0.45 });
@@ -144,8 +153,6 @@ export default function EventsPage() {
     <PageShell>
       {(openAction) => (
         <div className="bg-[#0b0b0c]">
-          <IntroLoader onDone={() => setReady(true)} />
-
           {/* ─── HERO: fluted-glass shader + staggered mixed type ─── */}
           <section className="relative h-[100svh] min-h-[680px] overflow-hidden">
             <div className="absolute inset-0">
@@ -158,7 +165,7 @@ export default function EventsPage() {
             <div className="relative z-10 flex h-full justify-center px-6">
               <div className="flex h-full w-fit max-w-full flex-col">
                 <div className="flex flex-1 items-center">
-                  <h1 className="flex w-fit flex-col text-[clamp(2.9rem,6.2vw,9.25rem)] font-medium leading-[0.98] tracking-[-0.045em]">
+                  <h1 data-plain className="flex w-fit flex-col text-[clamp(2.9rem,6.2vw,9.25rem)] font-medium leading-[0.98] tracking-[-0.045em]">
                     <span className="self-start">
                       <CharReveal text="Architecting" play={ready} delay={0.1} />
                     </span>
@@ -359,7 +366,7 @@ export default function EventsPage() {
 
           {/* ─── NEWSLETTER ─── */}
           <section className="mx-auto max-w-[1240px] px-6 pb-40 pt-24 lg:px-10">
-            <h2 className={`text-[clamp(3.5rem,10vw,9.5rem)] leading-[0.95] ${italic}`}>Never miss a beat.</h2>
+            <h2 className={`text-[clamp(3.5rem,10vw,9.5rem)] leading-[0.95] ${italic}`}><SplitWords>Never miss a beat.</SplitWords></h2>
             <div className="mt-16 grid grid-cols-1 items-end gap-10 lg:grid-cols-2">
               <p className="max-w-sm text-[13px] leading-relaxed text-white/55">
                 Get notified about the next high-stakes loop, summit, or founder mixer. No spam, just pure signal.

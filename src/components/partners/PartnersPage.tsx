@@ -2,8 +2,10 @@
 
 import React from 'react';
 import PageShell from '@/components/site/PageShell';
+import SplitWords from '@/components/site/SplitWords';
 import { Container, Figure, Label, PrimaryButton, Section, SectionHeader, body, display, lead } from '@/components/site/ui';
 import { FadeIn } from '@/components/FadeIn';
+import DottedWorldMap from './DottedWorldMap';
 
 // Content sourced from the Stitch "Partners" screen.
 
@@ -64,38 +66,38 @@ export default function PartnersPage() {
       {(openAction) => (
         <>
           {/* ─── HERO ─── */}
-          <Container className="pt-44 lg:pt-52 pb-20">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-              <div className="lg:col-span-6">
-                <FadeIn animation="fadeIn">
-                  <Label>Strategic Alliances</Label>
-                </FadeIn>
-                <FadeIn animation="blurInUp" duration={1.1}>
-                  <h1 className={`mt-10 text-[4rem] sm:text-8xl lg:text-[8.5rem] ${display}`}>
-                    Global
-                    <br />
-                    <span className="gradient-text">Ecosystem</span>
-                  </h1>
-                </FadeIn>
-                <FadeIn animation="slideUp" delay={0.3}>
-                  <p className={`mt-12 max-w-lg ${lead}`}>
+          <section className="relative flex min-h-[100svh] flex-col justify-end overflow-hidden">
+            <DottedWorldMap magnet className="absolute inset-0" />
+            {/* Fade the map into the page and keep the copy legible. */}
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_45%,#0b0b0c_100%)]" />
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-[#0b0b0c] via-[#0b0b0c]/80 to-transparent" />
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-[#0b0b0c] to-transparent" />
+
+            {/* Wider than the page container so the copy sits at both ends, in line with the navbar. */}
+            <div className="relative w-full px-6 pt-44 pb-20 md:px-10 xl:px-16 lg:pb-24">
+              <div className="flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between">
+                <div>
+                  <FadeIn animation="fadeIn">
+                    <Label>Strategic Alliances</Label>
+                  </FadeIn>
+                  <h1 className={`mt-8 text-[3rem] sm:text-7xl lg:text-[6rem] ${display}`}>
+                      <SplitWords>
+                        Global
+                        <br />
+                        <span className="gradient-text">Ecosystem</span>
+                      </SplitWords>
+                    </h1>
+                </div>
+                <FadeIn animation="slideUp" delay={0.3} className="lg:max-w-sm">
+                  <p className="text-base leading-[1.7] text-white/55">
                     We&apos;ve architected a borderless infrastructure that connects local innovation with global
                     capital. Our partners provide the regulatory, financial, and technical tailwinds required for
                     high-stakes venture scaling.
                   </p>
                 </FadeIn>
               </div>
-              <FadeIn animation="fadeIn" delay={0.2} duration={1.6} className="lg:col-span-6">
-                <Figure
-                  src="/images/partners/hero.jpg"
-                  alt="Digital Den global partner network"
-                  priority
-                  sizes="(max-width: 1024px) 100vw, 620px"
-                  className="aspect-square [mask-image:radial-gradient(circle_at_center,black_42%,transparent_70%)]"
-                />
-              </FadeIn>
             </div>
-          </Container>
+          </section>
 
           {/* ─── MARKET BRIDGES ─── */}
           <Section>
@@ -157,7 +159,9 @@ export default function PartnersPage() {
             <Container className="text-center">
               <Label className="justify-center">Alliance</Label>
               <h2 className={`mt-10 text-5xl sm:text-7xl lg:text-[6.5rem] ${display}`}>
-                Become a <span className="gradient-text">Partner</span>
+                <SplitWords>
+                  Become a <span className="gradient-text">Partner</span>
+                </SplitWords>
               </h2>
               <p className={`mx-auto mt-10 max-w-xl ${lead}`}>
                 Join an elite network of institutions building the next generation of global technology giants.

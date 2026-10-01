@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import PageShell from '@/components/site/PageShell';
+import SplitWords from '@/components/site/SplitWords';
 import { Container, Figure, Label, PrimaryButton, Section, Tabs, TextLink, body, display, lead } from '@/components/site/ui';
 import { FadeIn } from '@/components/FadeIn';
 
@@ -79,13 +80,13 @@ export default function PortfolioPage() {
             <FadeIn animation="fadeIn">
               <Label>The Den Portfolio</Label>
             </FadeIn>
-            <FadeIn animation="blurInUp" duration={1.1}>
-              <h1 className={`mt-10 text-[4rem] sm:text-8xl lg:text-[10rem] ${display}`}>
-                Venture
-                <br />
-                <span className="gradient-text">Portfolio</span>
+            <h1 className={`mt-10 text-[4rem] sm:text-8xl lg:text-[10rem] ${display}`}>
+                <SplitWords>
+                  Venture
+                  <br />
+                  <span className="gradient-text">Portfolio</span>
+                </SplitWords>
               </h1>
-            </FadeIn>
             <div className="mt-16 grid grid-cols-1 lg:grid-cols-12 gap-10">
               <FadeIn animation="slideUp" delay={0.3} className="lg:col-span-5 lg:col-start-8">
                 <p className={lead}>
@@ -115,7 +116,7 @@ export default function PortfolioPage() {
                     <article className="group">
                       <Figure src={image} alt={name} sizes="(max-width: 768px) 100vw, 580px" className="aspect-[4/5]" />
                       <div className="mt-8 flex items-baseline justify-between gap-6 border-b border-white/[0.12] pb-6">
-                        <h2 className="text-3xl sm:text-4xl font-semibold tracking-[-0.035em]">{name}</h2>
+                        <h2 className="text-3xl sm:text-4xl font-semibold tracking-[-0.035em]"><SplitWords>{name}</SplitWords></h2>
                         <span className="text-xs uppercase tracking-[0.22em] text-white/40">{sector}</span>
                       </div>
                       <p className={`mt-6 max-w-md ${body}`}>{text}</p>
@@ -134,7 +135,9 @@ export default function PortfolioPage() {
             <Container>
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:items-end">
                 <h2 className={`lg:col-span-8 text-5xl sm:text-7xl lg:text-[5.5rem] ${display}`}>
-                  Build the next unicorn from the comfort of <span className="gradient-text">the Den.</span>
+                  <SplitWords>
+                    Build the next unicorn from the comfort of <span className="gradient-text">the Den.</span>
+                  </SplitWords>
                 </h2>
                 <div className="lg:col-span-4">
                   <p className={lead}>

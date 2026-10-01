@@ -4,9 +4,11 @@ import React from 'react';
 import Link from 'next/link';
 import { ArrowUpRight } from 'lucide-react';
 import PageShell from '@/components/site/PageShell';
+import SplitWords from '@/components/site/SplitWords';
 import JoinForm from '@/components/site/JoinForm';
 import { Container, Figure, Label, PrimaryButton, Section, SectionHeader, body, display, heading, lead } from '@/components/site/ui';
 import { FadeIn } from '@/components/FadeIn';
+import { BgVideo } from '@/components/site/editorial';
 
 // Content sourced from the Stitch "Opportunities" screen.
 
@@ -65,11 +67,11 @@ export default function OpportunitiesPage() {
               <FadeIn animation="fadeIn">
                 <Label>Featured Opportunity · Podgorica, Montenegro</Label>
               </FadeIn>
-              <FadeIn animation="blurInUp" duration={1.1}>
-                <h1 className={`mt-10 max-w-5xl text-[3.25rem] sm:text-7xl lg:text-[7.5rem] ${display}`}>
-                  FinTech Innovation Loop <span className="gradient-text">Montenegro</span>
+              <h1 className={`mt-10 max-w-5xl text-[3.25rem] sm:text-7xl lg:text-[7.5rem] ${display}`}>
+                  <SplitWords>
+                    FinTech Innovation Loop <span className="gradient-text">Montenegro</span>
+                  </SplitWords>
                 </h1>
-              </FadeIn>
               <div className="mt-16 grid grid-cols-1 lg:grid-cols-12 gap-12">
                 <FadeIn animation="slideUp" delay={0.25} className="lg:col-span-5">
                   <p className={lead}>
@@ -100,7 +102,9 @@ export default function OpportunitiesPage() {
           </Container>
 
           <FadeIn animation="fadeIn" duration={1.4}>
-            <Figure src="/images/opportunities/featured.jpg" alt="FinTech Innovation Loop Montenegro" priority className="aspect-[16/10] sm:aspect-[21/9] w-full" />
+            <div className="relative aspect-[16/10] w-full overflow-hidden sm:aspect-[21/9]">
+              <BgVideo src="/videos/opportunities-featured.mp4" poster="/images/opportunities/featured-poster.jpg" />
+            </div>
           </FadeIn>
 
           {/* ─── PRIORITY VERTICALS ─── */}
@@ -135,7 +139,7 @@ export default function OpportunitiesPage() {
               <div className="lg:col-span-5">
                 <div className="lg:sticky lg:top-40">
                   <Label index="02">The Advantage</Label>
-                  <h2 className={`mt-8 ${heading}`}>Why Join Digital Den?</h2>
+                  <h2 className={`mt-8 ${heading}`}><SplitWords>Why Join Digital Den?</SplitWords></h2>
                   <p className={`mt-8 max-w-md ${lead}`}>
                     We provide the architectural foundation for long-term strategic success through direct access and
                     visibility.
@@ -187,7 +191,9 @@ export default function OpportunitiesPage() {
               <div className="lg:col-span-4">
                 <Label index="04">Apply</Label>
                 <h2 className={`mt-8 ${heading}`}>
-                  Join the <span className="gradient-text">Network</span>
+                  <SplitWords>
+                    Join the <span className="gradient-text">Network</span>
+                  </SplitWords>
                 </h2>
                 <p className={`mt-8 ${lead}`}>Complete the brief below to be considered for our next matchmaking cycle.</p>
               </div>

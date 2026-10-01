@@ -40,11 +40,11 @@ export default function JoinForm({ fields, submitLabel = 'Submit Application' }:
           <span className="block mb-3 text-[11px] font-medium uppercase tracking-[0.25em] text-white/40">{field.label}</span>
           {field.type === 'select' ? (
             <select name={field.name} required defaultValue="" className={`${inputClass} appearance-none cursor-pointer`}>
-              <option value="" disabled className="bg-black">
+              <option value="" disabled className="bg-[#0b0b0c]">
                 Select
               </option>
               {field.options.map((option) => (
-                <option key={option} value={option} className="bg-black">
+                <option key={option} value={option} className="bg-[#0b0b0c]">
                   {option}
                 </option>
               ))}

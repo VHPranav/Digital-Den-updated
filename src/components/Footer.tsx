@@ -3,268 +3,208 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import {
-  MapPin,
-  Phone,
-  Mail,
-  ArrowRight,
-  CheckCircle2,
-} from 'lucide-react';
+import { ArrowRight, ArrowUp, ArrowUpRight } from 'lucide-react';
+
+// Editorial footer matching the inner pages: near-black, hairline dividers,
+// oversized type, number pills and a giant wordmark.
+
+const explore = [
+  { href: '/platform', label: 'Platform', note: 'Venture Studio' },
+  { href: '/programs', label: 'Programs', note: 'Incubation & Acceleration' },
+  { href: '/projects', label: 'Projects', note: 'Project Activities' },
+  { href: '/portfolio', label: 'Portfolio', note: 'Proof of Growth' },
+  { href: '/opportunities', label: 'Opportunities', note: 'Matchmaking' },
+  { href: '/partners', label: 'Partners', note: 'Global Network' },
+  { href: '/events', label: 'Events', note: 'Summits & Loops' },
+];
+
+const socials = [
+  { href: 'https://instagram.com', label: 'Instagram' },
+  { href: 'https://linkedin.com', label: 'LinkedIn' },
+  { href: 'https://facebook.com', label: 'Facebook' },
+];
+
+const stats = [
+  { value: '11k', label: 'Community across all platforms' },
+  { value: '50+', label: 'Startup inquiries & applications daily' },
+  { value: '50', label: 'Balkan startups scaling globally' },
+];
+
+function Pill({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="inline-flex h-[22px] min-w-[30px] items-center justify-center rounded-full border border-current px-2 text-[11px] tabular-nums leading-none">
+      {children}
+    </span>
+  );
+}
 
 export default function Footer() {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
 
-  const handleSubscribe = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email) {
-      setSubscribed(true);
-      setEmail('');
-    }
-  };
-
   return (
-    <footer className="w-full bg-black pt-10 pb-16 sm:pb-18 md:pb-26 px-4 sm:px-8 lg:px-14 relative z-30">
-      {/* ─── Main Footer Card (3-Color Purple Gradient + Glassmorphism) ─── */}
-      <div
-        className="max-w-[1720px] mx-auto rounded-[40px] p-8 sm:p-12 lg:p-16 relative overflow-hidden"
-        style={{
-          background:
-            'linear-gradient(135deg, #090114 0%, #2e0854 48%, #6b21a8 100%)',
-          border: '1px solid rgba(192, 132, 252, 0.25)',
-          boxShadow:
-            '0 25px 60px -15px rgba(46, 8, 84, 0.6), inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.15), inset 0 -1.5px 1px 0 rgba(0, 0, 0, 0.5)',
-        }}
-      >
-        {/* Subtle 3-Color Purple Ambient Light Blooms */}
-        <div
-          className="absolute top-0 right-1/4 w-[500px] h-[500px] rounded-full pointer-events-none"
-          style={{
-            background: 'radial-gradient(circle, rgba(147, 51, 234, 0.28) 0%, transparent 70%)',
-            filter: 'blur(50px)',
-          }}
-        />
-        <div
-          className="absolute bottom-0 left-10 w-[450px] h-[450px] rounded-full pointer-events-none"
-          style={{
-            background: 'radial-gradient(circle, rgba(88, 28, 135, 0.35) 0%, transparent 70%)',
-            filter: 'blur(50px)',
-          }}
-        />
-        <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] rounded-full pointer-events-none"
-          style={{
-            background: 'radial-gradient(ellipse, rgba(168, 85, 247, 0.12) 0%, transparent 75%)',
-            filter: 'blur(60px)',
-          }}
-        />
-
-        {/* ─── Grid Content ─── */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-8 relative z-10">
-
-          {/* Column 1: Brand Info, Socials & Community Stats */}
-          <div className="lg:col-span-4 space-y-6">
-            <Link href="/" className="inline-flex items-center gap-3 group">
-              <Image
-                src="/logoden.svg"
-                alt="Digital Den Logo"
-                width={257}
-                height={52}
-                className="h-8 w-auto object-contain brightness-0 invert opacity-95 group-hover:opacity-100 transition-opacity"
-              />
+    <footer className="relative z-30 w-full overflow-hidden border-t border-white/10 bg-[#0b0b0c] text-[#f3f0ea]">
+      <div className="mx-auto max-w-[1480px] px-6 lg:px-10">
+        {/* ─── Statement ─── */}
+        <div className="grid grid-cols-1 gap-10 border-b border-white/10 py-20 lg:grid-cols-12 lg:py-28">
+          <h2 className="text-[clamp(2.75rem,6vw,6rem)] font-medium leading-[0.92] tracking-[-0.055em] lg:col-span-8">
+            Your gateway to <span className="font-light italic text-purple-200/90">global markets.</span>
+          </h2>
+          <div className="self-end lg:col-span-4">
+            <p className="text-[15px] leading-[1.6] text-white/60">
+              Connecting founders mainly from the Western Balkans with programs, strategic partners, capital and
+              high-growth international markets.
+            </p>
+            <Link href="/opportunities#join" className="group mt-8 inline-flex items-center gap-3 text-[15px]">
+              <span className="border-b border-current pb-0.5">Join the network</span>
+              <span className="flex h-6 w-9 items-center justify-center rounded-full bg-white text-black transition-colors duration-300 group-hover:bg-purple-300">
+                <ArrowRight className="h-3.5 w-3.5" strokeWidth={2.2} />
+              </span>
             </Link>
+          </div>
+        </div>
 
-            <p className="text-[#FCF8F1] text-sm font-semibold italic text-purple-200">
-              Your Gateway to Global Markets.
+        {/* ─── Columns ─── */}
+        <div className="grid grid-cols-1 gap-14 py-16 md:grid-cols-2 lg:grid-cols-12 lg:gap-10 lg:py-20">
+          {/* Explore */}
+          <nav aria-label="Footer" className="lg:col-span-5">
+            <p className="mb-6 flex items-center gap-2 text-[13px] text-white/60">
+              <Pill>01</Pill> Explore
             </p>
+            <ul>
+              {explore.map(({ href, label, note }) => (
+                <li key={href} className="border-t border-white/10 last:border-b">
+                  <Link href={href} className="group flex items-baseline justify-between gap-6 py-3.5">
+                    <span className="text-[clamp(1.5rem,2.2vw,2rem)] font-medium tracking-[-0.035em] text-white/85 transition-colors duration-300 group-hover:text-white">
+                      {label}
+                    </span>
+                    <span className="flex items-center gap-3 text-[13px] text-white/40 transition-colors group-hover:text-purple-200">
+                      <span className="hidden sm:inline">{note}</span>
+                      <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
 
-            <p className="text-[#F2ECE2]/60 text-xs leading-relaxed max-w-sm">
-              Connecting founders mainly from the Western Balkans with programs, strategic partners, capital and high-growth international markets.
+          {/* Connect + community */}
+          <div className="lg:col-span-3 lg:col-start-7">
+            <p className="mb-6 flex items-center gap-2 text-[13px] text-white/60">
+              <Pill>02</Pill> Connect
             </p>
-
-            {/* Social Icons Row */}
-            <div className="flex items-center gap-3 pt-1">
-              {/* Instagram */}
-              <a
-                href="https://instagram.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Instagram"
-                className="w-10 h-10 rounded-[10px] bg-white/10 hover:bg-purple-600/30 border border-white/10 flex items-center justify-center text-[#FCF8F1] hover:text-white transition-all hover:scale-105"
-              >
-                <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
-                </svg>
+            <address className="space-y-1.5 text-[15px] not-italic leading-[1.6] text-white/80">
+              <p>Podgorica, Montenegro</p>
+              <a href="tel:+38220123456" className="block transition-colors hover:text-purple-200">
+                +382 (0)20 123 456
               </a>
-
-              {/* LinkedIn */}
-              <a
-                href="https://linkedin.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="LinkedIn"
-                className="w-10 h-10 rounded-[10px] bg-white/10 hover:bg-purple-600/30 border border-white/10 flex items-center justify-center text-[#FCF8F1] hover:text-white transition-all hover:scale-105"
-              >
-                <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                  <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
-                </svg>
+              <a href="mailto:info@digitalden.me" className="block underline decoration-white/30 underline-offset-4 transition-colors hover:text-purple-200">
+                info@digitalden.me
               </a>
+            </address>
 
-              {/* Facebook */}
-              <a
-                href="https://facebook.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Facebook"
-                className="w-10 h-10 rounded-[10px] bg-white/10 hover:bg-purple-600/30 border border-white/10 flex items-center justify-center text-[#FCF8F1] hover:text-white transition-all hover:scale-105"
-              >
-                <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                </svg>
-              </a>
-            </div>
-
-            {/* Community Engagement Stats */}
-            <div className="space-y-3 pt-2">
-              <div className="flex items-center gap-3 text-[11.4px] leading-[14px] text-[#FCF8F1]">
-                <div className="w-6 h-6 rounded-full border border-[#FCF8F1]/60 flex items-center justify-center flex-shrink-0">
-                  <svg className="w-3 h-3 text-[#FCF8F1]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                </div>
-                <span>Combined across all platforms: 11k community</span>
-              </div>
-
-              <div className="flex items-center gap-3 text-[11.4px] leading-[14px] text-[#FCF8F1]">
-                <div className="w-6 h-6 rounded-full border border-[#FCF8F1]/60 flex items-center justify-center flex-shrink-0">
-                  <svg className="w-3 h-3 text-[#FCF8F1]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                  </svg>
-                </div>
-                <span>Daily: 50+ startup inquiries &amp; applications</span>
-              </div>
-
-              <div className="flex items-center gap-3 text-[11.3px] leading-[14px] text-[#FCF8F1]">
-                <div className="w-6 h-6 rounded-full border border-[#FCF8F1]/60 flex items-center justify-center flex-shrink-0">
-                  <svg className="w-3 h-3 text-[#FCF8F1]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                  </svg>
-                </div>
-                <span>Growth: 50 Balkan startups scaling globally</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Column 2: Explore Links */}
-          <div className="lg:col-span-3 space-y-4">
-            <div className="text-xs font-bold text-[#FCF8F1] uppercase tracking-wider">
-              Explore
-            </div>
-            <ul className="space-y-3 text-[13px] font-medium text-[#F2ECE2]/80">
-              <li>
-                <Link href="#platform" className="hover:text-purple-300 transition-colors">
-                  Platform &amp; Venture Studio
-                </Link>
-              </li>
-              <li>
-                <Link href="#programs" className="hover:text-purple-300 transition-colors">
-                  Incubation &amp; Acceleration Programs
-                </Link>
-              </li>
-              <li>
-                <Link href="#portfolio" className="hover:text-purple-300 transition-colors">
-                  Portfolio &amp; Proof of Growth
-                </Link>
-              </li>
-              <li>
-                <Link href="#opportunities" className="hover:text-purple-300 transition-colors">
-                  Opportunities &amp; Matchmaking
-                </Link>
-              </li>
-              <li>
-                <Link href="#partners" className="hover:text-purple-300 transition-colors">
-                  Global Partners Network
-                </Link>
-              </li>
-              <li>
-                <Link href="#events" className="hover:text-purple-300 transition-colors">
-                  Ecosystem Events &amp; Summits
-                </Link>
-              </li>
+            <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-[14px]">
+              {socials.map((s) => (
+                <li key={s.label}>
+                  <a
+                    href={s.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group inline-flex items-center gap-1 text-white/70 transition-colors hover:text-white"
+                  >
+                    {s.label}
+                    <ArrowUpRight className="h-3.5 w-3.5 opacity-60 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                  </a>
+                </li>
+              ))}
             </ul>
+
+            <dl className="mt-10 space-y-4 border-t border-white/10 pt-6">
+              {stats.map((s) => (
+                <div key={s.label} className="flex items-baseline gap-4">
+                  <dt className="w-14 shrink-0 text-2xl font-medium tracking-[-0.04em]">{s.value}</dt>
+                  <dd className="text-[13px] leading-snug text-white/50">{s.label}</dd>
+                </div>
+              ))}
+            </dl>
           </div>
 
-          {/* Column 3: Connect Info */}
-          <div className="lg:col-span-2 space-y-4">
-            <div className="text-xs font-bold text-[#FCF8F1] uppercase tracking-wider">
-              Connect
-            </div>
-            <ul className="space-y-3 text-xs text-[#F2ECE2]/70">
-              <li className="flex items-start gap-2.5">
-                <MapPin className="w-4 h-4 text-purple-400 flex-shrink-0 mt-0.5" />
-                <span>Podgorica, Montenegro</span>
-              </li>
-              <li className="flex items-center gap-2.5">
-                <Phone className="w-4 h-4 text-cyan-400 flex-shrink-0" />
-                <span>+382 (0)20 123 456</span>
-              </li>
-              <li className="flex items-center gap-2.5">
-                <Mail className="w-4 h-4 text-purple-400 flex-shrink-0" />
-                <span>info@digitalden.me</span>
-              </li>
-            </ul>
-          </div>
-
-          {/* Column 4: Newsletter Prompt */}
-          <div className="lg:col-span-3 space-y-4">
-            <div className="text-xs font-bold text-[#FCF8F1] uppercase tracking-wider">
-              Stay Informed
-            </div>
-            <p className="text-xs text-[#F2ECE2]/60 leading-relaxed">
+          {/* Newsletter */}
+          <div className="md:col-span-2 lg:col-span-3 lg:col-start-10">
+            <p className="mb-6 flex items-center gap-2 text-[13px] text-white/60">
+              <Pill>03</Pill> Stay informed
+            </p>
+            <p className="text-[15px] leading-[1.6] text-white/60">
               Subscribe to Digital Den updates for upcoming opportunities, programs, and ecosystem news.
             </p>
-
-            <form onSubmit={handleSubscribe} className="space-y-2">
-              <div className="relative">
+            {subscribed ? (
+              <p className="mt-8 border-b border-white/20 pb-3 text-[15px] text-purple-200">You&apos;re on the list.</p>
+            ) : (
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (email) {
+                    setSubscribed(true);
+                    setEmail('');
+                  }
+                }}
+                className="mt-8 flex items-center gap-3 border-b border-white/25 pb-3 transition-colors focus-within:border-white"
+              >
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email..."
-                  className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/15 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-purple-400 transition-all pr-11"
+                  placeholder="Your email"
+                  aria-label="Email address"
+                  className="min-w-0 flex-1 bg-transparent text-[15px] outline-none placeholder:text-white/35"
                 />
                 <button
                   type="submit"
                   aria-label="Subscribe"
-                  className="absolute right-1.5 top-1.5 bottom-1.5 px-2.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white flex items-center justify-center transition-colors"
+                  className="flex h-6 w-9 shrink-0 items-center justify-center rounded-full bg-white text-black transition-colors hover:bg-purple-300"
                 >
-                  <ArrowRight className="w-3.5 h-3.5" />
+                  <ArrowRight className="h-3.5 w-3.5" strokeWidth={2.2} />
                 </button>
-              </div>
-
-              {subscribed && (
-                <div className="flex items-center gap-1.5 text-xs text-emerald-400 font-medium pt-1">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  <span>Subscribed successfully!</span>
-                </div>
-              )}
-            </form>
+              </form>
+            )}
           </div>
-
         </div>
 
-        {/* ─── Bottom Copyright Bar ─── */}
-        <div className="mt-12 pt-8 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-[#F2ECE2]/40">
-          <div>
-            &copy; {new Date().getFullYear()} Digital Den Launch Platform. All rights reserved.
+        {/* ─── Bottom bar ─── */}
+        <div className="flex flex-col gap-6 border-t border-white/10 py-8 text-[13px] text-white/45 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-4">
+            <Link href="/" aria-label="Digital Den home">
+              <Image src="/logoden.svg" alt="Digital Den" width={257} height={52} className="h-5 w-auto brightness-0 invert opacity-80 transition-opacity hover:opacity-100" />
+            </Link>
+            <span>&copy; {new Date().getFullYear()} Digital Den. All rights reserved.</span>
           </div>
           <div className="flex items-center gap-6">
-            <Link href="#privacy" className="hover:text-[#FCF8F1] transition-colors">Privacy Policy</Link>
-            <Link href="#terms" className="hover:text-[#FCF8F1] transition-colors">Terms of Service</Link>
+            <Link href="#privacy" className="transition-colors hover:text-white">
+              Privacy Policy
+            </Link>
+            <Link href="#terms" className="transition-colors hover:text-white">
+              Terms of Service
+            </Link>
+            <button
+              type="button"
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="group inline-flex items-center gap-2 text-white/70 transition-colors hover:text-white"
+            >
+              Back to top
+              <span className="flex h-6 w-6 items-center justify-center rounded-full border border-white/30 transition-colors group-hover:border-white">
+                <ArrowUp className="h-3 w-3" />
+              </span>
+            </button>
           </div>
         </div>
+      </div>
 
+      {/* ─── Giant wordmark ─── */}
+      <div aria-hidden="true" className="pointer-events-none select-none overflow-hidden">
+        <p className="-mb-[0.22em] whitespace-nowrap text-center text-[19.5vw] font-medium leading-[0.9] tracking-[-0.07em] text-transparent [background-clip:text] [-webkit-background-clip:text] bg-gradient-to-b from-white/[0.14] via-purple-300/[0.10] to-transparent">
+          Digital Den
+        </p>
       </div>
     </footer>
   );

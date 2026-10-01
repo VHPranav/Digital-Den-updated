@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import SmoothScroll from "@/components/SmoothScroll";
-import FluidCursorRipple from "@/components/FluidCursorRipple";
+import SiteLoader from "@/components/site/SiteLoader";
 import "./globals.css";
 
 const plusJakarta = Plus_Jakarta_Sans({
@@ -40,7 +40,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         />
       </head>
       <body className="min-h-full flex flex-col bg-black text-white selection:bg-teal-500 selection:text-white">
-        <FluidCursorRipple />
+        <SiteLoader />
         <SmoothScroll>{children}</SmoothScroll>
       </body>
     </html>

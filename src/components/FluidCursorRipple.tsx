@@ -28,14 +28,19 @@ export default function FluidCursorRipple() {
     // not a detail surface, so the resolution drop is not perceptible.
     const SIM_SIZE = isMobile ? 96 : 192;
     const WAVE_SPEED = 1.42;
-    // Faster decay (was 0.985) so ripples settle quickly instead of lingering/building up —
-    // reads as calmer and more premium rather than chaotic, per client feedback.
-    const DAMPING = 0.975;
+    // Faster decay (was 0.985 -> 0.975) so ripples settle quickly instead of
+    // lingering/building up — reads as calmer and more premium rather than chaotic.
+    const DAMPING = 0.96;
     const BRUSH_RADIUS = isMobile ? 0.08 : 0.04;
-    // Reduced cap (was 0.35) — client asked for the mouse-driven movement to feel
-    // more subtle and premium rather than intense.
-    const MAX_STRENGTH = 0.2;
+    // Reduced cap (was 0.35 -> 0.2 -> 0.1 -> 0.06) — client asked for the mouse-driven movement
+    // to feel more subtle and premium rather than intense.
+    const MAX_STRENGTH = 0.06;
     const MOUSE_LERP = 0.18;
+    // Lens look (see waterRenderShader): light focusing, chromatic split, and
+    // how much the concave troughs darken what's underneath.
+    const LENS_STRENGTH = 9.0;
+    const LENS_DISPERSION = 0.3;
+    const LENS_SHADOW = 0.4;
 
     const width = window.innerWidth;
     const height = window.innerHeight;
@@ -80,8 +85,8 @@ export default function FluidCursorRipple() {
     const mouse = new THREE.Vector2(-10, -10);
     const prevMouse = new THREE.Vector2(-10, -10);
     const targetMouse = new THREE.Vector2(-10, -10);
-    let velocity = new THREE.Vector2(0, 0);
-    let prevTargetMouse = new THREE.Vector2(-10, -10);
+    const velocity = new THREE.Vector2(0, 0);
+    const prevTargetMouse = new THREE.Vector2(-10, -10);
 
     // ─── Simulation Material ────────────────────────────────────────
     const simMaterial = new THREE.ShaderMaterial({
@@ -111,6 +116,9 @@ export default function FluidCursorRipple() {
         uSimTexture: { value: null },
         uResolution: { value: new THREE.Vector2(SIM_SIZE, SIM_SIZE) },
         uTime: { value: 0 },
+        uLensStrength: { value: LENS_STRENGTH },
+        uDispersion: { value: LENS_DISPERSION },
+        uShadow: { value: LENS_SHADOW },
       },
       transparent: true,
       blending: THREE.NormalBlending,
@@ -122,10 +130,9 @@ export default function FluidCursorRipple() {
     // ─── Input Tracking ─────────────────────────────────────────────
     let isInteracting = false;
     let lastMoveTime = performance.now();
-    // Wave amplitude decays ~2.5%/frame (DAMPING^SIM_STEPS_PER_FRAME, now 1
-    // step) — slower than before now that steps-per-frame is halved below, so
-    // this window is widened to match (fully settled within ~3s at 60fps).
-    const IDLE_TIMEOUT_MS = 3000;
+    // Wave amplitude decays ~4%/frame (DAMPING^SIM_STEPS_PER_FRAME, 1 step),
+    // so it's fully settled within ~2s at 60fps.
+    const IDLE_TIMEOUT_MS = 2000;
 
     const updateMousePos = (clientX: number, clientY: number) => {
       const nx = clientX / window.innerWidth;
@@ -195,11 +202,11 @@ export default function FluidCursorRipple() {
       mouse.lerp(targetMouse, MOUSE_LERP);
 
       // Velocity-based force injection (faster cursor = stronger ripple).
-      // Multiplier reduced from 3.5 — normal mouse movement now injects noticeably
+      // Multiplier reduced from 3.5 -> 2.2 -> 1.2 — normal mouse movement now injects noticeably
       // gentler force, matching the client's request for a more subtle, premium feel.
       velocity.subVectors(mouse, prevMouse);
       const speed = velocity.length();
-      const strength = Math.min(speed * 2.2, MAX_STRENGTH);
+      const strength = Math.min(speed * 1.2, MAX_STRENGTH);
       simMaterial.uniforms.uStrength.value = strength;
 
       // ── Multi-step simulation for better propagation distance ──

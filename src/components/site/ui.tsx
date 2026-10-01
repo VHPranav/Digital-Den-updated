@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowUpRight } from 'lucide-react';
+import SplitWords from './SplitWords';
 
 // Editorial primitives for the inner pages: generous whitespace, hairline
 // dividers, restrained type. Prefer these over boxed cards.
@@ -65,7 +66,9 @@ export function SectionHeader({
     <div className={`grid grid-cols-1 lg:grid-cols-12 gap-10 lg:items-end ${className}`}>
       <div className="lg:col-span-7">
         <Label index={index}>{label}</Label>
-        <h2 className={`mt-8 ${heading}`}>{title}</h2>
+        <h2 className={`mt-8 ${heading}`}>
+          <SplitWords>{title}</SplitWords>
+        </h2>
       </div>
       {intro && <p className={`lg:col-span-4 lg:col-start-9 ${lead}`}>{intro}</p>}
     </div>
