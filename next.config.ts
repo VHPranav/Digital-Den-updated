@@ -1,52 +1,15 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Static HTML export for Cloudflare Pages (build output: out/).
+  output: "export",
   images: {
-    remotePatterns: [
-      { protocol: "https", hostname: "images.unsplash.com" },
-      { protocol: "https", hostname: "images.pexels.com" },
-    ],
+    // No image optimizer on a static host. Remote Unsplash/Pexels URLs
+    // already carry w=/q= params, so they arrive pre-sized.
+    unoptimized: true,
   },
-  async headers() {
-    return [
-      {
-        source: "/models/:path*",
-        headers: [
-          {
-            key: "Cache-Control",
-            value: "public, max-age=31536000, immutable",
-          },
-        ],
-      },
-      {
-        source: "/videos/:path*",
-        headers: [
-          {
-            key: "Cache-Control",
-            value: "public, max-age=31536000, immutable",
-          },
-        ],
-      },
-      {
-        source: "/frames/:path*",
-        headers: [
-          {
-            key: "Cache-Control",
-            value: "public, max-age=31536000, immutable",
-          },
-        ],
-      },
-      {
-        source: "/images/:path*",
-        headers: [
-          {
-            key: "Cache-Control",
-            value: "public, max-age=31536000, immutable",
-          },
-        ],
-      },
-    ];
-  },
+  // Cache-Control headers live in public/_headers (read by Cloudflare Pages);
+  // headers() is not supported with output: "export".
 };
 
 export default nextConfig;
