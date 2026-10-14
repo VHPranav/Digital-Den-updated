@@ -23,8 +23,16 @@ export default function BeyondBordersSection() {
         lead="Connecting founders with international partners, markets and opportunities across key global hubs."
       />
       <FadeIn animation="fadeIn" delay={0.3} duration={1.4} className="relative mt-10 w-full aspect-[2/1]">
-        <DottedWorldMap cities={REGIONS} fit="contain" dotColor="rgba(178, 120, 255, 0.85)" parallax={false} className="absolute inset-0" />
+        <DottedWorldMap cities={REGIONS} fit="contain" dotColor="rgba(178, 120, 255, 0.85)" parallax={false} labelMinWidth={640} className="absolute inset-0" />
       </FadeIn>
+      {/* Phones: labels would collide on the small map, so list the approved regions below it */}
+      <ul className="mt-6 flex flex-wrap justify-center gap-2 md:hidden">
+        {['Montenegro', ...REGIONS.map((r) => r.name)].map((name) => (
+          <li key={name} className="rounded-full border border-white/15 bg-white/[0.04] px-3.5 py-1.5 text-[13px] text-white/80">
+            {name}
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }

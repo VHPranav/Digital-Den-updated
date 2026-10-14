@@ -238,14 +238,17 @@ export default function CanvasScrollSequence({
         uniform vec2 uImageResolution;
         varying vec2 vUv;
 
+        // "object-fit: cover": show a centred slice of the frame that fills the screen.
+        // Narrower screen than the frame -> crop the sides; wider -> crop top/bottom.
         vec2 getCoverUv(vec2 uv, vec2 screenRes, vec2 texRes) {
-          vec2 s = screenRes;
-          vec2 i = texRes;
-          float rs = s.x / s.y;
-          float ri = i.x / i.y;
-          vec2 newUv = rs < ri ? vec2(uv.x * s.y / s.x * ri, uv.y) : vec2(uv.x, uv.y * s.x / s.y / ri);
-          newUv += (rs < ri ? vec2((1.0 - s.y / s.x * ri) * 0.5, 0.0) : vec2(0.0, (1.0 - s.x / s.y / ri) * 0.5));
-          return newUv;
+          float rs = screenRes.x / screenRes.y;
+          float ri = texRes.x / texRes.y;
+          if (rs < ri) {
+            float k = rs / ri;
+            return vec2(uv.x * k + (1.0 - k) * 0.5, uv.y);
+          }
+          float k = ri / rs;
+          return vec2(uv.x, uv.y * k + (1.0 - k) * 0.5);
         }
 
         void main() {
@@ -480,19 +483,11 @@ export default function CanvasScrollSequence({
             aria-hidden="true"
           /> */}
 
-          {/* Loading Overlay */}
+          {/* Loading state: page background with a small spinner low on the screen, so it never
+              sits behind the Hero copy (which renders above this layer). */}
           {!isInitialReady && (
-            <div className="absolute inset-0 bg-slate-950 flex flex-col items-center justify-center text-white z-50 transition-opacity duration-500 pointer-events-auto">
-              <div className="w-12 h-12 border-4 border-teal-500 border-t-transparent rounded-full animate-spin mb-4" />
-              <p className="text-sm font-semibold tracking-widest uppercase text-slate-300">
-                Loading High Definition Experience...
-              </p>
-              <div className="w-48 bg-slate-800 h-1.5 rounded-full mt-3 overflow-hidden">
-                <div
-                  className="bg-teal-400 h-full transition-all duration-200"
-                  style={{ width: `${Math.min(100, (imagesLoadedCount / 60) * 100)}%` }}
-                />
-              </div>
+            <div className="absolute inset-0 z-50 flex items-end justify-center bg-den pb-[12vh] pointer-events-none" aria-hidden="true">
+              <div className="h-6 w-6 animate-spin rounded-full border-2 border-white/15 border-t-purple-300" />
             </div>
           )}
         </div>

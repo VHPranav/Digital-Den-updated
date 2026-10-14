@@ -35,6 +35,7 @@ export default function DottedWorldMap({
   dotColor = 'rgba(236, 230, 255, 0.22)',
   parallax = true,
   magnet = false,
+  labelMinWidth = 0,
 }: {
   className?: string;
   cities?: City[];
@@ -46,6 +47,9 @@ export default function DottedWorldMap({
   parallax?: boolean;
   // Pull the dots around the cursor slightly towards it.
   magnet?: boolean;
+  // Below this map width (CSS px) the text labels are skipped (markers stay), e.g. on phones
+  // where they would collide; show the names outside the map instead.
+  labelMinWidth?: number;
 }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -256,6 +260,7 @@ export default function DottedWorldMap({
       // Dark halo behind labels so they stay readable over the dots and arcs.
       ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
       ctx.shadowBlur = 6;
+      const showLabels = W >= labelMinWidth;
       cities.forEach((c, i) => {
         const pt = arcs[i]?.b;
         if (!pt) return;
@@ -265,6 +270,7 @@ export default function DottedWorldMap({
         ctx.beginPath();
         ctx.arc(pt.x, pt.y, 2.2, 0, Math.PI * 2);
         ctx.fill();
+        if (!showLabels) return;
         ctx.shadowBlur = 6;
         ctx.fillStyle = 'rgba(248, 245, 255, 0.92)';
         const left = c.label === 'left-up' || c.label === 'left-down';
@@ -285,11 +291,13 @@ export default function DottedWorldMap({
       ctx.beginPath();
       ctx.arc(hub.x, hub.y, 3.2, 0, Math.PI * 2);
       ctx.fill();
-      ctx.shadowBlur = 6;
-      ctx.fillStyle = '#ffffff';
-      ctx.textAlign = 'left';
-      ctx.font = `700 15px ${family}`;
-      ctx.fillText(HUB.name, hub.x + 11, hub.y + 14);
+      if (showLabels) {
+        ctx.shadowBlur = 6;
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'left';
+        ctx.font = `700 15px ${family}`;
+        ctx.fillText(HUB.name, hub.x + 11, hub.y + 14);
+      }
       ctx.shadowBlur = 0;
     };
 
@@ -373,7 +381,7 @@ export default function DottedWorldMap({
       window.removeEventListener('pointermove', onHover);
       document.documentElement.removeEventListener('pointerleave', onLeave);
     };
-  }, [cities, fit, dotColor, parallax, magnet]);
+  }, [cities, fit, dotColor, parallax, magnet, labelMinWidth]);
 
   return (
     <div

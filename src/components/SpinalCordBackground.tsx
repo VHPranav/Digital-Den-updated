@@ -682,6 +682,11 @@ export default function SpinalCordBackground({
       const w = canvasEl.clientWidth;
       const h = canvasEl.clientHeight;
       camera.aspect = w / h;
+      // Portrait screens: widen the vertical FOV so the spine keeps roughly the same horizontal
+      // framing as a near-square screen instead of filling the phone like a close-up.
+      camera.fov = camera.aspect < 0.85
+        ? Math.min(80, 2 * THREE.MathUtils.radToDeg(Math.atan(Math.tan(THREE.MathUtils.degToRad(22.5)) * 0.85 / camera.aspect)))
+        : 45;
       camera.updateProjectionMatrix();
       renderer.setSize(w, h);
       composer.setSize(w, h);
@@ -690,6 +695,7 @@ export default function SpinalCordBackground({
       }
     }
     window.addEventListener('resize', onResize);
+    onResize(); // apply the portrait framing on first load too
 
     /* ─── Scroll Velocity Tracker ─── */
     let lastScrollY = window.scrollY;

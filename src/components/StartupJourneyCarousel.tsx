@@ -94,6 +94,13 @@ const TOTAL_CARDS = journeyCards.length;
 const ANGLE_STEP = 90;  // 360° / 4 cards = 90° rotation per step along helix
 const RADIUS = 520; // px — circular radius around spine (expanded for bigger reference cards)
 const STEP_Y = 200; // px — vertical step height along spine
+// Phones: a much tighter orbit, shorter steps and a deeper perspective so the front card stays fully on screen.
+const layoutFor = (w: number) =>
+  w < 768
+    ? { radius: 170, stepY: 130, perspective: 1400 }
+    : w < 1100
+      ? { radius: 380, stepY: 170, perspective: 1100 }
+      : { radius: RADIUS, stepY: STEP_Y, perspective: 1000 };
 
 export default function StartupJourneyCarousel() {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -110,6 +117,14 @@ export default function StartupJourneyCarousel() {
     let smooth = 0;
     let lastSnapped = -1;
     let rafId = 0;
+    let layout = layoutFor(window.innerWidth);
+    const applyLayout = () => {
+      layout = layoutFor(window.innerWidth);
+      const stage = carouselRef.current?.parentElement;
+      if (stage) stage.style.perspective = `${layout.perspective}px`;
+    };
+    applyLayout();
+    window.addEventListener('resize', applyLayout);
 
     /* ── Read scroll position ── */
     const computeScrollTargets = () => {
@@ -194,7 +209,7 @@ export default function StartupJourneyCarousel() {
         if (!card) return;
         const relPosition = i - smooth;
         const dist = Math.abs(relPosition);
-        const yOffset = relPosition * STEP_Y;
+        const yOffset = relPosition * layout.stepY;
 
         const scale = Math.max(0.5, 1 - dist * 0.22);
         let opa = Math.max(0.08, 1 - dist * 0.42);
@@ -214,7 +229,7 @@ export default function StartupJourneyCarousel() {
         card.style.opacity = String(opa);
         card.style.boxShadow = activeShadow;
         card.style.transform =
-          `translateX(-50%) translateY(calc(-50% + ${yOffset}px)) rotateY(${i * ANGLE_STEP}deg) translateZ(${RADIUS}px) scale(${scale})`;
+          `translateX(-50%) translateY(calc(-50% + ${yOffset}px)) rotateY(${i * ANGLE_STEP}deg) translateZ(${layout.radius}px) scale(${scale})`;
       });
 
       // Only trigger React re-render when the active step index actually changes
@@ -232,6 +247,7 @@ export default function StartupJourneyCarousel() {
 
     return () => {
       window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', applyLayout);
       cancelAnimationFrame(rafId);
     };
   }, []);
@@ -306,7 +322,7 @@ export default function StartupJourneyCarousel() {
                   position: 'absolute',
                   left: 0,
                   top: 0,
-                  width: 'min(370px, calc(100vw - 32px))',
+                  width: 'min(370px, calc(100vw - 72px))',
                   aspectRatio: '16 / 10',
                   transformStyle: 'preserve-3d',
                   transform: `translateX(-50%) translateY(calc(-50% + ${i * STEP_Y}px)) rotateY(${i * ANGLE_STEP}deg) translateZ(${RADIUS}px)`,

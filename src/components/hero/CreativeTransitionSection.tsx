@@ -305,10 +305,23 @@ function Scene({
   scrollProgress: React.RefObject<number>;
 }) {
   const camera = useThree((state) => state.camera) as THREE.PerspectiveCamera;
+  const size = useThree((state) => state.size);
+  const getThree = useThree((state) => state.get);
+  // Portrait (phones): widen the camera so the emblem fits, and stack the headline above it.
+  const portrait = size.width / size.height < 0.9;
 
   useEffect(() => {
     RectAreaLightUniformsLib.init();
   }, []);
+
+  useEffect(() => {
+    const aspect = size.width / size.height;
+    const cam = getThree().camera as THREE.PerspectiveCamera;
+    cam.fov = portrait
+      ? Math.min(70, Math.max(38, 2 * THREE.MathUtils.radToDeg(Math.atan(Math.tan(THREE.MathUtils.degToRad(24)) / aspect))))
+      : 38;
+    cam.updateProjectionMatrix();
+  }, [getThree, size.width, size.height, portrait]);
 
   // Smooth scroll camera scrub
   useEffect(() => {
@@ -360,14 +373,14 @@ function Scene({
 
       {/* ─── 3D Clean Text (Left-aligned, passing directly behind the glass ring, vertically centered) ─── */}
       <Text
-        position={[-2.65, 0.0, -0.45]}
-        fontSize={0.30}
+        position={portrait ? [0, 2.15, -0.45] : [-2.65, 0.0, -0.45]}
+        fontSize={portrait ? 0.34 : 0.30}
         maxWidth={3.0}
         lineHeight={1.08}
         letterSpacing={0.04}
-        anchorX="left"
+        anchorX={portrait ? 'center' : 'left'}
         anchorY="middle"
-        textAlign="left"
+        textAlign={portrait ? 'center' : 'left'}
       >
         {"VENTURING\nBEYOND\nBORDERS"}
         <meshBasicMaterial color="#e4e4e7" toneMapped={true} />
@@ -434,8 +447,8 @@ export default function CreativeTransitionSection() {
         </div>
 
         {/* ─── Right-Side Information Column (Vertically Centered) ─── */}
-        <div className="absolute inset-0 z-10 flex items-center justify-end pointer-events-none">
-          <div className="mr-[5vw] sm:mr-[7vw] md:mr-[8vw] max-w-[260px] sm:max-w-[290px] md:max-w-[320px] space-y-6 text-neutral-300 font-mono text-[11px] sm:text-xs md:text-[13px] leading-[1.75] drop-shadow-lg">
+        <div className="absolute inset-0 z-10 flex items-end justify-center pb-[10vh] pointer-events-none md:items-center md:justify-end md:pb-0">
+          <div className="mx-6 text-center md:mx-0 md:text-left md:mr-[8vw] max-w-[320px] space-y-4 md:space-y-6 text-neutral-300 font-mono text-[11px] sm:text-xs md:text-[13px] leading-[1.75] drop-shadow-lg">
             <p className="text-white font-semibold uppercase tracking-widest">
               Startup Launch Platform
             </p>
