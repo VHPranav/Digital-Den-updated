@@ -8,8 +8,8 @@ import BorderGlow from './BorderGlow';
 
 // Four entry points into the ecosystem (final approved copy). Not "pillars":
 // the Platform page owns the three pillars. All four cards share one treatment
-// (photo background + shade) for equal visual weight; cards 2 and 4 sit slightly
-// lower on desktop. `position` = background crop focus.
+// (photo background + shade) on one aligned row for equal visual weight.
+// `position` = background crop focus.
 const cards: { title: string; body: string; cta: string; href: string; image: string; position?: string }[] = [
   {
     title: 'Venture Building',
@@ -69,7 +69,6 @@ export default function FourPillarsSection() {
             animation="slideUp"
             delay={0.2 + i * 0.3}
             duration={1.2}
-            className={i % 2 === 1 ? 'lg:translate-y-10' : undefined}
           >
             <BorderGlow
               borderRadius={24}
