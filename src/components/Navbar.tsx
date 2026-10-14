@@ -4,8 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { createPortal } from 'react-dom';
-import { Compass, Menu, X, ArrowUpRight, ChevronDown, Rocket, Layers, Globe, Trophy } from 'lucide-react';
+import { Menu, X, ArrowUpRight } from 'lucide-react';
 
 interface NavbarProps {
   onOpenAction?: () => void;
@@ -16,14 +15,10 @@ export default function Navbar({ onOpenAction }: NavbarProps) {
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
-  const [mounted, setMounted] = useState(false);
 
   const pathname = usePathname();
 
   useEffect(() => {
-    setMounted(true);
-
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       const scrollThreshold = window.innerHeight * 0.02;
@@ -53,17 +48,9 @@ export default function Navbar({ onOpenAction }: NavbarProps) {
     border: '1px solid rgba(255, 255, 255, 0.15)',
   };
 
-  const dropdownGlassStyle = {
-    background: 'rgba(11, 11, 12, 0.85)',
-    backdropFilter: 'blur(24px) saturate(180%)',
-    WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-    boxShadow: '0 20px 50px 0 rgba(0,0,0,0.6), inset 0 1px 0 0 rgba(255, 255, 255, 0.15)',
-    border: '1px solid rgba(255, 255, 255, 0.15)',
-  };
-
   const navItems = [
-    { name: 'Platform', href: '/platform', hasDropdown: true, key: 'platform' },
-    { name: 'Programs', href: '/programs', hasDropdown: true, key: 'programs' },
+    { name: 'Platform', href: '/platform' },
+    { name: 'Programs', href: '/programs' },
     { name: 'Partners', href: '/partners' },
     { name: 'Opportunities', href: '/opportunities' },
     { name: 'Projects', href: '/projects' },
@@ -136,146 +123,6 @@ export default function Navbar({ onOpenAction }: NavbarProps) {
                 <div className={`flex items-center ${isScrolled ? 'space-x-4 xl:space-x-6' : 'space-x-4 xl:space-x-8'}`}>
                   {navItems.map((item) => {
                     const isActive = pathname === item.href;
-                    if (item.hasDropdown) {
-                      return (
-                        <div
-                          key={item.name}
-                          className="relative"
-                          onMouseEnter={() => setActiveDropdown(item.key)}
-                          onMouseLeave={() => setActiveDropdown(null)}
-                        >
-                          <Link
-                            href={item.href}
-                            className={`flex items-center gap-1 text-[13px] xl:text-sm font-medium transition-colors cursor-pointer ${isActive
-                              ? 'text-purple-300 font-semibold'
-                              : 'text-slate-200 hover:text-white'
-                              }`}
-                          >
-                            <span>{item.name}</span>
-                            <ChevronDown className="w-3.5 h-3.5 text-purple-300/80 transition-transform duration-300 group-hover:rotate-180" />
-                          </Link>
-
-                          {/* Dropdown Portal */}
-                          {mounted &&
-                            item.key === 'platform' &&
-                            createPortal(
-                              <div
-                                className={`fixed left-1/2 -translate-x-1/2 rounded-2xl border border-purple-500/20 shadow-2xl transition-all duration-300 z-[9999] pointer-events-auto overflow-hidden w-[720px] ${activeDropdown === 'platform'
-                                  ? 'opacity-100 translate-y-0 visible'
-                                  : 'opacity-0 -translate-y-2 invisible'
-                                  }`}
-                                style={{ top: '100px', ...dropdownGlassStyle }}
-                                onMouseEnter={() => setActiveDropdown('platform')}
-                                onMouseLeave={() => setActiveDropdown(null)}
-                              >
-                                {/* Radial Glow Orbs */}
-                                <div
-                                  className="pointer-events-none absolute -top-16 -right-16 w-[350px] h-[350px] rounded-full opacity-25"
-                                  style={{ background: 'radial-gradient(circle, #a855f7 0%, transparent 70%)', filter: 'blur(40px)' }}
-                                />
-                                <div
-                                  className="pointer-events-none absolute -bottom-16 -left-16 w-[350px] h-[350px] rounded-full opacity-25"
-                                  style={{ background: 'radial-gradient(circle, #06b6d4 0%, transparent 70%)', filter: 'blur(40px)' }}
-                                />
-
-                                <div className="relative z-10 p-6 grid grid-cols-2 gap-4 text-white">
-                                  <Link
-                                    href="/platform#building"
-                                    className="p-4 rounded-xl bg-white/[0.03] hover:bg-purple-600/10 transition-all border border-white/10 group flex gap-3.5 items-start"
-                                  >
-                                    <div className="w-9 h-9 rounded-lg bg-purple-500/20 border border-purple-400/30 flex items-center justify-center text-purple-300 flex-shrink-0">
-                                      <Layers className="w-4 h-4" />
-                                    </div>
-                                    <div>
-                                      <h4 className="font-semibold text-sm text-white group-hover:text-purple-300 transition-colors">
-                                        Venture Building
-                                      </h4>
-                                      <p className="text-xs text-slate-300 mt-1">
-                                        Architectural support to build, validate & scale your tech stack.
-                                      </p>
-                                    </div>
-                                  </Link>
-
-                                  <Link
-                                    href="/platform#expansion"
-                                    className="p-4 rounded-xl bg-white/[0.03] hover:bg-purple-600/10 transition-all border border-white/10 group flex gap-3.5 items-start"
-                                  >
-                                    <div className="w-9 h-9 rounded-lg bg-cyan-500/20 border border-cyan-400/30 flex items-center justify-center text-cyan-300 flex-shrink-0">
-                                      <Globe className="w-4 h-4" />
-                                    </div>
-                                    <div>
-                                      <h4 className="font-semibold text-sm text-white group-hover:text-purple-300 transition-colors">
-                                        Global Expansion
-                                      </h4>
-                                      <p className="text-xs text-slate-300 mt-1">
-                                        Direct market access across Montenegro, US, Benelux & Jordan.
-                                      </p>
-                                    </div>
-                                  </Link>
-                                </div>
-                              </div>,
-                              document.body
-                            )}
-
-                          {mounted &&
-                            item.key === 'programs' &&
-                            createPortal(
-                              <div
-                                className={`fixed left-1/2 -translate-x-1/2 rounded-2xl border border-purple-500/20 shadow-2xl transition-all duration-300 z-[9999] pointer-events-auto overflow-hidden w-[720px] ${activeDropdown === 'programs'
-                                  ? 'opacity-100 translate-y-0 visible'
-                                  : 'opacity-0 -translate-y-2 invisible'
-                                  }`}
-                                style={{ top: '100px', ...dropdownGlassStyle }}
-                                onMouseEnter={() => setActiveDropdown('programs')}
-                                onMouseLeave={() => setActiveDropdown(null)}
-                              >
-                                <div
-                                  className="pointer-events-none absolute -top-16 -right-16 w-[350px] h-[350px] rounded-full opacity-25"
-                                  style={{ background: 'radial-gradient(circle, #a855f7 0%, transparent 70%)', filter: 'blur(40px)' }}
-                                />
-
-                                <div className="relative z-10 p-6 grid grid-cols-2 gap-4 text-white">
-                                  <Link
-                                    href="/programs#acceleration"
-                                    className="p-4 rounded-xl bg-white/[0.03] hover:bg-purple-600/10 transition-all border border-white/10 group flex gap-3.5 items-start"
-                                  >
-                                    <div className="w-9 h-9 rounded-lg bg-purple-500/20 border border-purple-400/30 flex items-center justify-center text-purple-300 flex-shrink-0">
-                                      <Rocket className="w-4 h-4" />
-                                    </div>
-                                    <div>
-                                      <h4 className="font-semibold text-sm text-white group-hover:text-purple-300 transition-colors">
-                                        Startup Accelerator
-                                      </h4>
-                                      <p className="text-xs text-slate-300 mt-1">
-                                        Structured acceleration moving founders from seed to capital.
-                                      </p>
-                                    </div>
-                                  </Link>
-
-                                  <Link
-                                    href="/opportunities#fintech"
-                                    className="p-4 rounded-xl bg-white/[0.03] hover:bg-purple-600/10 transition-all border border-white/10 group flex gap-3.5 items-start"
-                                  >
-                                    <div className="w-9 h-9 rounded-lg bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-300 flex-shrink-0">
-                                      <Trophy className="w-4 h-4" />
-                                    </div>
-                                    <div>
-                                      <h4 className="font-semibold text-sm text-white group-hover:text-purple-300 transition-colors">
-                                        FinTech Innovation Loop
-                                      </h4>
-                                      <p className="text-xs text-slate-300 mt-1">
-                                        Sector-focused opportunity connecting startups & financial institutions.
-                                      </p>
-                                    </div>
-                                  </Link>
-                                </div>
-                              </div>,
-                              document.body
-                            )}
-                        </div>
-                      );
-                    }
-
                     return (
                       <Link
                         key={item.name}
@@ -299,7 +146,7 @@ export default function Navbar({ onOpenAction }: NavbarProps) {
                       onClick={onOpenAction}
                       className="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 whitespace-nowrap bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-md shadow-purple-950/40 flex items-center gap-1 cursor-pointer border border-purple-400/30"
                     >
-                      <span>Apply Now</span>
+                      <span>Apply as Startup</span>
                       <ArrowUpRight className="w-3.5 h-3.5" />
                     </button>
                   </>

@@ -1,68 +1,128 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
-import { ExternalLink, Globe } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
+import { gsap, ScrollTrigger } from '@/lib/gsap';
 import { FadeIn } from './FadeIn';
-import DottedWorldMap, { type City } from './partners/DottedWorldMap';
+import { headingGradient } from './home/SectionIntro';
+import { proofOfGrowth } from '@/lib/homeContent';
 
-// Countries/regions connected to the Montenegro hub on the dotted map.
-const HOME_HUBS: City[] = [
-  { name: 'United States', lat: 39.5, lng: -98.35 },
-  { name: 'Benelux', lat: 50.8, lng: 4.9 },
-  { name: 'Jordan', lat: 31.2, lng: 36.5, label: 'left-down' },
-];
+// Portfolio highlights — exactly the approved content: title, one sentence, "Explore Full
+// Portfolio", plus 3–4 real startups once Digital Den confirms them (src/lib/homeContent.ts).
+// Kinetic statement: the sentence is set large and lights up word by word as you scroll;
+// the four outcomes (investment, revenue, clients, international market presence) light up
+// in the brand gradient.
+const SENTENCE = 'Startups that turned potential into investment, revenue, clients and international market presence.';
+const OUTCOMES = new Set(['investment', 'revenue', 'clients', 'international', 'market', 'presence']);
+const DIM = 0.14;
+
+const outcomeGradient: React.CSSProperties = {
+  backgroundImage: 'linear-gradient(90deg, #d8b4fe 0%, #a855f7 45%, #38bdf8 100%)',
+  WebkitBackgroundClip: 'text',
+  backgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
+};
 
 export default function ProofOfGrowthSection() {
+  const startups = proofOfGrowth.slice(0, 4);
+  const statementRef = useRef<HTMLParagraphElement>(null);
+
+  useEffect(() => {
+    const el = statementRef.current;
+    if (!el) return;
+    const words = el.querySelectorAll<HTMLElement>('[data-word]');
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      words.forEach((w) => (w.style.opacity = '1'));
+      return;
+    }
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        words,
+        { opacity: DIM },
+        {
+          opacity: 1,
+          ease: 'none',
+          stagger: 0.12,
+          scrollTrigger: { trigger: el, start: 'top 82%', end: 'bottom 48%', scrub: 0.6 },
+        }
+      );
+    }, el);
+    ScrollTrigger.refresh();
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <section className="w-full max-w-[1450px] mx-auto px-4 sm:px-8 lg:px-12">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-        {/* Left Copy Column */}
-        <div className="space-y-6 text-left lg:col-span-5">
-          <div className="space-y-3">
-            <FadeIn animation="fadeIn" delay={0.1}>
-              <span className="text-xs font-semibold uppercase tracking-widest text-purple-300 bg-purple-500/10 border border-purple-500/20 px-3.5 py-1.5 rounded-full inline-flex items-center gap-2">
-                <Globe className="w-3.5 h-3.5 text-purple-400 animate-pulse" />
-                Proof of Growth & Beyond Borders
-              </span>
-            </FadeIn>
-            <FadeIn animation="fadeIn" delay={0.2}>
-              <h2
-                className="text-3xl sm:text-4xl lg:text-[44px] leading-[118%] font-medium tracking-tight"
-                style={{
-                  background: 'linear-gradient(90deg, #FFFFFF 0%, #FFFFFF 30%, #F3E8FF 45%, #D8B4FE 60%, #C084FC 75%, #A855F7 88%, #7E22CE 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                }}
-              >
-                Connecting Founders Across Key Global Hubs
-              </h2>
-            </FadeIn>
-          </div>
+    <section id="proof-of-growth" className="relative w-full max-w-[1450px] mx-auto px-4 sm:px-8 lg:px-12">
+      {/* Soft ambient light (no box) */}
+      <div className="pointer-events-none absolute -top-20 left-[-10%] h-[380px] w-[620px] rounded-full bg-purple-600/[0.10] blur-[130px]" />
 
-          <FadeIn animation="fadeIn" delay={0.3}>
-            <p className="text-slate-300 text-sm sm:text-base font-normal leading-relaxed">
-              Startups that turned potential into investment, revenue, clients and international market presence across Montenegro, the Western Balkans, US, Jordan and Benelux.
-            </p>
-          </FadeIn>
-
-
-          <div className="pt-2">
-            <Link
-              href="/portfolio"
-              className="px-6 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs uppercase tracking-wider border border-white/20 transition-all flex items-center gap-2 w-fit group hover:border-purple-400/40 shadow-lg"
-            >
-              <span>Explore Full Portfolio</span>
-              <ExternalLink className="w-4 h-4 text-purple-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-            </Link>
-          </div>
-        </div>
-
-        {/* Right: live dotted network map */}
-        <FadeIn animation="fadeIn" delay={0.4} duration={1.4} className="relative w-full aspect-[2/1] lg:col-span-7">
-          <DottedWorldMap cities={HOME_HUBS} fit="contain" dotColor="rgba(178, 120, 255, 0.85)" parallax={false} className="absolute inset-0" />
+      <div className="relative flex flex-wrap items-end justify-between gap-6">
+        <FadeIn animation="fadeIn" delay={0.1}>
+          <h2 className="text-3xl font-medium leading-[110%] tracking-tight sm:text-4xl lg:text-[48px]" style={headingGradient}>
+            Proof of Growth
+          </h2>
+        </FadeIn>
+        <FadeIn animation="fadeIn" delay={0.2}>
+          <Link href="/portfolio" className="group inline-flex items-center gap-3 pb-1 text-[15px] font-medium text-white">
+            <span className="relative">
+              Explore Full Portfolio
+              <span className="absolute -bottom-1 left-0 h-px w-full origin-left scale-x-[0.35] bg-gradient-to-r from-purple-400 to-sky-400 transition-transform duration-500 group-hover:scale-x-100" />
+            </span>
+            <span className="flex h-9 w-9 items-center justify-center rounded-full border border-white/25 transition-all duration-500 group-hover:rotate-45 group-hover:border-transparent group-hover:bg-white group-hover:text-black">
+              <ArrowUpRight className="h-4 w-4" />
+            </span>
+          </Link>
         </FadeIn>
       </div>
+
+      {/* Kinetic statement */}
+      <p
+        ref={statementRef}
+        className="relative mt-10 sm:mt-14 max-w-[1250px] font-['Plus_Jakarta_Sans',sans-serif] text-[clamp(1.75rem,3.6vw,2.9rem)] font-medium leading-[1.18] tracking-[-0.02em] text-white"
+      >
+        {SENTENCE.split(' ').map((word, i, arr) => {
+          const isOutcome = OUTCOMES.has(word.replace(/[^a-z]/gi, '').toLowerCase());
+          return (
+            <React.Fragment key={i}>
+              <span data-word className="inline-block" style={{ opacity: DIM, ...(isOutcome ? outcomeGradient : null) }}>
+                {word}
+              </span>
+              {i < arr.length - 1 && ' '}
+            </React.Fragment>
+          );
+        })}
+      </p>
+
+      {/* Real startups (DD-approved data only): a quiet row under the statement */}
+      {startups.length > 0 && (
+        <div className={`mt-14 grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2 ${startups.length === 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3'}`}>
+          {startups.map((s, i) => {
+            const body = (
+              <>
+                <div className="relative h-10 w-28">
+                  <Image src={s.logo} alt={`${s.name} logo`} fill className="object-contain object-left" sizes="112px" />
+                </div>
+                <h3 className="mt-6 font-['Plus_Jakarta_Sans',sans-serif] text-xl font-semibold tracking-tight text-white">{s.name}</h3>
+                <p className="mt-2 text-sm leading-[1.55] text-white/70">{s.achievement}</p>
+                {s.metric && <p className="mt-3 text-sm font-medium text-purple-200">{s.metric}</p>}
+              </>
+            );
+            return (
+              <FadeIn key={s.name} animation="slideUp" delay={0.15 + i * 0.12}>
+                {s.href ? (
+                  <Link href={s.href} className="block border-l border-white/10 pl-5 transition-colors hover:border-purple-400/60">
+                    {body}
+                  </Link>
+                ) : (
+                  <div className="border-l border-white/10 pl-5">{body}</div>
+                )}
+              </FadeIn>
+            );
+          })}
+        </div>
+      )}
     </section>
   );
 }

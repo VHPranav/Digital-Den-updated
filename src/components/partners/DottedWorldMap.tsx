@@ -13,13 +13,11 @@ export type City = { name: string; lat: number; lng: number; label?: 'right' | '
 
 // Points sit near each country's centre, so labels read as countries/regions.
 const HUB: City = { name: 'Montenegro', lat: 42.7, lng: 19.3 };
+// Only markets Digital Den is active in (per the Master Brief): US, Benelux, Jordan.
 const PARTNER_CITIES: City[] = [
   { name: 'United States', lat: 39.5, lng: -98.35 },
-  { name: 'United Kingdom', lat: 52.6, lng: -1.5, label: 'left-up' },
-  { name: 'France', lat: 46.6, lng: 2.4, label: 'left-down' },
-  { name: 'Germany', lat: 51.2, lng: 10.4 },
+  { name: 'Benelux', lat: 50.8, lng: 4.9 },
   { name: 'Jordan', lat: 31.2, lng: 36.5, label: 'left-down' },
-  { name: 'Singapore', lat: 1.35, lng: 103.82 },
 ];
 
 const DEG = Math.PI / 180;

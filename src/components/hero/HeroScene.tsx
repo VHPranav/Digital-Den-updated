@@ -23,7 +23,7 @@ export default function HeroScene({
       camera={{ position: [0, 0.3, 8.5], fov: 32 }}
       frameloop={isTabVisible && isInViewport ? "always" : "never"}
     >
-      <color attach="background" args={["#000000"]} />
+      <color attach="background" args={["#0b0b0c"]} />
       <SceneRig triggerRef={triggerRef} />
       <EffectComposer multisampling={0}>
         <Bloom intensity={0.9} luminanceThreshold={0.25} luminanceSmoothing={0.4} mipmapBlur />

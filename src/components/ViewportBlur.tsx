@@ -99,7 +99,7 @@ export default function ViewportBlur() {
           className="absolute inset-0 w-full h-full"
           style={{
             background:
-              'linear-gradient(to top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.25) 30%, rgba(0, 0, 0, 0.75) 75%, rgb(0, 0, 0) 100%)',
+              'linear-gradient(to top, rgba(11, 11, 12, 0) 0%, rgba(11, 11, 12, 0.25) 30%, rgba(11, 11, 12, 0.75) 75%, rgb(11, 11, 12) 100%)',
             zIndex: 2,
           }}
         />
@@ -132,7 +132,7 @@ export default function ViewportBlur() {
           className="absolute inset-0 w-full h-full"
           style={{
             background:
-              'linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.25) 30%, rgba(0, 0, 0, 0.75) 75%, rgb(0, 0, 0) 100%)',
+              'linear-gradient(to bottom, rgba(11, 11, 12, 0) 0%, rgba(11, 11, 12, 0.25) 30%, rgba(11, 11, 12, 0.75) 75%, rgb(11, 11, 12) 100%)',
             zIndex: 2,
           }}
         />

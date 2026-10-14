@@ -1,13 +1,16 @@
 @import "tailwindcss";
 
 :root {
-  --background: #070a0f;
+  --background: #0b0b0c;
   --foreground: #ededed;
+  /* Site background (same as the footer / inner pages) */
+  --den: #0b0b0c;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-den: var(--den);
   --font-sans: var(--font-plus-jakarta), sans-serif;
   --font-mono: var(--font-plus-jakarta), sans-serif;
 }

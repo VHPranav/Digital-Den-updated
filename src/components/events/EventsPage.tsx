@@ -18,7 +18,7 @@ const upcoming = [
     date: '02 Nov 2024',
     title: 'FinTech Innovation Loop: Series A Dynamics',
     body: 'A high-stakes session covering capital efficiency and market penetration for late-stage seed startups.',
-    location: 'The Vault, London / Hybrid',
+    location: 'Hybrid',
     cta: 'Register for Event',
     glyph: 'sun',
   },
@@ -36,7 +36,7 @@ const upcoming = [
     date: '28 Nov 2024',
     title: 'Founders Mixer: Q4 Portfolio Social',
     body: 'An informal evening for portfolio founders and limited partners to synchronize and network.',
-    location: 'Rooftop Den, Singapore',
+    location: 'Location to be announced',
     cta: 'Request Invite',
     glyph: 'asterisk',
   },
@@ -53,7 +53,7 @@ const stats = [
   { value: 3, unit: 'Upcoming', caption: 'Events on the calendar this season' },
   { value: 4, unit: 'Recaps', caption: 'Summits, loops and mixers to relive' },
   { value: 3, unit: 'Formats', caption: 'Tech loops, summits and founder mixers' },
-  { value: 3, unit: 'Venues', caption: 'London, Singapore and virtual' },
+  { value: 2, unit: 'Settings', caption: 'In person and virtual' },
 ];
 
 /* ─── Inline glyphs (violet, like the reference's accent icons) ─── */

@@ -9,7 +9,7 @@ export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
 
   return (
-    <section ref={sectionRef} className="relative h-[300vh] w-full bg-black">
+    <section ref={sectionRef} className="relative h-[300vh] w-full bg-den">
       <div className="sticky top-0 h-screen w-full overflow-hidden">
         {/* 3D emblem + GPU particle field, unified in one scene */}
         <div className="absolute inset-0 z-0">

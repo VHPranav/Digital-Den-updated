@@ -38,8 +38,8 @@ const programs: {
     id: 'mtsb-europe',
     status: 'ongoing',
     title: 'MTSB Europe',
-    region: 'Berlin · Paris',
-    body: "The Master's in Tech & Sustainable Business. A partnership program across Berlin and Paris focusing on circular economy solutions.",
+    region: 'Europe',
+    body: "The Master's in Tech & Sustainable Business. A European partnership program focusing on circular economy solutions.",
     tags: ['Academic + Venture', 'EU Markets'],
     image: '/images/programs/europe.jpg',
   },
@@ -303,7 +303,7 @@ export default function ProgramsPage() {
               </Reveal>
               <Reveal delay={0.1} className="self-end lg:col-span-4 lg:col-start-9">
                 <p className="text-[16px] leading-[1.55] text-white/70">
-                  From a 12-week readiness intensive to academic partnerships in Berlin and Paris, Silicon Valley
+                  From a 12-week readiness intensive to academic partnerships in Europe, Silicon Valley
                   immersion and a MENA accelerator in Amman. Hover a program to see it.
                 </p>
               </Reveal>

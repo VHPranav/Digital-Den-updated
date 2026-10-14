@@ -19,7 +19,7 @@ const bridges = [
   {
     title: 'European Gateway',
     body: 'Navigating the complex landscape of EU regulations and multi-market scaling. Our European partners provide localized expertise in GDPR compliance, R&D tax credits, and pan-continental expansion.',
-    hubs: ['Berlin Hub', 'London FinTech'],
+    hubs: ['Benelux'],
     image: '/images/partners/europe.jpg',
   },
 ];

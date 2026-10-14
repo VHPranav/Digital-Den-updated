@@ -26,18 +26,21 @@ export default function SlantedSectionTransition({
     <div className="relative z-30 w-full -mt-[6vw] overflow-visible">
       {/* ─── 1. Asymmetrical Slanted HTML Masking Wrapper (Opposite Slant) ─── */}
       <div
-        className="relative w-full bg-black text-white overflow-hidden transition-transform duration-75 ease-out"
+        className="relative w-full bg-den text-white overflow-hidden transition-transform duration-75 ease-out"
         style={{
           clipPath: `polygon(0 ${slantSlopeVw}vw, 100% 0, 100% 100%, 0 100%)`,
           WebkitClipPath: `polygon(0 ${slantSlopeVw}vw, 100% 0, 100% 100%, 0 100%)`,
           paddingTop: `${slantSlopeVw * 1.1}vw`,
         }}
       >
-        {/* ─── 2. Seamless Slanted Black Dissolve Gradient Overlay (Joined with Slant Angle) ─── */}
+        {/* ─── 2. Seamless Slanted Black Dissolve Gradient Overlay (Joined with Slant Angle) ───
+            Sits above the page content (z-12 > z-10), so it is kept short: fully transparent
+            by slope + 16vw, before the Hero copy starts. */}
         <div
-          className="absolute top-0 inset-x-0 h-[50vh] sm:h-[100vh] pointer-events-none z-[12]"
+          className="absolute top-0 inset-x-0 pointer-events-none z-[12]"
           style={{
-            background: `linear-gradient(${180 - angleDeg}deg, #000000 0%, #000000 ${slantSlopeVw * 0.9}vw, rgba(0, 0, 0, 0.96) ${slantSlopeVw + 6}vw, rgba(0, 0, 0, 0.75) ${slantSlopeVw + 16}vw, rgba(0, 0, 0, 0.3) ${slantSlopeVw + 28}vw, transparent 100%)`,
+            height: `${slantSlopeVw + 16}vw`,
+            background: `linear-gradient(${180 - angleDeg}deg, #0b0b0c 0%, #0b0b0c ${slantSlopeVw * 0.9}vw, rgba(11, 11, 12, 0.96) ${slantSlopeVw + 3}vw, rgba(11, 11, 12, 0.6) ${slantSlopeVw + 8}vw, rgba(11, 11, 12, 0.25) ${slantSlopeVw + 12}vw, transparent 100%)`,
           }}
           aria-hidden="true"
         />

@@ -2,12 +2,14 @@
 
 import React, { useEffect, useState, useSyncExternalStore } from 'react';
 
-const EASE = 'cubic-bezier(0.2, 0.7, 0.1, 1)';
-const COUNT_MS = 2400; // percentage count-up
-const LIFT_MS = 1400; // curtain lift
+const WORD = 'DIGITAL DEN';
+const SWEEP_MS = 1100; // one light sweep across the wordmark
+const SWEEPS = 2; // sweeps before the loader leaves
+const STAGGER_MS = 60; // delay between letters within a sweep
+const EXIT_MS = 700; // fade/blur out
 
 // Site-wide "loader finished" flag, so pages can hold their intro animations
-// until the curtain lifts. Stays true for client-side navigations afterwards.
+// until the loader leaves. Stays true for client-side navigations afterwards.
 let loaderDone = false;
 const listeners = new Set<() => void>();
 const subscribe = (cb: () => void) => {
@@ -18,35 +20,31 @@ export function useLoaderDone() {
   return useSyncExternalStore(subscribe, () => loaderDone, () => false);
 }
 
-/** Full-screen intro on the first load of any page: count to 100%, then the curtain lifts. */
+/**
+ * First-load intro: a small centred wordmark on the page background with a band of light
+ * sweeping across its letters (dim → bright → dim), twice, then a soft fade-out.
+ */
 export default function SiteLoader() {
-  const [pct, setPct] = useState(0);
   const [leaving, setLeaving] = useState(false);
   const [gone, setGone] = useState(false);
 
   useEffect(() => {
     const root = document.documentElement;
     root.style.overflow = 'hidden';
-    const start = performance.now();
-    let frame = 0;
-    let timer = 0;
-    const tick = (now: number) => {
-      const t = Math.min((now - start) / COUNT_MS, 1);
-      setPct(Math.round(100 * (1 - Math.pow(1 - t, 2.2))));
-      if (t < 1) {
-        frame = requestAnimationFrame(tick);
-        return;
-      }
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const holdMs = reduced ? 600 : SWEEP_MS * SWEEPS + STAGGER_MS * WORD.length;
+
+    const leave = window.setTimeout(() => {
       setLeaving(true);
       root.style.overflow = '';
       loaderDone = true;
       listeners.forEach((l) => l());
-      timer = window.setTimeout(() => setGone(true), LIFT_MS + 100);
-    };
-    frame = requestAnimationFrame(tick);
+    }, holdMs);
+    const remove = window.setTimeout(() => setGone(true), holdMs + EXIT_MS + 100);
+
     return () => {
-      cancelAnimationFrame(frame);
-      window.clearTimeout(timer);
+      window.clearTimeout(leave);
+      window.clearTimeout(remove);
       root.style.overflow = '';
     };
   }, []);
@@ -54,17 +52,41 @@ export default function SiteLoader() {
   if (gone) return null;
   return (
     <div
-      className="fixed inset-0 z-[10000] flex items-end justify-end bg-[#0b0b0c] px-6 pb-8 text-white lg:px-10"
-      style={{
-        transform: leaving ? 'translateY(-100%)' : 'translateY(0)',
-        transition: `transform ${LIFT_MS}ms ${EASE}`,
-      }}
+      className="fixed inset-0 z-[10000] flex items-center justify-center bg-den"
+      style={{ opacity: leaving ? 0 : 1, transition: `opacity ${EXIT_MS}ms ease-out` }}
       aria-hidden="true"
     >
-      <span className="text-[18vw] lg:text-[12rem] font-light leading-none tracking-[-0.06em] tabular-nums">
-        {pct}
-        <span className="text-white/30">%</span>
-      </span>
+      <style>{`
+        @keyframes dd-loader-sweep {
+          0%, 100% { color: rgba(255, 255, 255, 0.22); text-shadow: none; }
+          35% { color: rgba(255, 255, 255, 1); text-shadow: 0 0 18px rgba(196, 181, 253, 0.55); }
+          70% { color: rgba(255, 255, 255, 0.22); text-shadow: none; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .dd-loader-letter { animation: none !important; color: rgba(255, 255, 255, 0.85) !important; }
+        }
+      `}</style>
+      <p
+        className="font-['Plus_Jakarta_Sans',sans-serif] text-[18px] sm:text-[22px] font-medium tracking-[0.32em] text-white/20"
+        style={{
+          transform: leaving ? 'scale(1.06)' : 'scale(1)',
+          filter: leaving ? 'blur(8px)' : 'blur(0px)',
+          transition: `transform ${EXIT_MS}ms ease-out, filter ${EXIT_MS}ms ease-out`,
+        }}
+      >
+        {WORD.split('').map((ch, i) => (
+          <span
+            key={i}
+            className="dd-loader-letter inline-block"
+            style={{
+              animation: `dd-loader-sweep ${SWEEP_MS}ms ease-in-out ${i * STAGGER_MS}ms ${SWEEPS} both`,
+              whiteSpace: 'pre',
+            }}
+          >
+            {ch}
+          </span>
+        ))}
+      </p>
     </div>
   );
 }

@@ -40,7 +40,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           crossOrigin="anonymous"
         />
       </head>
-      <body className="min-h-full flex flex-col bg-black text-white selection:bg-teal-500 selection:text-white">
+      <body className="min-h-full flex flex-col bg-den text-white selection:bg-teal-500 selection:text-white">
         <SiteLoader />
         <ImageReveal />
         <SmoothScroll>{children}</SmoothScroll>

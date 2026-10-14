@@ -58,18 +58,40 @@ function CardVideo({ src, isActive }: { src: string; isActive: boolean }) {
   );
 }
 
-/* ─── 6 Journey Orbit Cards (Dark Pillars & Sci-Fi Neon Loops) ─── */
+/* ─── 4 Glass Orbit Cards (intro copy) ─── */
 const journeyCards = [
-  { step: '01', title: 'INCEPTION', videoUrl: '/videos/card-v1.mp4', accentColor: '#00F5D4' },
-  { step: '02', title: 'THE INCUBATOR', videoUrl: '/videos/card-v2.mp4', accentColor: '#C084FC' },
-  { step: '03', title: 'GLOBAL SYNDICATE', videoUrl: '/videos/card-v3.mp4', accentColor: '#38BDF8' },
-  { step: '04', title: 'BREAKTHROUGH LABS', videoUrl: '/videos/card-v4.mp4', accentColor: '#2DD4BF' },
-  { step: '05', title: 'STRATEGIC CAPITAL', videoUrl: '/videos/card-v5.mp4', accentColor: '#BB9DEE' },
-  { step: '06', title: 'HYPER-SCALE', videoUrl: '/videos/card-v6.mp4', accentColor: '#00F5D4' },
+  {
+    step: '01',
+    title: 'BUILD',
+    body: 'Supporting founders from early potential to stronger, market-ready ventures.',
+    videoUrl: '/videos/card-v1.mp4',
+    accentColor: '#00F5D4',
+  },
+  {
+    step: '02',
+    title: 'CONNECT',
+    body: 'Opening access to mentors, partners, companies and the wider innovation ecosystem.',
+    videoUrl: '/videos/card-v2.mp4',
+    accentColor: '#C084FC',
+  },
+  {
+    step: '03',
+    title: 'ACCESS CAPITAL',
+    body: 'Preparing startups for investment opportunities and connecting them with relevant capital.',
+    videoUrl: '/videos/card-v3.mp4',
+    accentColor: '#38BDF8',
+  },
+  {
+    step: '04',
+    title: 'GO GLOBAL',
+    body: 'Creating pathways to new markets through international programs, partnerships and soft-landing opportunities.',
+    videoUrl: '/videos/card-v4.mp4',
+    accentColor: '#BB9DEE',
+  },
 ];
 
 const TOTAL_CARDS = journeyCards.length;
-const ANGLE_STEP = 60;  // 360° / 6 cards = 60° rotation per step along helix
+const ANGLE_STEP = 90;  // 360° / 4 cards = 90° rotation per step along helix
 const RADIUS = 520; // px — circular radius around spine (expanded for bigger reference cards)
 const STEP_Y = 200; // px — vertical step height along spine
 
@@ -217,12 +239,12 @@ export default function StartupJourneyCarousel() {
   return (
     <section
       ref={sectionRef}
-      className="relative z-30 w-full h-[900vh] -mt-[100vh] overflow-visible bg-transparent pointer-events-none"
+      className="relative z-30 w-full h-[650vh] -mt-[100vh] overflow-visible bg-transparent pointer-events-none"
     >
       {/* ── Sticky full-screen 100vh stage (Masked with straight horizontal curtain reveal) ── */}
       <div
         ref={stageRef}
-        className="sticky top-0 w-full h-screen flex flex-col overflow-hidden bg-black pointer-events-auto"
+        className="sticky top-0 w-full h-screen flex flex-col overflow-hidden bg-den pointer-events-auto"
         style={{
           clipPath: 'inset(100% 0 0 0)',
           WebkitClipPath: 'inset(100% 0 0 0)',
@@ -254,7 +276,7 @@ export default function StartupJourneyCarousel() {
         {/* <div
           className="absolute top-0 inset-x-0 h-[50vh] sm:h-[80vh] pointer-events-none z-[5]"
           style={{
-            background: `linear-gradient(${180 - Math.atan2(8.5, 100) * (180 / Math.PI)}deg, #000000 0%, #000000 7.5vw, rgba(0, 0, 0, 0.96) 15vw, rgba(0, 0, 0, 0.75) 25vw, rgba(0, 0, 0, 0.3) 38vw, transparent 100%)`,
+            background: `linear-gradient(${180 - Math.atan2(8.5, 100) * (180 / Math.PI)}deg, #0b0b0c 0%, #0b0b0c 7.5vw, rgba(11, 11, 12, 0.96) 15vw, rgba(11, 11, 12, 0.75) 25vw, rgba(11, 11, 12, 0.3) 38vw, transparent 100%)`,
           }}
           aria-hidden="true"
         /> */}
@@ -342,15 +364,17 @@ export default function StartupJourneyCarousel() {
                   }}
                 />
 
-                {/* ── Title Only Centered Layer ── */}
+                {/* ── Title + Description Centered Layer ── */}
                 <div
                   style={{
                     position: 'absolute',
                     inset: 0,
                     display: 'flex',
+                    flexDirection: 'column',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    padding: '16px 22px',
+                    gap: '10px',
+                    padding: '16px 26px',
                     textAlign: 'center',
                     zIndex: 10,
                     WebkitFontSmoothing: 'antialiased',
@@ -373,6 +397,20 @@ export default function StartupJourneyCarousel() {
                   >
                     {card.title}
                   </h3>
+                  <p
+                    style={{
+                      margin: 0,
+                      maxWidth: '290px',
+                      fontSize: 'clamp(12px, 2.4vw, 14px)',
+                      fontWeight: 500,
+                      color: 'rgba(255, 255, 255, 0.88)',
+                      lineHeight: 1.5,
+                      textShadow: '0 2px 14px rgba(0, 0, 0, 0.95)',
+                      fontFamily: 'var(--font-plus-jakarta), sans-serif',
+                    }}
+                  >
+                    {card.body}
+                  </p>
                 </div>
               </div>
             ))}
@@ -406,7 +444,7 @@ export default function StartupJourneyCarousel() {
       <div
         className="absolute bottom-0 inset-x-0 h-[40vh] sm:h-[65vh] pointer-events-none z-30"
         style={{
-          background: `linear-gradient(${Math.atan2(6, 100) * (180 / Math.PI)}deg, #000000 0%, transparent 100%)`,
+          background: `linear-gradient(${(Math.atan2(6, 100) * (180 / Math.PI)).toFixed(2)}deg, #0b0b0c 0%, transparent 100%)`,
         }}
         aria-hidden="true"
       />

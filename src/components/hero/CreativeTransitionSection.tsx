@@ -338,7 +338,7 @@ function Scene({
 
   return (
     <>
-      <color attach="background" args={["#000000"]} />
+      <color attach="background" args={["#0b0b0c"]} />
 
       {/* ─── Curated Multi-Shade Purple & Lavender Lighting Rig on the Big Emblem ─── */}
       <ambientLight intensity={0.2} color="#181028" />
@@ -369,7 +369,7 @@ function Scene({
         anchorY="middle"
         textAlign="left"
       >
-        {"CREATIVE\nDIGITAL\nEXPERIENCES"}
+        {"VENTURING\nBEYOND\nBORDERS"}
         <meshBasicMaterial color="#e4e4e7" toneMapped={true} />
       </Text>
 
@@ -399,14 +399,14 @@ export default function CreativeTransitionSection() {
     <section
       ref={sectionRef}
       onMouseMove={handleMouseMove}
-      className="relative z-[25] w-full min-h-[220vh] bg-black select-none -mt-[8.5vw] overflow-visible"
+      className="relative z-[25] w-full min-h-[220vh] bg-den select-none -mt-[8.5vw] overflow-visible"
       style={{
         clipPath: "polygon(0 8.5vw, 100% 0, 100% 100%, 0 100%)",
         WebkitClipPath: "polygon(0 8.5vw, 100% 0, 100% 100%, 0 100%)",
       }}
     >
       {/* ─── Pinned 100vh Full Viewport Stage (Clean 100vh inside viewport) ─── */}
-      <div className="sticky top-0 h-screen w-full overflow-hidden bg-black flex items-center justify-center">
+      <div className="sticky top-0 h-screen w-full overflow-hidden bg-den flex items-center justify-center">
         {/* 3D WebGL Canvas */}
         <div className="absolute inset-0 z-0">
           <Canvas
@@ -435,22 +435,16 @@ export default function CreativeTransitionSection() {
 
         {/* ─── Right-Side Information Column (Vertically Centered) ─── */}
         <div className="absolute inset-0 z-10 flex items-center justify-end pointer-events-none">
-          <div className="mr-[5vw] sm:mr-[7vw] md:mr-[8vw] max-w-[280px] sm:max-w-xs md:max-w-sm space-y-7 text-neutral-300 font-mono text-[11px] sm:text-xs md:text-[13px] uppercase tracking-wider leading-[1.7] drop-shadow-lg">
-            <div>
-              <p className="text-white font-semibold tracking-widest">
-                FOUNDED IN 2012
-              </p>
-            </div>
-            <div>
-              <p>
-                WE BLEND STORY, ART &amp; TECHNOLOGY AS AN IN-HOUSE TEAM OF PASSIONATE MAKERS
-              </p>
-            </div>
-            <div>
-              <p>
-                OUR INDUSTRY-LEADING WEB TOOLSET CONSISTENTLY DELIVERS AWARD-WINNING WORK THROUGH QUALITY &amp; PERFORMANCE
-              </p>
-            </div>
+          <div className="mr-[5vw] sm:mr-[7vw] md:mr-[8vw] max-w-[260px] sm:max-w-[290px] md:max-w-[320px] space-y-6 text-neutral-300 font-mono text-[11px] sm:text-xs md:text-[13px] leading-[1.75] drop-shadow-lg">
+            <p className="text-white font-semibold uppercase tracking-widest">
+              Startup Launch Platform
+            </p>
+            <p className="tracking-wide">
+              Built in Montenegro. Connected to global markets.
+            </p>
+            <p className="tracking-wide">
+              Supporting founders through venture building, programs, strategic partnerships, capital and international opportunities.
+            </p>
           </div>
         </div>
       </div>
