@@ -17,6 +17,7 @@ export default function BeyondBordersSection() {
   return (
     <section id="beyond-borders" className="w-full max-w-[1450px] mx-auto px-4 sm:px-8 lg:px-12">
       <SectionIntro
+        eyebrow="Global Presence"
         align="center"
         title="Beyond Borders"
         lead="Connecting founders with international partners, markets and opportunities across key global hubs."

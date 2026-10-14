@@ -25,6 +25,9 @@ export default function FinalCTASection({ onOpenAction }: FinalCTASectionProps) 
         <div className="pointer-events-none absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-sky-500/10 blur-[100px]" />
 
         <div className="relative z-10 mx-auto max-w-2xl space-y-5">
+          <FadeIn animation="fadeIn" delay={0.1}>
+            <p className="font-['Plus_Jakarta_Sans',sans-serif] text-[11px] sm:text-xs font-medium uppercase tracking-[0.2em] text-white/45">Work with Digital Den</p>
+          </FadeIn>
           <FadeIn animation="fadeIn" delay={0.2}>
             <h2 className="text-3xl font-medium leading-[110%] tracking-tight sm:text-4xl lg:text-[48px]" style={headingGradient}>
               Ready to Go Beyond Borders?

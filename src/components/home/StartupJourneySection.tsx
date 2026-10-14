@@ -58,6 +58,7 @@ export default function StartupJourneySection() {
   return (
     <section ref={sectionRef} id="startup-journey" className="w-full max-w-[1450px] mx-auto px-4 sm:px-8 lg:px-12">
       <SectionIntro
+        eyebrow="Startup Journey"
         title="From Idea to Global"
         lead="From first idea to global opportunity, we support founders through every stage of startup growth."
       />

@@ -60,6 +60,7 @@ export default function ProofOfGrowthSection() {
 
       <div className="relative flex flex-wrap items-end justify-between gap-6">
         <FadeIn animation="fadeIn" delay={0.1}>
+          <p className="mb-4 font-['Plus_Jakarta_Sans',sans-serif] text-[11px] sm:text-xs font-medium uppercase tracking-[0.2em] text-white/45">Portfolio Highlights</p>
           <h2 className="text-3xl font-medium leading-[110%] tracking-tight sm:text-4xl lg:text-[48px]" style={headingGradient}>
             Proof of Growth
           </h2>
@@ -80,7 +81,7 @@ export default function ProofOfGrowthSection() {
       {/* Kinetic statement */}
       <p
         ref={statementRef}
-        className="relative mt-10 sm:mt-14 max-w-[1250px] font-['Plus_Jakarta_Sans',sans-serif] text-[clamp(1.75rem,3.6vw,2.9rem)] font-medium leading-[1.18] tracking-[-0.02em] text-white"
+        className="relative mt-8 sm:mt-10 max-w-[900px] font-['Plus_Jakarta_Sans',sans-serif] text-[clamp(1.25rem,2vw,1.75rem)] font-medium leading-[1.4] tracking-[-0.02em] text-white"
       >
         {SENTENCE.split(' ').map((word, i, arr) => {
           const isOutcome = OUTCOMES.has(word.replace(/[^a-z]/gi, '').toLowerCase());
