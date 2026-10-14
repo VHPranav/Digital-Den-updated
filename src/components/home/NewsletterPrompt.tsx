@@ -47,7 +47,7 @@ export default function NewsletterPrompt({ triggerId }: { triggerId: string }) {
     <div
       role="dialog"
       aria-label="Subscribe to Digital Den updates"
-      className="fixed bottom-6 left-4 right-4 z-50 sm:left-8 sm:right-auto sm:w-[360px] animate-fade-in rounded-2xl border border-white/15 bg-black/80 p-5 text-white shadow-[0_20px_60px_rgba(0,0,0,0.8)] backdrop-blur-2xl"
+      className="fixed bottom-6 left-4 right-4 z-[9995] sm:left-8 sm:right-auto sm:w-[360px] animate-fade-in rounded-2xl border border-white/15 bg-black/80 p-5 text-white shadow-[0_20px_60px_rgba(0,0,0,0.8)] backdrop-blur-2xl"
     >
       <button
         type="button"

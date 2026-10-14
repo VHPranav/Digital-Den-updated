@@ -26,15 +26,16 @@ export type ProofStartup = {
 // 3–4 real startups, to be confirmed by Digital Den. Never add placeholders.
 export const proofOfGrowth: ProofStartup[] = [];
 
-// Footer contact details: only Digital Den-confirmed values. Empty = hidden.
+// Footer contact details. Taken from Digital Den's own live site (digitalden.me footer,
+// 14 Oct 2026) — to be confirmed by Digital Den. Empty = hidden.
 export const contact = {
-  address: '', // awaiting confirmed office address
+  address: 'Seika Zaida, Zgrada Oaze, Podgorica, Montenegro',
   email: 'info@digitalden.me',
-  phone: '', // awaiting confirmed phone number
+  phone: '+382 69 033 311',
   socials: {
-    instagram: '', // awaiting verified profile URLs
-    linkedin: '',
-    facebook: '',
+    instagram: 'https://openinapp.co/digitaldenhub',
+    linkedin: 'https://openinapp.co/digital-den-hub',
+    facebook: 'https://openinapp.co/hubdigitalden',
   },
 };
 
