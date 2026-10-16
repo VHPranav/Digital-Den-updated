@@ -26,7 +26,7 @@ export default function SlantedSectionTransition({
     <div className="relative z-30 w-full -mt-[6vw] overflow-visible">
       {/* ─── 1. Asymmetrical Slanted HTML Masking Wrapper (Opposite Slant) ─── */}
       <div
-        className="relative w-full bg-den text-white overflow-hidden transition-transform duration-75 ease-out"
+        className="relative w-full bg-den text-white overflow-clip transition-transform duration-75 ease-out"
         style={{
           clipPath: `polygon(0 ${slantSlopeVw}vw, 100% 0, 100% 100%, 0 100%)`,
           WebkitClipPath: `polygon(0 ${slantSlopeVw}vw, 100% 0, 100% 100%, 0 100%)`,

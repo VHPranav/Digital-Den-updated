@@ -27,10 +27,10 @@ const cards: { title: string; body: string; cta: string; href: string; image: st
     image: '/images/firstimg.png',
   },
   {
-    title: 'Opportunities',
+    title: 'Services',
     body: 'A matchmaking space connecting startup solutions with industry challenges, partners, investors and pilot opportunities.',
-    cta: 'Discover Opportunities',
-    href: '/opportunities',
+    cta: 'Discover Services',
+    href: '/services',
     image: '/images/opportunities/featured-poster.jpg',
     position: '38% center',
   },

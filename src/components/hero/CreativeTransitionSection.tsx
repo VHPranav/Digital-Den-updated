@@ -374,7 +374,7 @@ function Scene({
       {/* ─── 3D Clean Text (Left-aligned, passing directly behind the glass ring, vertically centered) ─── */}
       <Text
         position={portrait ? [0, 2.15, -0.45] : [-2.65, 0.0, -0.45]}
-        fontSize={portrait ? 0.34 : 0.30}
+        fontSize={portrait ? 0.28 : 0.24}
         maxWidth={3.0}
         lineHeight={1.08}
         letterSpacing={0.04}

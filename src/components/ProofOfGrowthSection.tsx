@@ -25,8 +25,68 @@ const outcomeGradient: React.CSSProperties = {
   WebkitTextFillColor: 'transparent',
 };
 
+type Card = { name: string; logo?: string; image?: string; achievement: string; metric?: string; href?: string };
+
+const tints = [
+  'from-[#6d28d9] via-[#3b1a78] to-[#120a24]',
+  'from-[#7c3aed] via-[#2a1458] to-[#0b0b0c]',
+  'from-[#0ea5e9] via-[#3b1a78] to-[#120a24]',
+  'from-[#a855f7] via-[#2a1458] to-[#0b0b0c]',
+];
+
+function StartupCard({ s, i }: { s: Card; i: number }) {
+  const inner = (
+    <>
+      <div className="relative aspect-square w-full overflow-hidden rounded-[24px] border border-white/10">
+        {s.image ? (
+          <Image src={s.image} alt="" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.05]" />
+        ) : (
+          <div className={`absolute inset-0 bg-gradient-to-br ${tints[i % tints.length]}`} />
+        )}
+        {/* Brand wash so the logo reads on any photo */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#2a1458]/60 via-[#1a0d38]/55 to-black/70 mix-blend-multiply" />
+        <div className="absolute inset-0 bg-black/20" />
+        <div className="absolute inset-0 flex items-center justify-center p-8">
+          {s.logo ? (
+            <div className="relative h-14 w-full max-w-[220px] drop-shadow-[0_2px_18px_rgba(0,0,0,0.45)]">
+              <Image src={s.logo} alt={`${s.name} logo`} fill className="object-contain" sizes="220px" />
+            </div>
+          ) : (
+            <span className="text-2xl font-medium text-white/90">{s.name}</span>
+          )}
+        </div>
+      </div>
+      <h3 className="mt-5 font-['Plus_Jakarta_Sans',sans-serif] text-xl font-medium leading-snug tracking-tight text-white">{s.name}</h3>
+      <p className="mt-2 text-[15px] leading-[1.5] text-white/70">{s.achievement}</p>
+      {s.metric && <p className="mt-3 text-sm font-medium text-purple-200">{s.metric}</p>}
+    </>
+  );
+  return (
+    <FadeIn animation="slideUp" delay={0.15 + i * 0.12}>
+      {s.href ? (
+        <Link href={s.href} className="group block">{inner}</Link>
+      ) : (
+        <div className="group block">{inner}</div>
+      )}
+    </FadeIn>
+  );
+}
+
 export default function ProofOfGrowthSection() {
   const startups = proofOfGrowth.slice(0, 4);
+  const cards: Card[] =
+    startups.length > 0
+      ? startups
+      : [
+          { img: 'datamesh', n: 1 },
+          { img: 'neuralnexus', n: 2 },
+          { img: 'ecotrace', n: 3 },
+        ].map(({ img, n }) => ({
+          name: `Startup name ${n}`,
+          image: `/images/portfolio/${img}.jpg`,
+          logo: `/images/portfolio/logos/logo${n}.svg`,
+          achievement: 'Approved result or achievement',
+        }));
   const statementRef = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
@@ -96,34 +156,14 @@ export default function ProofOfGrowthSection() {
         })}
       </p>
 
-      {/* Real startups (DD-approved data only): a quiet row under the statement */}
-      {startups.length > 0 && (
-        <div className={`mt-14 grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2 ${startups.length === 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3'}`}>
-          {startups.map((s, i) => {
-            const body = (
-              <>
-                <div className="relative h-10 w-28">
-                  <Image src={s.logo} alt={`${s.name} logo`} fill className="object-contain object-left" sizes="112px" />
-                </div>
-                <h3 className="mt-6 font-['Plus_Jakarta_Sans',sans-serif] text-xl font-semibold tracking-tight text-white">{s.name}</h3>
-                <p className="mt-2 text-sm leading-[1.55] text-white/70">{s.achievement}</p>
-                {s.metric && <p className="mt-3 text-sm font-medium text-purple-200">{s.metric}</p>}
-              </>
-            );
-            return (
-              <FadeIn key={s.name} animation="slideUp" delay={0.15 + i * 0.12}>
-                {s.href ? (
-                  <Link href={s.href} className="block border-l border-white/10 pl-5 transition-colors hover:border-purple-400/60">
-                    {body}
-                  </Link>
-                ) : (
-                  <div className="border-l border-white/10 pl-5">{body}</div>
-                )}
-              </FadeIn>
-            );
-          })}
-        </div>
-      )}
+      {/* Selected startups (DD-approved data only): equal square image cards with the logo centred,
+          name and result below. Until DD supplies the final startups, three layout placeholders show
+          how they will appear. */}
+      <div className={`mt-14 grid grid-cols-1 gap-6 sm:grid-cols-2 ${cards.length === 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3'}`}>
+        {cards.map((c, i) => (
+          <StartupCard key={c.name} s={c} i={i} />
+        ))}
+      </div>
     </section>
   );
 }

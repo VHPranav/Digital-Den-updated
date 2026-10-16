@@ -107,11 +107,10 @@ export default function HeroSection({ onOpenAction }: HeroSectionProps) {
   }, []);
 
   return (
-    <section
-      ref={sectionRef}
-      id="hero-gateway-section"
-      className="relative z-10 min-h-screen flex flex-col justify-center items-center py-16 sm:py-24 px-4 sm:px-8 lg:px-16 max-w-6xl mx-auto w-full pointer-events-auto text-center overflow-visible"
-    >
+    // Tall track: the content below is pinned (sticky) in the viewport while the background frames
+    // play through the ocean surface, then it releases and scrolls away with the page.
+    <section ref={sectionRef} id="hero-gateway-section" className="relative h-[185vh] w-full pointer-events-none">
+      <div className="sticky top-0 flex h-screen w-full flex-col justify-center items-center px-4 sm:px-8 lg:px-16 max-w-6xl mx-auto pointer-events-auto text-center overflow-visible">
       {/* Top Black Gradient Overlay (Disabled for now) */}
       {/* <div
         className="pointer-events-none absolute -top-32 sm:-top-44 left-1/2 -translate-x-1/2 w-screen h-[400px] sm:h-[550px] z-0"
@@ -189,6 +188,7 @@ export default function HeroSection({ onOpenAction }: HeroSectionProps) {
             </div>
           </div>
         </div>
+      </div>
       </div>
     </section>
   );
