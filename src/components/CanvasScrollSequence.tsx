@@ -13,6 +13,10 @@ interface CanvasScrollSequenceProps {
   endAnchorId?: string;
   /** id of the element whose centre, reaching the viewport centre, starts playback (holds startFrame until then). */
   startAnchorId?: string;
+  /** Which edge of the end anchor must reach the viewport for the last frame: its centre at the viewport centre (default) or its bottom edge at the viewport bottom. */
+  endAnchorAlign?: 'center' | 'bottom';
+  /** Without anchors, frames play across the whole container: from its top entering the viewport to its bottom reaching the viewport bottom (no held first/last frame). `curve` maps scroll progress to frame progress with [scroll, video] keyframes (both 0–1, ascending) so the pacing can be shaped, e.g. lingering on the opening frames while content arrives. */
+  curve?: [number, number][];
   onProgressUpdate?: (progress: number, frameIndex: number) => void;
   children?: (progress: number, frameIndex: number) => React.ReactNode;
 }
@@ -23,6 +27,8 @@ export default function CanvasScrollSequence({
   containerHeight = '',
   endAnchorId,
   startAnchorId,
+  endAnchorAlign = 'center',
+  curve,
   onProgressUpdate,
   children,
 }: CanvasScrollSequenceProps) {
@@ -36,6 +42,8 @@ export default function CanvasScrollSequence({
   // continuing a front-to-back fill.
   const priorityFrameRef = useRef(0);
   const currentFrameRef = useRef<number>(0);
+  const targetFrameRef = useRef<number>(0);
+  const smoothFrameRef = useRef<number>(0);
   const animationFrameIdRef = useRef<number | null>(null);
   const idleAnimIdRef = useRef<number | null>(null);
 
@@ -149,6 +157,10 @@ export default function CanvasScrollSequence({
     // 1. Immediately load the first 12 urgent frames (from the start frame)
     priorityFrameRef.current = Math.max(priorityFrameRef.current, startFrame);
     for (let i = startFrame; i < Math.min(startFrame + 12, frameCount); i++) {
+      loadSingleImage(i);
+    }
+    // ...and the last few, so the ending never waits on a download.
+    for (let i = Math.max(startFrame, frameCount - 12); i < frameCount; i++) {
       loadSingleImage(i);
     }
 
@@ -372,6 +384,24 @@ export default function CanvasScrollSequence({
 
   // Handle Window Scroll
   useEffect(() => {
+    // Eased frame playback: runs only while the displayed frame is still catching up to the target.
+    let loopId: number | null = null;
+    const loop = () => {
+      const target = targetFrameRef.current;
+      const diff = target - smoothFrameRef.current;
+      smoothFrameRef.current = Math.abs(diff) < 0.4 ? target : smoothFrameRef.current + diff * 0.18;
+      const frame = Math.max(startFrame, Math.min(frameCount - 1, Math.round(smoothFrameRef.current)));
+      if (frame !== currentFrameRef.current) {
+        currentFrameRef.current = frame;
+        setCurrentFrameIndex(frame);
+        renderFrame(frame);
+      }
+      loopId = smoothFrameRef.current === target ? null : requestAnimationFrame(loop);
+    };
+    const startLoop = () => {
+      if (loopId === null) loopId = requestAnimationFrame(loop);
+    };
+
     const computeScrollState = () => {
       if (!containerRef.current) return;
       const rect = containerRef.current.getBoundingClientRect();
@@ -391,29 +421,41 @@ export default function CanvasScrollSequence({
       const centreOffset = (r: DOMRect) => r.top + r.height / 2 - window.innerHeight / 2; // 0 when centred
       let videoProgress: number;
       if (anchor) {
-        const end = centreOffset(anchor.getBoundingClientRect());
+        const ar = anchor.getBoundingClientRect();
+        const end = endAnchorAlign === 'bottom' ? ar.bottom - window.innerHeight : centreOffset(ar);
         const start = startAnchor ? centreOffset(startAnchor.getBoundingClientRect()) : rect.top - window.innerHeight;
         const total = end - start; // fixed scroll distance between the two points
         videoProgress = total > 0 ? Math.max(0, Math.min(1, -start / total)) : 1;
+      } else if (!startAnchorId) {
+        // Whole-container range: moving from the moment the section enters until its bottom edge
+        // reaches the viewport bottom, so neither the first nor the last frame is ever held.
+        const linear = Math.max(0, Math.min(1, (window.innerHeight - rect.top) / rect.height));
+        videoProgress = linear;
       } else {
         videoProgress = Math.max(0, Math.min(1, progress / 0.80));
       }
-      const targetFrame = Math.min(frameCount - 1, startFrame + Math.floor(videoProgress * (frameCount - 1 - startFrame)));
-
-      setScrollProgress(progress);
-      setCurrentFrameIndex(targetFrame);
-      // Re-center the background loader on wherever the user actually is,
-      // every scroll tick — not just when the drawn frame changes — so a
-      // fast fling immediately reprioritizes the frames now needed.
-      priorityFrameRef.current = targetFrame;
-
-      if (targetFrame !== currentFrameRef.current) {
-        currentFrameRef.current = targetFrame;
-        requestDrawFrame(targetFrame);
+      if (curve && curve.length > 1) {
+        // Shape the pacing: piecewise-linear through the [scroll, video] keyframes (monotonic, no stalls).
+        for (let i = 1; i < curve.length; i++) {
+          const [x0, y0] = curve[i - 1];
+          const [x1, y1] = curve[i];
+          if (videoProgress <= x1 || i === curve.length - 1) {
+            videoProgress = y0 + ((Math.min(videoProgress, x1) - x0) / (x1 - x0)) * (y1 - y0);
+            break;
+          }
+        }
       }
+      // Scroll only sets a (fractional) target; the render loop below eases toward it so the frames
+      // glide with the smooth-scroll instead of stepping, and a fast fling still lands on the last frame.
+      const targetFrame = Math.min(frameCount - 1, startFrame + videoProgress * (frameCount - 1 - startFrame));
+      targetFrameRef.current = targetFrame;
+      setScrollProgress(progress);
+      // Re-center the background loader on wherever the user is heading, every scroll tick.
+      priorityFrameRef.current = Math.round(targetFrame);
+      startLoop();
 
       if (onProgressUpdate) {
-        onProgressUpdate(progress, targetFrame);
+        onProgressUpdate(progress, Math.round(targetFrame));
       }
     };
 
@@ -440,8 +482,9 @@ export default function CanvasScrollSequence({
       if (animationFrameIdRef.current) {
         cancelAnimationFrame(animationFrameIdRef.current);
       }
+      if (loopId !== null) cancelAnimationFrame(loopId);
     };
-  }, [frameCount, startFrame, requestDrawFrame, onProgressUpdate, endAnchorId, startAnchorId]);
+  }, [frameCount, startFrame, renderFrame, onProgressUpdate, endAnchorId, startAnchorId, endAnchorAlign, curve]);
 
   // Initial draw when first image ready
   useEffect(() => {

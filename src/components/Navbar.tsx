@@ -53,7 +53,7 @@ export default function Navbar({ onOpenAction }: NavbarProps) {
     { name: 'Programs', href: '/programs' },
     { name: 'Partners', href: '/partners' },
     { name: 'Opportunities', href: '/opportunities' },
-    { name: 'Projects', href: '/projects' },
+    { name: 'Services', href: '/services' },
     { name: 'Portfolio', href: '/portfolio' },
     { name: 'Events', href: '/events' },
   ];

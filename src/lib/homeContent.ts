@@ -18,6 +18,7 @@ export const upcomingOpportunity: UpcomingOpportunity | null = null;
 export type ProofStartup = {
   name: string;
   logo: string; // path under /public
+  image?: string; // card background photo under /public
   achievement: string; // one concise verified statement
   metric?: string; // optional verified metric / market
   href?: string;
