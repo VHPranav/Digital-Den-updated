@@ -134,3 +134,18 @@ main[data-inner] :is(h1, h2) button {
     transform: none !important;
   }
 }
+
+/* Rotating headline word (Platform hero): blur up in, blur up out */
+@keyframes dd-word-in {
+  from { opacity: 0; transform: translateY(0.35em); filter: blur(14px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+@keyframes dd-word-out {
+  from { opacity: 1; transform: translateY(0); filter: blur(0); }
+  to { opacity: 0; transform: translateY(-0.35em); filter: blur(14px); }
+}
+.dd-word-in { animation: dd-word-in 0.8s cubic-bezier(0.2, 0.7, 0.1, 1) both; }
+.dd-word-out { animation: dd-word-out 0.55s ease-in both; }
+@media (prefers-reduced-motion: reduce) {
+  .dd-word-in, .dd-word-out { animation: none; }
+}

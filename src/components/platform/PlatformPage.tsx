@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { ArrowLink, BgVideo, BlurWords, Pill, Reveal } from '@/components/site/editorial';
 import PageShell from '@/components/site/PageShell';
@@ -51,6 +51,65 @@ function ImpactPanel({ slide, index, total }: { slide: ImpactSlide; index: numbe
         </div>
       </div>
     </section>
+  );
+}
+
+/* ─── Hero headline: "Connecting" stays, the word after it blurs up in / out ─── */
+
+const HERO_WORDS = ['ideas', 'people', 'markets'];
+
+/** Letters blur up one after another (in) or blur up and away one after another (out). */
+function Letters({ text, mode, baseDelay = 0, step = 0.05 }: { text: string; mode: 'in' | 'out'; baseDelay?: number; step?: number }) {
+  return (
+    <>
+      {text.split('').map((ch, n) => (
+        <span
+          key={`${mode}-${n}`}
+          className={`inline-block ${mode === 'in' ? 'dd-word-in' : 'dd-word-out'}`}
+          style={{ animationDelay: `${baseDelay + n * step}s` }}
+        >
+          {ch}
+        </span>
+      ))}
+    </>
+  );
+}
+
+function RotatingHeadline() {
+  const [i, setI] = useState(0);
+  const [leaving, setLeaving] = useState(false);
+
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const word = HERO_WORDS[i];
+    const inTime = 0.8 + word.length * 0.05; // letters finish blurring in
+    const outTime = 0.55 + word.length * 0.035; // letters finish blurring out
+    const hold = setTimeout(() => setLeaving(true), (inTime + 1.8) * 1000);
+    const swap = setTimeout(() => {
+      setI((n) => (n + 1) % HERO_WORDS.length);
+      setLeaving(false);
+    }, (inTime + 1.8 + outTime) * 1000);
+    return () => {
+      clearTimeout(hold);
+      clearTimeout(swap);
+    };
+  }, [i]);
+
+  return (
+    <h1 data-plain aria-label="Connecting ideas, people and markets" className="text-[clamp(2.4rem,6vw,5.75rem)] font-medium leading-[1] tracking-[-0.05em]">
+      <span className="block" aria-hidden="true">
+        <Letters text="Connecting" mode="in" baseDelay={0.2} step={0.045} />
+      </span>
+      <span className="block" aria-hidden="true">
+        {/* Sized by the longest word so the line never jumps */}
+        <span className="relative inline-block">
+          <span className="invisible">markets</span>
+          <span key={i} className="absolute left-0 top-0 whitespace-nowrap">
+            <Letters text={HERO_WORDS[i]} mode={leaving ? 'out' : 'in'} baseDelay={i === 0 && !leaving ? 0.9 : 0} step={leaving ? 0.035 : 0.05} />
+          </span>
+        </span>
+      </span>
+    </h1>
   );
 }
 
@@ -122,11 +181,9 @@ export default function PlatformPage() {
           {/* ─── 1. HERO VIDEO ─── */}
           <section className="relative h-[100svh] min-h-[600px] overflow-hidden">
             <BgVideo src={platformHero.video} poster={platformHero.poster} />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/75" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/55" />
             <div className="absolute inset-x-0 bottom-0 mx-auto max-w-[1480px] px-6 pb-16 lg:px-10 lg:pb-20">
-              <h1 data-plain className="max-w-[16ch] text-[clamp(2.4rem,6vw,5.75rem)] font-medium leading-[0.98] tracking-[-0.05em]">
-                <BlurWords text={platformHero.headline} delay={0.2} />
-              </h1>
+              <RotatingHeadline />
               <p className="mt-6 max-w-2xl text-[clamp(0.95rem,1.15vw,1.1rem)] leading-[1.6] text-white/80">{platformHero.body}</p>
               <div className="mt-8 flex flex-wrap gap-8">
                 <ArrowLink onClick={openAction}>{platformHero.primaryCta}</ArrowLink>

@@ -3,8 +3,11 @@
 // Digital Den website" (Oct 2026). Do not add content that Digital Den has not approved.
 
 export const platformHero = {
-  video: '/videos/platform-hero.mp4', // TODO: replace with the Podgorica / Millennium Bridge film once supplied
-  poster: '/images/platform/hero-poster.jpg',
+  // ~22s, 1080p, 10 Mbps drone-style loop made in Google Flow: new stills generated with Nano Banana
+  // Pro (Millennium Bridge, Kotor Bay, Budva), animated with Veo 3.1 Quality (slow camera), 1080p
+  // upscale, generator marks removed. Replace with a real Podgorica film when Digital Den supplies one.
+  video: '/videos/platform-hero-podgorica.mp4',
+  poster: '/images/platform/hero-podgorica-poster.jpg',
   headline: 'Connecting ideas, people and markets.',
   body: 'Digital Den brings together programs, expert support, strategic partnerships, access to capital and international market connections to create stronger pathways for innovation and growth.',
   primaryCta: 'Apply as Startup',
