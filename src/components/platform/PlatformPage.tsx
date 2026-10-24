@@ -1,155 +1,38 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React from 'react';
 import Image from 'next/image';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { ArrowLink, BgVideo, BlurWords, Pill, Reveal } from '@/components/site/editorial';
 import PageShell from '@/components/site/PageShell';
-import SplitWords from '@/components/site/SplitWords';
-import { ScrubText, useScrollProgress } from '@/components/events/motion';
+import { useScrollProgress } from '@/components/events/motion';
+import {
+  founders,
+  impactSlides,
+  missionVision,
+  operationalTeam,
+  platformClosing,
+  platformHero,
+  platformTransition,
+  type ImpactSlide,
+  type TeamMember,
+} from '@/lib/platformContent';
 
-// Content sourced from the Stitch "Platform / How It Works" screen; layout and
-// motion modelled on an editorial studio site (pinned hero, portrait slider,
-// stacked full-bleed panels).
+// Platform page (final order, Oct 2026): video hero → "One platform" transition → impact scroll →
+// Mission & Vision → Team → Budva CTA → minimal footer. All copy/images live in
+// src/lib/platformContent.ts.
 
 const BG = 'bg-[#0b0b0c]';
 
-const pillars = [
-  {
-    id: 'building',
-    title: 'Venture',
-    accent: 'Building',
-    body: 'Our internal engineering and design teams act as your founding department, shipping MVP-level products in weeks, not months. We handle the heavy lifting of tech stack selection and UI/UX architecture.',
-    meta: 'Full-Stack · UX Design · GTM Strategy',
-    image: '/images/platform/building.jpg',
-  },
-  {
-    id: 'expansion',
-    title: 'Market',
-    accent: 'Access',
-    body: 'Instant connectivity to 500+ corporate partners and 50+ institutional LPs. We open doors that usually take years to knock on.',
-    meta: '500+ partners · 50+ LPs',
-    image: '/images/platform/access.jpg',
-  },
-  {
-    id: 'capital',
-    title: 'Capital',
-    accent: '',
-    body: 'Pre-seed funding up to $500k, followed by guaranteed participation in Series A rounds for top-performing studio graduates.',
-    meta: 'Up to $500k pre-seed',
-    image: '/images/platform/capital.jpg',
-  },
-  {
-    id: 'expertise',
-    title: 'Expertise',
-    accent: '',
-    body: "Access to our 'Residency' network: 40+ exited founders and technical specialists who provide weekly 1-on-1 surgical strikes on your most difficult bottlenecks.",
-    meta: '40+ exited founders',
-    image: '/images/platform/expertise.jpg',
-  },
-];
+/* ─── Impact scroll: one full-screen visual per metric, stacked on scroll ─── */
 
-const stages = [
-  { title: 'Idea', body: 'Deep research into underserved verticals and thesis-driven ideation.', image: '/images/platform/idea.jpg' },
-  { title: 'Build', body: 'Our studio engineers build your core MVP while you focus on vision.', image: '/images/platform/build.jpg' },
-  { title: 'Validate', body: 'Pilot programs with corporate partners for rapid iteration cycles.', image: '/images/platform/validate.jpg' },
-  { title: 'Scale', body: 'Series A preparation and aggressive user acquisition strategies.', image: '/images/platform/scale.jpg' },
-  { title: 'Global', body: 'International expansion via our multi-continent network nodes.', image: '/images/platform/global.jpg' },
-];
-
-/* ─── Sections ─── */
-
-function PillarSlider() {
-  const track = useRef<HTMLDivElement>(null);
-  const [edge, setEdge] = useState({ start: true, end: false });
-
-  const update = () => {
-    const t = track.current;
-    if (!t) return;
-    setEdge({ start: t.scrollLeft < 8, end: t.scrollLeft + t.clientWidth > t.scrollWidth - 8 });
-  };
-  const go = (dir: 1 | -1) => {
-    const t = track.current;
-    const card = t?.querySelector<HTMLElement>('[data-card]');
-    t?.scrollBy({ left: dir * ((card?.offsetWidth ?? 400) + 20), behavior: 'smooth' });
-  };
-
-  return (
-    <>
-      <div className="mx-auto flex max-w-[1480px] items-center justify-between px-6 lg:px-10">
-        <span className="flex items-center gap-2 text-[13px] text-white/80">
-          <Pill>04</Pill> Pillars
-        </span>
-        <div className="flex gap-2">
-          {([-1, 1] as const).map((dir) => {
-            const disabled = dir === -1 ? edge.start : edge.end;
-            return (
-              <button
-                key={dir}
-                type="button"
-                onClick={() => go(dir)}
-                disabled={disabled}
-                aria-label={dir === -1 ? 'Previous pillar' : 'Next pillar'}
-                className={`flex h-6 w-9 items-center justify-center rounded-full border transition-colors ${disabled ? 'border-white/25 text-white/25' : 'border-white text-white hover:bg-white hover:text-black'
-                  }`}
-              >
-                {dir === -1 ? <ArrowLeft className="h-3.5 w-3.5" /> : <ArrowRight className="h-3.5 w-3.5" />}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div
-        ref={track}
-        onScroll={update}
-        className="no-scrollbar mt-6 flex snap-x snap-mandatory scroll-pl-6 gap-5 overflow-x-auto px-6 lg:scroll-pl-[max(2.5rem,calc((100vw-1480px)/2+2.5rem))] lg:px-[max(2.5rem,calc((100vw-1480px)/2+2.5rem))]"
-      >
-        {pillars.map((p, i) => (
-          <Reveal key={p.id} delay={i * 0.08} className="shrink-0 snap-start">
-            <article
-              id={p.id}
-              data-card
-              data-img-reveal
-              className="group relative aspect-[3/4] w-[78vw] scroll-mt-32 overflow-hidden sm:w-[46vw] lg:w-[calc((min(100vw,1480px)-5rem-3*1.25rem)/3.4)]"
-            >
-              <Image
-                src={p.image}
-                alt={`${p.title} ${p.accent}`}
-                fill
-                sizes="(max-width: 640px) 80vw, (max-width: 1024px) 46vw, 30vw"
-                className="object-cover transition-transform duration-[1600ms] ease-out group-hover:scale-[1.04]"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent" />
-              <div className="absolute inset-x-0 bottom-0 p-6 lg:p-7">
-                <h3 className="text-[1.65rem] leading-[1.05] tracking-[-0.02em]">
-                  <span className="font-light italic">{p.title}</span>
-                  {p.accent && (
-                    <>
-                      {' '}
-                      <span className="font-medium">{p.accent}</span>
-                    </>
-                  )}
-                </h3>
-                <p className="mt-3 text-xs uppercase tracking-[0.18em] text-purple-200/80">{p.meta}</p>
-                <div className="grid grid-rows-[0fr] opacity-0 transition-all duration-700 group-hover:grid-rows-[1fr] group-hover:opacity-100">
-                  <p className="overflow-hidden pt-0 text-[14px] leading-[1.55] text-white/80 group-hover:pt-4">{p.body}</p>
-                </div>
-              </div>
-            </article>
-          </Reveal>
-        ))}
-      </div>
-    </>
-  );
-}
-
-function StagePanel({ stage, index, total }: { stage: (typeof stages)[number]; index: number; total: number }) {
+function ImpactPanel({ slide, index, total }: { slide: ImpactSlide; index: number; total: number }) {
   const [ref, progress] = useScrollProgress<HTMLDivElement>({ start: 1, end: 0.2 });
   return (
     <section className="sticky top-0 h-[100svh] overflow-hidden">
-      <Image src={stage.image} alt={stage.title} fill sizes="100vw" className="object-cover" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/25" />
+      <Image src={slide.image} alt="" fill sizes="100vw" className="object-cover" style={{ objectPosition: slide.position ?? 'center' }} />
+      {/* Same dark fade on every slide so the metric stays readable and the images feel consistent */}
+      <div className="absolute inset-0 bg-black/55" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-black/35" />
       <div ref={ref} className="absolute inset-x-0 bottom-0 mx-auto max-w-[1480px] px-6 pb-14 lg:px-10 lg:pb-20">
         <div className="relative h-px w-full bg-white/20">
           <span className="absolute inset-y-0 left-0 bg-white" style={{ width: `${Math.max(12, progress * 100)}%`, transition: 'width 120ms linear' }} />
@@ -160,171 +43,200 @@ function StagePanel({ stage, index, total }: { stage: (typeof stages)[number]; i
             <span className="text-xs">/</span>
             <Pill>{String(total).padStart(2, '0')}</Pill>
           </div>
-          <div className="lg:col-span-6">
-            <h3 className="text-[clamp(3.5rem,8vw,7.5rem)] font-medium leading-[0.9] tracking-[-0.055em]">{stage.title}</h3>
-            <p className="mt-5 text-[14px] leading-snug text-white/75">
-              Stage {String(index + 1).padStart(2, '0')}
-              <br />
-              12-month trajectory
-            </p>
+          <div className="lg:col-span-11">
+            <h3 className="text-[clamp(4.5rem,15vw,13rem)] font-medium leading-[0.88] tracking-[-0.06em]">{slide.metric}</h3>
+            <p className="mt-4 text-[clamp(1.25rem,2.2vw,2rem)] font-medium tracking-[-0.02em] text-white/90">{slide.label}</p>
+            {slide.support && <p className="mt-3 text-[13px] uppercase tracking-[0.22em] text-white/65">{slide.support}</p>}
           </div>
-          <p className="self-end text-[clamp(1.15rem,1.6vw,1.45rem)] leading-[1.35] tracking-[-0.01em] text-white/90 lg:col-span-5">
-            {stage.body}
-          </p>
         </div>
       </div>
     </section>
   );
 }
 
-export default function PlatformPage() {
+/* ─── Team ─── */
+
+function LinkedInIcon() {
   return (
-    <PageShell>
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor" aria-hidden="true">
+      <path d="M20.4 20.5h-3.6v-5.6c0-1.3 0-3-1.8-3s-2.1 1.4-2.1 2.9v5.7H9.3V9h3.4v1.6h.1c.5-.9 1.6-1.8 3.4-1.8 3.6 0 4.3 2.4 4.3 5.5v6.2zM5.3 7.4a2.1 2.1 0 1 1 0-4.2 2.1 2.1 0 0 1 0 4.2zM7.1 20.5H3.6V9h3.5v11.5zM22.2 0H1.8C.8 0 0 .8 0 1.7v20.6c0 .9.8 1.7 1.8 1.7h20.4c1 0 1.8-.8 1.8-1.7V1.7C24 .8 23.2 0 22.2 0z" />
+    </svg>
+  );
+}
+
+function TeamGroup({ title, people }: { title: string; people: TeamMember[] }) {
+  return (
+    <div>
+      <Reveal>
+        <h3 className="text-[clamp(1.5rem,2.4vw,2.1rem)] font-medium tracking-[-0.03em] text-white">{title}</h3>
+        <div className="mt-5 h-px w-full bg-gradient-to-r from-purple-400/50 via-white/10 to-transparent" />
+      </Reveal>
+      <ul className="mt-10 grid grid-cols-2 gap-x-5 gap-y-10 md:grid-cols-3 lg:grid-cols-4">
+        {people.map((p, i) => (
+          <li key={`${p.name}-${i}`}>
+            <Reveal delay={(i % 4) * 0.08}>
+              <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[20px] border border-white/10 bg-gradient-to-br from-[#2a1458] via-[#150b2b] to-[#0b0b0c]">
+                {p.photo ? (
+                  <Image src={p.photo} alt={p.name} fill sizes="(max-width: 768px) 46vw, 22vw" className="object-cover" />
+                ) : (
+                  <span className="absolute inset-0 flex items-center justify-center text-[11px] uppercase tracking-[0.22em] text-white/35">Photo</span>
+                )}
+              </div>
+              <div className="mt-4 flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-[16px] font-medium tracking-[-0.01em] text-white">{p.name}</p>
+                  <p className="mt-1 text-[13px] leading-snug text-white/55">{p.role}</p>
+                </div>
+                {p.linkedin ? (
+                  <a
+                    href={p.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`${p.name} on LinkedIn`}
+                    className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/20 text-white/80 transition-colors hover:border-purple-300 hover:text-white"
+                  >
+                    <LinkedInIcon />
+                  </a>
+                ) : (
+                  <span aria-hidden="true" className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/10 text-white/25">
+                    <LinkedInIcon />
+                  </span>
+                )}
+              </div>
+            </Reveal>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+/* ─── Page ─── */
+
+export default function PlatformPage() {
+  const { mission, vision } = missionVision;
+  return (
+    <PageShell minimalFooter>
       {(openAction) => (
         <div className={`${BG} text-[#f3f0ea]`}>
-          {/* ─── PINNED HERO: headline screen, then intro scrolls over the same image ─── */}
-          <section className="relative">
-            <div className="sticky top-0 h-[100svh] overflow-hidden">
-              <BgVideo src="/videos/platform-hero.mp4" poster="/images/platform/hero-poster.jpg" />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/25 to-black/70" />
-            </div>
-
-            <div className="relative -mt-[100svh]">
-              <div className="flex h-[100svh] flex-col justify-end px-6 pb-16 lg:px-10 lg:pb-20">
-                <p className="mb-8 flex items-center gap-2 text-[13px] text-white/80">
-                  <Pill>01</Pill> The Operating Model
-                </p>
-                <h1 data-plain className="text-[clamp(3.25rem,9.6vw,9.5rem)] font-medium leading-[0.9] tracking-[-0.06em]">
-                  <span className="block">
-                    <BlurWords text="We don’t just invest." delay={0.2} />
-                  </span>
-                  <span className="block">
-                    <BlurWords text="We co-build." delay={0.75} />
-                  </span>
-                </h1>
-                <div className="mt-10 flex items-center justify-end gap-3 text-[13px] text-white/70">
-                  Scroll
-                  <span className="relative h-7 w-4 rounded-full border border-white/70">
-                    <span className="absolute left-1/2 top-1.5 h-1.5 w-1 -translate-x-1/2 animate-bounce rounded-full bg-white" />
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex min-h-[100svh] items-center px-6 pb-24 lg:px-10">
-                <div className="ml-auto w-full max-w-[44rem]">
-                  <ScrubText
-                    className="text-[clamp(1.5rem,2.3vw,2.25rem)] font-medium leading-[1.2] tracking-[-0.025em]"
-                    parts={[
-                      'Our studio architecture is designed to de-risk innovation through shared infrastructure and concentrated expertise. The Den Model turns an idea into a funded, scaled company inside a single, hyper-accelerated year.',
-                    ]}
-                  />
-                  <div className="mt-10 flex flex-wrap gap-8">
-                    <ArrowLink href="/programs">View Active Batch</ArrowLink>
-                    <ArrowLink onClick={openAction}>Download Thesis</ArrowLink>
-                  </div>
-                </div>
+          {/* ─── 1. HERO VIDEO ─── */}
+          <section className="relative h-[100svh] min-h-[600px] overflow-hidden">
+            <BgVideo src={platformHero.video} poster={platformHero.poster} />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/75" />
+            <div className="absolute inset-x-0 bottom-0 mx-auto max-w-[1480px] px-6 pb-16 lg:px-10 lg:pb-20">
+              <h1 data-plain className="max-w-[16ch] text-[clamp(2.4rem,6vw,5.75rem)] font-medium leading-[0.98] tracking-[-0.05em]">
+                <BlurWords text={platformHero.headline} delay={0.2} />
+              </h1>
+              <p className="mt-6 max-w-2xl text-[clamp(0.95rem,1.15vw,1.1rem)] leading-[1.6] text-white/80">{platformHero.body}</p>
+              <div className="mt-8 flex flex-wrap gap-8">
+                <ArrowLink onClick={openAction}>{platformHero.primaryCta}</ArrowLink>
+                <ArrowLink href={platformHero.secondaryCta.href}>{platformHero.secondaryCta.label}</ArrowLink>
               </div>
             </div>
           </section>
 
-          {/* ─── FOUR PILLARS ─── */}
-          <section className={`${BG} relative z-10 pb-36 pt-32 lg:pt-44`}>
-            <div className="mx-auto grid max-w-[1480px] grid-cols-1 gap-10 px-6 lg:grid-cols-12 lg:px-10">
-              <Reveal className="lg:col-span-6">
-                <h2 className="text-[clamp(3rem,5.4vw,5.5rem)] font-medium leading-[0.95] tracking-[-0.05em]">
-                  <SplitWords>
-                    Four pillars.
-                    <br />
-                    One studio.
-                  </SplitWords>
-                </h2>
-              </Reveal>
-              <Reveal delay={0.1} className="lg:col-span-5 lg:col-start-8">
-                <p className="text-[16px] leading-[1.55] text-white/75">
-                  Every founder in the Den gets the same foundation: a founding engineering department, direct market
-                  access, committed capital and a residency of operators who have done it before. Built to take a company
-                  from idea to Series A without the usual gaps.
+          {/* ─── 2. TRANSITION STATEMENT ─── */}
+          <section className={`${BG} relative z-10 flex min-h-[100svh] flex-col justify-center overflow-hidden px-6 lg:px-10`}>
+            <div className="relative z-10 mx-auto w-full max-w-[1480px]">
+              <Reveal>
+                <p className="text-[clamp(2.4rem,5.2vw,5rem)] font-medium leading-[1.02] tracking-[-0.045em]">{platformTransition.line1}</p>
+                <p className="mt-1 text-[clamp(1.9rem,4.4vw,4.2rem)] font-light leading-[1.05] tracking-[-0.04em] text-white/90">
+                  {platformTransition.line2Before} <span className="font-medium text-purple-400">{platformTransition.line2Accent}</span>
                 </p>
-                <div className="mt-6">
-                  <ArrowLink onClick={openAction}>Apply to the Den</ArrowLink>
-                </div>
               </Reveal>
             </div>
-            <div className="mt-20">
-              <PillarSlider />
+
+            {/* Purple → turquoise wave */}
+            <svg className="pointer-events-none absolute inset-x-0 bottom-[18%] h-[26vh] w-full" viewBox="0 0 1440 260" preserveAspectRatio="none" aria-hidden="true">
+              <defs>
+                <linearGradient id="platform-wave" x1="0" x2="1" y1="0" y2="0">
+                  <stop offset="0%" stopColor="#a855f7" stopOpacity="0.1" />
+                  <stop offset="25%" stopColor="#a855f7" />
+                  <stop offset="65%" stopColor="#38bdf8" />
+                  <stop offset="100%" stopColor="#22d3ee" stopOpacity="0.15" />
+                </linearGradient>
+              </defs>
+              <path d="M0 150 C 220 60, 420 70, 640 130 S 1040 215, 1220 140 S 1380 90, 1440 110" fill="none" stroke="url(#platform-wave)" strokeWidth="6" opacity="0.25" style={{ filter: 'blur(8px)' }} />
+              <path d="M0 150 C 220 60, 420 70, 640 130 S 1040 215, 1220 140 S 1380 90, 1440 110" fill="none" stroke="url(#platform-wave)" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+
+            <div className="absolute inset-x-0 bottom-10 flex flex-col items-center gap-3 text-[11px] uppercase tracking-[0.3em] text-white/55">
+              <span className="relative h-10 w-px overflow-hidden bg-white/15">
+                <span className="absolute inset-x-0 top-0 h-4 animate-bounce bg-gradient-to-b from-purple-300 to-transparent" />
+              </span>
+              {platformTransition.scrollLabel}
             </div>
           </section>
 
-          {/* ─── STATEMENT ─── */}
-          <section className={`${BG} relative z-10 px-6 pb-40 pt-16 text-center lg:px-10`}>
-            <Reveal>
-              <p className="mx-auto max-w-6xl text-[clamp(2.25rem,4.2vw,4rem)] font-medium leading-[1.02] tracking-[-0.045em]">
-                A hyper-accelerated 12-month trajectory
-              </p>
-              <p className="mx-auto mt-2 max-w-4xl text-[clamp(2rem,3.8vw,3.6rem)] font-light italic leading-[1.05] tracking-[-0.035em] text-purple-200/90">
-                from inception to global market penetration.
-              </p>
-            </Reveal>
-          </section>
-
-          {/* ─── STACKED STAGE PANELS ─── */}
+          {/* ─── 3. IMPACT SCROLL ─── */}
           <div className="relative">
-            {stages.map((s, i) => (
-              <StagePanel key={s.title} stage={s} index={i} total={stages.length} />
+            {impactSlides.map((s, i) => (
+              <ImpactPanel key={s.metric} slide={s} index={i} total={impactSlides.length} />
             ))}
           </div>
 
-          {/* ─── MISSION & VISION ─── */}
-          <section className={`${BG} relative z-10 py-36 lg:py-48`}>
-            <div className="mx-auto grid max-w-[1480px] grid-cols-1 gap-16 px-6 lg:grid-cols-12 lg:px-10">
-              <Reveal className="lg:col-span-5">
-                <p className="flex items-center gap-2 text-[13px] text-white/80">
-                  <Pill>02</Pill> Mission
-                </p>
-                <h2 className="mt-8 text-[clamp(2.5rem,4.4vw,4.5rem)] font-medium leading-[0.98] tracking-[-0.045em]">
-                  <SplitWords>
-                    Built in studios, <span className="font-light italic text-purple-200/90">not garages.</span>
-                  </SplitWords>
-                </h2>
-              </Reveal>
-              <Reveal delay={0.1} className="space-y-12 lg:col-span-6 lg:col-start-7 lg:pt-16">
-                <p className="text-[clamp(1.25rem,1.8vw,1.6rem)] leading-[1.35] tracking-[-0.015em]">
-                  “To engineer the most efficient path for transformative technologies to reach global scale.”
-                </p>
-                <div className="border-t border-white/15 pt-8">
-                  <p className="flex items-center gap-2 text-[13px] text-white/80">
-                    <Pill>03</Pill> Vision
-                  </p>
-                  <p className="mt-5 text-[16px] leading-[1.6] text-white/70">
-                    We believe the next generation of decacorns will be built in studios, not garages. Our vision is to be
-                    the primary architectural firm for the digital economy&apos;s most critical infrastructure.
-                  </p>
+          {/* ─── 4. MISSION & VISION (static two columns) ─── */}
+          <section className={`${BG} relative z-10 overflow-hidden py-28 lg:py-40`}>
+            <div className="relative mx-auto grid max-w-[1320px] grid-cols-1 gap-20 px-6 lg:grid-cols-2 lg:gap-0 lg:px-10">
+              <span aria-hidden="true" className="absolute bottom-0 left-1/2 top-0 hidden w-px bg-gradient-to-b from-transparent via-white/20 to-transparent lg:block" />
+
+              {[
+                { data: mission, accent: 'text-purple-400' },
+                { data: vision, accent: 'text-violet-400' },
+              ].map(({ data, accent }, i) => (
+                <div key={data.label} className={i === 0 ? 'lg:pr-20' : 'lg:pl-20'}>
+                  <Reveal delay={i * 0.1}>
+                    <p className="text-[13px] uppercase tracking-[0.3em] text-white/55">{data.label}</p>
+                    <h2 className="mt-6 text-[clamp(2.75rem,5vw,4.75rem)] font-light leading-[1] tracking-[-0.04em]">
+                      {data.titleLine1}
+                      <br />
+                      <span className={accent}>{data.titleLine2}</span>
+                    </h2>
+                    <p className="mt-8 max-w-[34rem] text-[16px] leading-[1.65] text-white/80">{data.body}</p>
+                  </Reveal>
                 </div>
-              </Reveal>
+              ))}
+            </div>
+
+            {/* Curves: purple glow under Mission, turquoise under Vision */}
+            <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-[34%]">
+              <div className="absolute -left-[12%] top-[35%] aspect-square w-[62%] rounded-full border-t border-purple-400/70 shadow-[0_-12px_60px_rgba(168,85,247,0.35)]" />
+              <div className="absolute -right-[12%] top-[40%] aspect-square w-[62%] rounded-full border-t border-cyan-300/60 shadow-[0_-12px_60px_rgba(34,211,238,0.28)]" />
             </div>
           </section>
 
-          {/* ─── CLOSING CARD OVER IMAGE ─── */}
+          {/* ─── 5. TEAM ─── */}
+          <section className={`${BG} relative z-10 py-24 lg:py-32`}>
+            <div className="mx-auto max-w-[1480px] space-y-24 px-6 lg:space-y-32 lg:px-10">
+              <TeamGroup title="Operational Team" people={operationalTeam} />
+              <TeamGroup title="Founders" people={founders} />
+            </div>
+          </section>
+
+          {/* ─── 6. FINAL CTA VIDEO (Budva) ─── */}
           <section className="relative z-10 h-[88svh] min-h-[560px] overflow-hidden">
-            <BgVideo src="/videos/platform-close.mp4" poster="/images/platform/close-poster.jpg" />
-            <div className="absolute inset-0 bg-black/35" />
-            <div className="absolute inset-x-6 top-10 lg:left-auto lg:right-10 lg:top-12 lg:w-[46rem]">
+            <BgVideo src={platformClosing.video} poster={platformClosing.poster} />
+            <div className="absolute inset-0 bg-black/20" />
+            <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/70 to-transparent" />
+            <div className="absolute inset-x-6 bottom-10 lg:bottom-14 lg:left-10 lg:right-auto lg:w-[34rem]">
               <Reveal>
-                <div className="bg-[#0b0b0c]/92 p-8 backdrop-blur-md lg:p-10">
-                  <p className="text-[clamp(1.75rem,2.6vw,2.6rem)] font-medium leading-[1.08] tracking-[-0.035em]">
-                    Investor or founder, the Den is open.{' '}
-                    <button type="button" onClick={openAction} className="underline decoration-2 underline-offset-[6px] hover:text-purple-200">
-                      Partner with us.
-                    </button>
-                  </p>
-                  <p className="mt-6 max-w-lg text-[15px] leading-[1.6] text-white/65">
-                    Whether you are an institutional investor looking for venture exposure or a founder ready to build
-                    your next legacy, the Den is open.
-                  </p>
-                  <div className="mt-8 flex flex-wrap gap-8">
-                    <ArrowLink onClick={openAction}>For Founders</ArrowLink>
-                    <ArrowLink onClick={openAction}>For Investors</ArrowLink>
-                  </div>
+                <h2 className="text-[clamp(1.75rem,2.8vw,2.6rem)] font-medium leading-[1.08] tracking-[-0.035em]">{platformClosing.title}</h2>
+                <p className="mt-4 max-w-md text-[14px] leading-[1.6] text-white/80">{platformClosing.body}</p>
+                <div className="mt-6 flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    onClick={openAction}
+                    className="h-[46px] rounded-[12px] bg-white px-6 text-[14px] font-semibold text-black transition-transform hover:scale-[1.03]"
+                  >
+                    {platformClosing.primaryCta}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={openAction}
+                    className="h-[46px] rounded-[12px] border border-white/40 px-6 text-[14px] font-semibold text-white backdrop-blur-sm transition-all hover:border-white hover:bg-white/10"
+                  >
+                    {platformClosing.secondaryCta}
+                  </button>
                 </div>
               </Reveal>
             </div>

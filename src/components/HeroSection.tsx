@@ -17,8 +17,6 @@ interface HeroSectionProps {
 export default function HeroSection({ onOpenAction }: HeroSectionProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
-  const eyebrowRef = useRef<HTMLParagraphElement>(null);
-  const copyRef = useRef<HTMLParagraphElement>(null);
   const line1Ref = useRef<HTMLHeadingElement>(null);
   const line2Ref = useRef<HTMLHeadingElement>(null);
   const button1Ref = useRef<HTMLDivElement>(null);
@@ -72,18 +70,7 @@ export default function HeroSection({ onOpenAction }: HeroSectionProps) {
         );
       }
 
-      // 3. Eyebrow + supporting copy
-      const textEls = [eyebrowRef.current, copyRef.current].filter(Boolean);
-      if (textEls.length > 0) {
-        tl.fromTo(
-          textEls,
-          { opacity: 0, y: 20, filter: 'blur(8px)' },
-          { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.9, stagger: 0.2, ease: 'power3.out' },
-          0.15
-        );
-      }
-
-      // 4. CTA Buttons Elastic Stagger
+      // 3. CTA Buttons Elastic Stagger
       const buttons = [button1Ref.current, button2Ref.current].filter(Boolean);
       if (buttons.length > 0) {
         tl.fromTo(
@@ -131,14 +118,6 @@ export default function HeroSection({ onOpenAction }: HeroSectionProps) {
       />
 
       <div className="w-full max-w-5xl flex flex-col items-center justify-center space-y-6 text-center mx-auto relative z-10" style={{ perspective: '1000px' }}>
-        {/* Eyebrow label */}
-        <p
-          ref={eyebrowRef}
-          className="inline-flex items-center rounded-full border border-white/15 bg-black/40 px-4 py-1.5 backdrop-blur-md font-['Plus_Jakarta_Sans',sans-serif] font-semibold text-xs sm:text-sm uppercase tracking-[0.22em] text-purple-100 shadow-[0_4px_24px_rgba(0,0,0,0.45)]"
-        >
-          Venturing Beyond Borders
-        </p>
-
         {/* Main Headline (approved copy, two lines on desktop) */}
         <div className="w-full flex flex-col items-center justify-center text-center mx-auto" style={{ perspective: '1000px' }}>
           <h1
@@ -154,14 +133,6 @@ export default function HeroSection({ onOpenAction }: HeroSectionProps) {
             Global Markets
           </h1>
         </div>
-
-        {/* Supporting copy (final approved text; body/subheadline scale) */}
-        <p
-          ref={copyRef}
-          className="font-['Plus_Jakarta_Sans',sans-serif] font-normal text-[15px] sm:text-[17px] leading-[1.6] text-white/75 max-w-2xl mx-auto"
-        >
-          Digital Den is a startup launch platform and venture studio connecting founders from Montenegro and the Western Balkans with programs, strategic partners, capital and international markets.
-        </p>
 
         {/* Bottom Controls Row (Centered) */}
         <div className="pt-2 flex flex-col items-center justify-center gap-6 w-full max-w-2xl mx-auto text-center">

@@ -2,9 +2,9 @@ import type { Metadata } from 'next';
 import PlatformPage from '@/components/platform/PlatformPage';
 
 export const metadata: Metadata = {
-  title: 'The Den Model | Digital Den',
+  title: 'Platform | Digital Den',
   description:
-    "We don't just invest; we co-build. Our studio architecture is designed to de-risk innovation through shared infrastructure and concentrated expertise.",
+    'Digital Den brings together programs, expert support, strategic partnerships, access to capital and international market connections.',
 };
 
 export default function Page() {

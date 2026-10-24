@@ -448,16 +448,9 @@ export default function CreativeTransitionSection() {
 
         {/* ─── Right-Side Information Column (Vertically Centered) ─── */}
         <div className="absolute inset-0 z-10 flex items-end justify-center pb-[10vh] pointer-events-none md:items-center md:justify-end md:pb-0">
-          <div className="mx-6 text-center md:mx-0 md:text-left md:mr-[8vw] max-w-[320px] space-y-4 md:space-y-6 text-neutral-300 font-mono text-[11px] sm:text-xs md:text-[13px] leading-[1.75] drop-shadow-lg">
-            <p className="text-white font-semibold uppercase tracking-widest">
-              Startup Launch Platform
-            </p>
-            <p className="tracking-wide">
-              Built in Montenegro. Connected to global markets.
-            </p>
-            <p className="tracking-wide">
-              Supporting founders through venture building, programs, strategic partnerships, capital and international opportunities.
-            </p>
+          <div className="mx-6 text-center md:mx-0 md:text-left md:mr-[8vw] space-y-1.5 md:space-y-2 font-['Plus_Jakarta_Sans',sans-serif] text-[clamp(1.15rem,2vw,1.85rem)] font-medium leading-[1.2] tracking-tight text-neutral-200 drop-shadow-lg">
+            <p>Built in Montenegro.</p>
+            <p>Connected to global markets.</p>
           </div>
         </div>
       </div>

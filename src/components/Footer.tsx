@@ -81,6 +81,68 @@ function ContactCard({ it, index }: { it: ContactItem; index: number }) {
   );
 }
 
+const footerNav = [
+  { href: '/platform', label: 'Platform' },
+  { href: '/programs', label: 'Programs' },
+  { href: '/partners', label: 'Partners' },
+  { href: '/opportunities', label: 'Opportunities' },
+  { href: '/services', label: 'Services' },
+  { href: '/portfolio', label: 'Portfolio' },
+  { href: '/events', label: 'Events' },
+];
+
+// Compact site-wide footer for inner pages: navigation, contact/social links, © and Back to top.
+// (The full "Get in Touch" section stays on the Home Page.)
+export function MinimalFooter() {
+  return (
+    <footer className="relative z-30 w-full overflow-hidden bg-den text-[#f3f0ea]">
+      <div className="h-px w-full bg-gradient-to-r from-transparent via-purple-400/50 to-transparent" />
+      <div className="mx-auto max-w-[1450px] px-6 py-12 lg:px-12">
+        <div className="flex flex-col items-center justify-between gap-8 lg:flex-row">
+          <nav aria-label="Footer">
+            <ul className="flex flex-wrap items-center justify-center gap-x-7 gap-y-3 text-[14px] text-white/70">
+              {footerNav.map((n) => (
+                <li key={n.href}>
+                  <Link href={n.href} className="transition-colors hover:text-white">
+                    {n.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+          <ul className="flex items-center gap-3">
+            {items.map((it) => (
+              <li key={it.key}>
+                <a
+                  href={it.href}
+                  aria-label={it.label}
+                  {...(it.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] text-white/80 transition-all duration-300 hover:-translate-y-0.5 hover:border-purple-300/60 hover:text-white [&_svg]:h-[18px] [&_svg]:w-[18px]"
+                >
+                  {it.icon}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="mt-10 flex flex-col items-center gap-4 border-t border-white/10 pt-6 text-[13px] text-white/45 sm:flex-row sm:justify-between">
+          <p>&copy; {new Date().getFullYear()} Digital Den. All rights reserved.</p>
+          <button
+            type="button"
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="group inline-flex items-center gap-2 text-white/70 transition-colors hover:text-white"
+          >
+            Back to top
+            <span className="flex h-7 w-7 items-center justify-center rounded-full border border-white/25 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:border-white">
+              <ArrowUp className="h-3.5 w-3.5" />
+            </span>
+          </button>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
 export default function Footer() {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
