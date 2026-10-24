@@ -3,7 +3,7 @@
 // Digital Den website" (Oct 2026). Do not add content that Digital Den has not approved.
 
 export const platformHero = {
-  // ~22s, 1080p, 10 Mbps drone-style loop made in Google Flow: new stills generated with Nano Banana
+  // ~22s, 1080p, 7.5 Mbps drone-style loop made in Google Flow: new stills generated with Nano Banana
   // Pro (Millennium Bridge, Kotor Bay, Budva), animated with Veo 3.1 Quality (slow camera), 1080p
   // upscale, generator marks removed. Replace with a real Podgorica film when Digital Den supplies one.
   video: '/videos/platform-hero-podgorica.mp4',
