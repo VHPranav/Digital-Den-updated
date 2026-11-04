@@ -122,7 +122,7 @@ export default function OpportunitiesPage() {
                     <Link href={href} className="group block">
                       <Figure src={image} alt={title} sizes="(max-width: 768px) 100vw, 400px" className="aspect-[3/4]" />
                       <div className="mt-8 flex items-center justify-between border-b border-white/[0.12] pb-5">
-                        <h3 className="text-2xl font-semibold tracking-[-0.025em] transition-colors group-hover:text-purple-200">{title}</h3>
+                        <h3 className="transition-colors group-hover:text-purple-200 text-2xl font-semibold tracking-[-0.025em]">{title}</h3>
                         <ArrowUpRight className="h-5 w-5 text-white/40 transition-all duration-300 group-hover:text-white group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
                       </div>
                       <p className={`mt-5 ${body}`}>{text}</p>

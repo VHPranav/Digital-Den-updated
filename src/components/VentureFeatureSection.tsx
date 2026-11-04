@@ -31,7 +31,7 @@ export default function VentureFeatureSection({ onOpenAction }: VentureFeatureSe
           {/* Card 1 */}
           <FadeIn animation="slideUp" delay={0.2}>
             <div className="h-[125px] sm:h-[135px] p-5 rounded-[16px] bg-black/30 backdrop-blur-[10px] border border-white/10 flex items-center justify-start text-left shadow-xl hover:border-white/25 transition-all group">
-              <p className="font-['Plus_Jakarta_Sans',sans-serif] text-[14.4px] leading-[20px] text-[#f2ece2]/70 font-normal">
+              <p className="font-['Plus_Jakarta_Sans',sans-serif] text-[#f2ece2]/70 text-[14.4px] leading-[20px] font-normal">
                 Structured incubation & <span className="font-semibold text-white">seed capital acceleration</span> designed for repeatable startup growth
               </p>
             </div>
@@ -40,7 +40,7 @@ export default function VentureFeatureSection({ onOpenAction }: VentureFeatureSe
           {/* Card 2 */}
           <FadeIn animation="slideUp" delay={0.3}>
             <div className="h-[125px] sm:h-[135px] p-5 rounded-[16px] bg-black/30 backdrop-blur-[10px] border border-white/10 flex items-center justify-start text-left shadow-xl hover:border-white/25 transition-all group">
-              <p className="font-['Plus_Jakarta_Sans',sans-serif] text-[14.4px] leading-[20px] text-[#f2ece2]/70 font-normal">
+              <p className="font-['Plus_Jakarta_Sans',sans-serif] text-[#f2ece2]/70 text-[14.4px] leading-[20px] font-normal">
                 Direct market expansion across <span className="font-semibold text-white">Montenegro, US, Benelux & Jordan</span> with expert advisory
               </p>
             </div>
@@ -49,7 +49,7 @@ export default function VentureFeatureSection({ onOpenAction }: VentureFeatureSe
           {/* Card 3 */}
           <FadeIn animation="slideUp" delay={0.4}>
             <div className="h-[125px] sm:h-[135px] p-5 rounded-[16px] bg-black/30 backdrop-blur-[10px] border border-white/10 flex items-center justify-start text-left shadow-xl hover:border-white/25 transition-all group">
-              <p className="font-['Plus_Jakarta_Sans',sans-serif] text-[14.4px] leading-[20px] text-[#f2ece2]/70 font-normal">
+              <p className="font-['Plus_Jakarta_Sans',sans-serif] text-[#f2ece2]/70 text-[14.4px] leading-[20px] font-normal">
                 Institutional investor syndicate network, <span className="font-semibold text-white">FinTech innovation loops</span> and mentor access
               </p>
             </div>

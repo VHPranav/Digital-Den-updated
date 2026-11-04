@@ -11,10 +11,12 @@ import { useTextReveal } from './useTextReveal';
 export default function PageShell({
   children,
   minimalFooter = false,
+  hideFooter = false,
 }: {
   children: (openAction: () => void) => React.ReactNode;
   /** Use the compact footer (inner pages that shouldn't repeat the Home Page contact section). */
   minimalFooter?: boolean;
+  hideFooter?: boolean;
 }) {
   const [isActionModalOpen, setIsActionModalOpen] = useState(false);
   const openAction = () => setIsActionModalOpen(true);
@@ -25,9 +27,9 @@ export default function PageShell({
     <main ref={mainRef} data-inner className="min-h-screen bg-[#0b0b0c] text-white selection:bg-purple-600 selection:text-white relative overflow-x-clip">
       <Navbar onOpenAction={openAction} />
       {children(openAction)}
-      <div data-footer className="relative z-20 bg-[#0b0b0c]">
+      {!hideFooter && <div data-footer className="relative z-20 bg-[#0b0b0c]">
         {minimalFooter ? <MinimalFooter /> : <Footer />}
-      </div>
+      </div>}
       <ActionModal isOpen={isActionModalOpen} onClose={() => setIsActionModalOpen(false)} />
     </main>
   );

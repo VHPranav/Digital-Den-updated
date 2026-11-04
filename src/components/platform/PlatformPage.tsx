@@ -4,18 +4,10 @@ import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { ArrowLink, BgVideo, BlurWords, Pill, Reveal } from '@/components/site/editorial';
 import PageShell from '@/components/site/PageShell';
+import { MinimalFooter } from '@/components/Footer';
 import { useScrollProgress } from '@/components/events/motion';
-import {
-  founders,
-  impactSlides,
-  missionVision,
-  operationalTeam,
-  platformClosing,
-  platformHero,
-  platformTransition,
-  type ImpactSlide,
-  type TeamMember,
-} from '@/lib/platformContent';
+import { defaultPlatformPage, type PlatformPageContent } from '@/lib/sitePagesSanity';
+import type { ImpactSlide, TeamMember } from '@/lib/platformContent';
 
 // Platform page (final order, Oct 2026): video hero → "One platform" transition → impact scroll →
 // Mission & Vision → Team → Budva CTA → minimal footer. All copy/images live in
@@ -28,12 +20,14 @@ const BG = 'bg-[#0b0b0c]';
 function ImpactPanel({ slide, index, total }: { slide: ImpactSlide; index: number; total: number }) {
   const [ref, progress] = useScrollProgress<HTMLDivElement>({ start: 1, end: 0.2 });
   return (
-    <section className="sticky top-0 h-[100svh] overflow-hidden">
-      <Image src={slide.image} alt="" fill sizes="100vw" className="object-cover" style={{ objectPosition: slide.position ?? 'center' }} />
+    <section data-impact-panel className="sticky top-0 h-[100svh] min-h-[480px] overflow-hidden">
+      <div className="absolute inset-0">
+        <Image src={slide.image} alt="" fill sizes="100vw" className="object-cover" style={{ objectPosition: slide.position ?? 'center' }} />
+      </div>
       {/* Same dark fade on every slide so the metric stays readable and the images feel consistent */}
       <div className="absolute inset-0 bg-black/55" />
       <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-black/35" />
-      <div ref={ref} className="absolute inset-x-0 bottom-0 mx-auto max-w-[1480px] px-6 pb-14 lg:px-10 lg:pb-20">
+      <div ref={ref} data-impact-content data-noreveal className="absolute inset-x-0 top-1/2 mx-auto max-w-[1480px] -translate-y-1/2 px-6 lg:px-10">
         <div className="relative h-px w-full bg-white/20">
           <span className="absolute inset-y-0 left-0 bg-white" style={{ width: `${Math.max(12, progress * 100)}%`, transition: 'width 120ms linear' }} />
         </div>
@@ -45,8 +39,8 @@ function ImpactPanel({ slide, index, total }: { slide: ImpactSlide; index: numbe
           </div>
           <div className="lg:col-span-11">
             <h3 className="text-[clamp(4.5rem,15vw,13rem)] font-medium leading-[0.88] tracking-[-0.06em]">{slide.metric}</h3>
-            <p className="mt-4 text-[clamp(1.25rem,2.2vw,2rem)] font-medium tracking-[-0.02em] text-white/90">{slide.label}</p>
-            {slide.support && <p className="mt-3 text-[13px] uppercase tracking-[0.22em] text-white/65">{slide.support}</p>}
+            <p className="mt-4 text-white/90 text-[clamp(1.25rem,2.2vw,2rem)] font-medium tracking-[-0.02em]">{slide.label}</p>
+            {slide.support && <p className="mt-3 uppercase text-white/65 text-[13px] tracking-[0.22em]">{slide.support}</p>}
           </div>
         </div>
       </div>
@@ -54,61 +48,33 @@ function ImpactPanel({ slide, index, total }: { slide: ImpactSlide; index: numbe
   );
 }
 
-/* ─── Hero headline: "Connecting" stays, the word after it blurs up in / out ─── */
-
-const HERO_WORDS = ['ideas', 'people', 'markets'];
-
-/** Letters blur up one after another (in) or blur up and away one after another (out). */
 function Letters({ text, mode, baseDelay = 0, step = 0.05 }: { text: string; mode: 'in' | 'out'; baseDelay?: number; step?: number }) {
-  return (
-    <>
-      {text.split('').map((ch, n) => (
-        <span
-          key={`${mode}-${n}`}
-          className={`inline-block ${mode === 'in' ? 'dd-word-in' : 'dd-word-out'}`}
-          style={{ animationDelay: `${baseDelay + n * step}s` }}
-        >
-          {ch}
-        </span>
-      ))}
-    </>
-  );
+  return <>{text.split('').map((ch, n) => <span key={`${mode}-${n}`} className={`inline-block ${mode === 'in' ? 'dd-word-in' : 'dd-word-out'}`} style={{ animationDelay: `${baseDelay + n * step}s` }}>{ch}</span>)}</>;
 }
 
-function RotatingHeadline() {
+function RotatingHeadline({ headline }: { headline: string }) {
   const [i, setI] = useState(0);
   const [leaving, setLeaving] = useState(false);
+  const clean = headline.replace(/[.,]/g, '').trim();
+  const parts = clean.split(/\s+/);
+  const prefix = parts.slice(0, 1).join(' ');
+  const rotatingWords = parts.slice(1).join(' ').split(/,\s*|\s+and\s+/).filter(Boolean);
+  const words = rotatingWords.length ? rotatingWords : [parts.slice(1).join(' ') || clean];
 
   useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const word = HERO_WORDS[i];
-    const inTime = 0.8 + word.length * 0.05; // letters finish blurring in
-    const outTime = 0.55 + word.length * 0.035; // letters finish blurring out
+    if (words.length < 2 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const word = words[i % words.length];
+    const inTime = 0.8 + word.length * 0.05;
+    const outTime = 0.55 + word.length * 0.035;
     const hold = setTimeout(() => setLeaving(true), (inTime + 1.8) * 1000);
-    const swap = setTimeout(() => {
-      setI((n) => (n + 1) % HERO_WORDS.length);
-      setLeaving(false);
-    }, (inTime + 1.8 + outTime) * 1000);
-    return () => {
-      clearTimeout(hold);
-      clearTimeout(swap);
-    };
-  }, [i]);
+    const swap = setTimeout(() => { setI((n) => (n + 1) % words.length); setLeaving(false); }, (inTime + 1.8 + outTime) * 1000);
+    return () => { clearTimeout(hold); clearTimeout(swap); };
+  }, [i, words.length]);
 
   return (
-    <h1 data-plain aria-label="Connecting ideas, people and markets" className="text-[clamp(2.4rem,6vw,5.75rem)] font-medium leading-[1] tracking-[-0.05em]">
-      <span className="block" aria-hidden="true">
-        <Letters text="Connecting" mode="in" baseDelay={0.2} step={0.045} />
-      </span>
-      <span className="block" aria-hidden="true">
-        {/* Sized by the longest word so the line never jumps */}
-        <span className="relative inline-block">
-          <span className="invisible">markets</span>
-          <span key={i} className="absolute left-0 top-0 whitespace-nowrap">
-            <Letters text={HERO_WORDS[i]} mode={leaving ? 'out' : 'in'} baseDelay={i === 0 && !leaving ? 0.9 : 0} step={leaving ? 0.035 : 0.05} />
-          </span>
-        </span>
-      </span>
+    <h1 data-plain aria-label={headline} className="text-[clamp(2.4rem,6vw,5.75rem)] font-medium leading-[1] tracking-[-0.05em]">
+      <span className="block" aria-hidden="true"><Letters text={prefix} mode="in" baseDelay={0.2} step={0.045} /></span>
+      <span className="block" aria-hidden="true"><span className="relative inline-block"><span className="invisible">{words.reduce((longest, word) => word.length > longest.length ? word : longest, '')}</span><span key={i} className="absolute left-0 top-0 whitespace-nowrap"><Letters text={words[i % words.length]} mode={leaving ? 'out' : 'in'} baseDelay={i === 0 && !leaving ? 0.9 : 0} step={leaving ? 0.035 : 0.05} /></span></span></span>
     </h1>
   );
 }
@@ -123,59 +89,49 @@ function LinkedInIcon() {
   );
 }
 
+const REFERENCE_PORTRAITS = [
+  'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=800&q=85',
+  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=85',
+  'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=800&q=85',
+  'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=800&q=85',
+];
+
 function TeamGroup({ title, people }: { title: string; people: TeamMember[] }) {
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  if (!people.length) return null;
   return (
-    <div>
-      <Reveal>
-        <h3 className="text-[clamp(1.5rem,2.4vw,2.1rem)] font-medium tracking-[-0.03em] text-white">{title}</h3>
-        <div className="mt-5 h-px w-full bg-gradient-to-r from-purple-400/50 via-white/10 to-transparent" />
-      </Reveal>
-      <ul className="mt-10 grid grid-cols-2 gap-x-5 gap-y-10 md:grid-cols-3 lg:grid-cols-4">
-        {people.map((p, i) => (
-          <li key={`${p.name}-${i}`}>
-            <Reveal delay={(i % 4) * 0.08}>
-              <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[20px] border border-white/10 bg-gradient-to-br from-[#2a1458] via-[#150b2b] to-[#0b0b0c]">
-                {p.photo ? (
-                  <Image src={p.photo} alt={p.name} fill sizes="(max-width: 768px) 46vw, 22vw" className="object-cover" />
-                ) : (
-                  <span className="absolute inset-0 flex items-center justify-center text-[11px] uppercase tracking-[0.22em] text-white/35">Photo</span>
-                )}
-              </div>
-              <div className="mt-4 flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-[16px] font-medium tracking-[-0.01em] text-white">{p.name}</p>
-                  <p className="mt-1 text-[13px] leading-snug text-white/55">{p.role}</p>
+    <div className="dd-team-group">
+      <Reveal><h2 className="text-center text-[clamp(2.25rem,4.5vw,4.5rem)] font-medium leading-none tracking-[-0.045em]">{title}</h2></Reveal>
+      <div className="dd-team-cards" onMouseLeave={() => setActiveIndex(null)}>
+        {people.map((person, i) => (
+          <article key={`${person.name}-${i}`} className={`dd-team-card ${activeIndex === i ? 'is-active' : ''}`} onMouseEnter={() => setActiveIndex(i)} onFocus={() => setActiveIndex(i)} onBlur={() => setActiveIndex(null)} tabIndex={0} aria-label={`${person.name}, ${person.role}`}>
+            <Image src={person.photo || REFERENCE_PORTRAITS[i % REFERENCE_PORTRAITS.length]} alt={person.photo ? person.name : 'Temporary reference portrait'} fill sizes="(max-width: 640px) 80vw, (max-width: 1024px) 45vw, 25vw" className="dd-team-portrait" />
+            <div className="dd-team-shade" />
+            <div className="dd-team-info">
+              <div className="dd-team-grid" aria-hidden="true" />
+              <div className="relative z-10">
+                <h3 className="text-[clamp(1.2rem,1.8vw,1.8rem)] font-medium tracking-[-0.035em]">{person.name}</h3>
+                <p className="mt-2 text-white/65 text-[14px] leading-[1.6]">{person.role}</p>
+                <div className="dd-team-extra">
+                  {!person.photo && <p className="uppercase text-white/45 text-[13px] leading-relaxed">Reference image</p>}
+                  {person.linkedin && <a href={person.linkedin} target="_blank" rel="noopener noreferrer" aria-label={`${person.name} on LinkedIn`} className="ml-auto inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/30 hover:bg-white/15"><LinkedInIcon /></a>}
                 </div>
-                {p.linkedin ? (
-                  <a
-                    href={p.linkedin}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={`${p.name} on LinkedIn`}
-                    className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/20 text-white/80 transition-colors hover:border-purple-300 hover:text-white"
-                  >
-                    <LinkedInIcon />
-                  </a>
-                ) : (
-                  <span aria-hidden="true" className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/10 text-white/25">
-                    <LinkedInIcon />
-                  </span>
-                )}
               </div>
-            </Reveal>
-          </li>
+            </div>
+          </article>
         ))}
-      </ul>
+      </div>
     </div>
   );
 }
 
 /* ─── Page ─── */
 
-export default function PlatformPage() {
+export default function PlatformPage({ content = defaultPlatformPage }: { content?: PlatformPageContent }) {
+  const { hero: platformHero, transition: platformTransition, impact: impactSlides, missionVision, operationalTeam, founders, closing: platformClosing } = content;
   const { mission, vision } = missionVision;
   return (
-    <PageShell minimalFooter>
+    <PageShell hideFooter>
       {(openAction) => (
         <div className={`${BG} text-[#f3f0ea]`}>
           {/* ─── 1. HERO VIDEO ─── */}
@@ -183,8 +139,8 @@ export default function PlatformPage() {
             <BgVideo src={platformHero.video} poster={platformHero.poster} />
             <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/55" />
             <div className="absolute inset-x-0 bottom-0 mx-auto max-w-[1480px] px-6 pb-16 lg:px-10 lg:pb-20">
-              <RotatingHeadline />
-              <p className="mt-6 max-w-2xl text-[clamp(0.95rem,1.15vw,1.1rem)] leading-[1.6] text-white/80">{platformHero.body}</p>
+              <RotatingHeadline headline={platformHero.headline} />
+              <p className="mt-6 max-w-2xl text-white/80 text-[clamp(0.95rem,1.15vw,1.1rem)] leading-[1.6]">{platformHero.body}</p>
               <div className="mt-8 flex flex-wrap gap-8">
                 <ArrowLink onClick={openAction}>{platformHero.primaryCta}</ArrowLink>
                 <ArrowLink href={platformHero.secondaryCta.href}>{platformHero.secondaryCta.label}</ArrowLink>
@@ -197,7 +153,7 @@ export default function PlatformPage() {
             <div className="relative z-10 mx-auto w-full max-w-[1480px]">
               <Reveal>
                 <p className="text-[clamp(2.4rem,5.2vw,5rem)] font-medium leading-[1.02] tracking-[-0.045em]">{platformTransition.line1}</p>
-                <p className="mt-1 text-[clamp(1.9rem,4.4vw,4.2rem)] font-light leading-[1.05] tracking-[-0.04em] text-white/90">
+                <p className="mt-1 text-white/90 text-[clamp(1.9rem,4.4vw,4.2rem)] font-light leading-[1.05] tracking-[-0.04em]">
                   {platformTransition.line2Before} <span className="font-medium text-purple-400">{platformTransition.line2Accent}</span>
                 </p>
               </Reveal>
@@ -243,13 +199,13 @@ export default function PlatformPage() {
               ].map(({ data, accent }, i) => (
                 <div key={data.label} className={i === 0 ? 'lg:pr-20' : 'lg:pl-20'}>
                   <Reveal delay={i * 0.1}>
-                    <p className="text-[13px] uppercase tracking-[0.3em] text-white/55">{data.label}</p>
+                    <p className="uppercase text-white/55 text-[13px] tracking-[0.3em]">{data.label}</p>
                     <h2 className="mt-6 text-[clamp(2.75rem,5vw,4.75rem)] font-light leading-[1] tracking-[-0.04em]">
                       {data.titleLine1}
                       <br />
                       <span className={accent}>{data.titleLine2}</span>
                     </h2>
-                    <p className="mt-8 max-w-[34rem] text-[16px] leading-[1.65] text-white/80">{data.body}</p>
+                    <p className="mt-8 max-w-[34rem] text-white/80 text-[16px] leading-[1.65]">{data.body}</p>
                   </Reveal>
                 </div>
               ))}
@@ -265,20 +221,21 @@ export default function PlatformPage() {
           {/* ─── 5. TEAM ─── */}
           <section className={`${BG} relative z-10 py-24 lg:py-32`}>
             <div className="mx-auto max-w-[1480px] space-y-24 px-6 lg:space-y-32 lg:px-10">
-              <TeamGroup title="Operational Team" people={operationalTeam} />
-              <TeamGroup title="Founders" people={founders} />
+              <TeamGroup title={content.teamTitleOperational} people={operationalTeam} />
+              <TeamGroup title={content.teamTitleFounders} people={founders} />
             </div>
           </section>
 
           {/* ─── 6. FINAL CTA VIDEO (Budva) ─── */}
-          <section className="relative z-10 h-[88svh] min-h-[560px] overflow-hidden">
+          <div className="platform-ending">
+          <section className="platform-ending-cta relative z-10 overflow-hidden">
             <BgVideo src={platformClosing.video} poster={platformClosing.poster} />
             <div className="absolute inset-0 bg-black/20" />
             <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/70 to-transparent" />
-            <div className="absolute inset-x-6 bottom-10 lg:bottom-14 lg:left-10 lg:right-auto lg:w-[34rem]">
+            <div className="absolute inset-x-6 bottom-10 lg:bottom-14 lg:left-10 lg:right-auto lg:w-[44rem]">
               <Reveal>
-                <h2 className="text-[clamp(1.75rem,2.8vw,2.6rem)] font-medium leading-[1.08] tracking-[-0.035em]">{platformClosing.title}</h2>
-                <p className="mt-4 max-w-md text-[14px] leading-[1.6] text-white/80">{platformClosing.body}</p>
+                <h2 className="text-[clamp(2.25rem,3.8vw,3.75rem)] font-medium leading-[1.08] tracking-[-0.035em]">{platformClosing.title}</h2>
+                <p className="mt-5 max-w-xl text-[clamp(1rem,1.3vw,1.2rem)] leading-[1.6] text-white/80">{platformClosing.body}</p>
                 <div className="mt-6 flex flex-wrap gap-3">
                   <button
                     type="button"
@@ -298,6 +255,8 @@ export default function PlatformPage() {
               </Reveal>
             </div>
           </section>
+          <div data-footer className="relative z-20 shrink-0"><MinimalFooter /></div>
+          </div>
         </div>
       )}
     </PageShell>

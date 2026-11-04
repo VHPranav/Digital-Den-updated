@@ -60,7 +60,7 @@ export default function ActionModal({ isOpen, mode = 'startup', onClose }: Actio
           <div className="space-y-4 py-6 text-center">
             <CheckCircle2 className="mx-auto h-12 w-12 text-purple-300" />
             <h3 className="text-2xl font-semibold tracking-tight">Thank you.</h3>
-            <p className="text-sm text-white/60">The Digital Den team will be in touch.</p>
+            <p className="text-white/60 text-sm">The Digital Den team will be in touch.</p>
             <button
               onClick={handleClose}
               className="mt-4 w-full rounded-xl bg-white/10 py-3 text-sm font-semibold transition-colors hover:bg-white/20"
@@ -72,7 +72,7 @@ export default function ActionModal({ isOpen, mode = 'startup', onClose }: Actio
           <div className="space-y-6">
             <div>
               <h3 className="text-2xl font-semibold tracking-tight">{c.title}</h3>
-              <p className="mt-1 text-sm text-white/60">{c.lead}</p>
+              <p className="mt-1 text-white/60 text-sm">{c.lead}</p>
             </div>
             <form
               onSubmit={(e) => {

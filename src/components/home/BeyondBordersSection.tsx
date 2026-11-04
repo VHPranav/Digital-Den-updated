@@ -5,16 +5,17 @@ import { FadeIn } from '../FadeIn';
 import SectionIntro from './SectionIntro';
 import RegionMap from './RegionMap';
 import { REGIONS } from './regionMapData';
+import type { HomePageContent } from '@/lib/sitePagesSanity';
 
 // Approved countries/regions only: Montenegro (hub), Western Balkans, United States, Benelux,
 // Jordan — filled in purple on a recognisable world map. No cities, no UK/France/Germany.
-export default function BeyondBordersSection() {
+export default function BeyondBordersSection({ content }: { content: HomePageContent['presence'] }) {
   return (
     <section id="beyond-borders" className="w-full max-w-[1450px] mx-auto px-4 sm:px-8 lg:px-12">
       <SectionIntro
         align="center"
-        title="Global Presence"
-        lead="Connecting founders with international partners, markets and opportunities across key global hubs."
+        title={content.title}
+        lead={content.lead}
       />
       <FadeIn animation="fadeIn" delay={0.3} duration={1.4} className="mt-10 w-full">
         <RegionMap className="block h-auto w-full" />

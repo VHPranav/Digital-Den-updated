@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import SectionIntro from './SectionIntro';
+import type { HomePageContent } from '@/lib/sitePagesSanity';
 
 // Startup Journey (agreed Master Brief section): Idea → Build → Validate → Scale → Global.
 // A glowing rising line through all five stages that draws on scroll and ends fully drawn,
@@ -21,7 +22,7 @@ const VB_H = 160;
 const POINT_Y = [135, 108, 80, 52, 24];
 const WAVE = 'M 0 142 C 40 142, 60 135, 100 135 C 200 135, 200 108, 300 108 S 400 80, 500 80 S 600 52, 700 52 S 800 24, 900 24 S 960 14, 1000 12';
 
-export default function StartupJourneySection() {
+export default function StartupJourneySection({ content }: { content: HomePageContent['journey'] }) {
   const sectionRef = useRef<HTMLElement>(null);
   const pathRef = useRef<SVGPathElement>(null);
   const glowRef = useRef<SVGPathElement>(null);
@@ -77,11 +78,7 @@ export default function StartupJourneySection() {
 
   return (
     <section ref={sectionRef} id="startup-journey" className="w-full max-w-[1450px] mx-auto px-4 sm:px-8 lg:px-12">
-      <SectionIntro
-        eyebrow="Startup Journey"
-        title="From Idea to Global"
-        lead="From first idea to global opportunity, we support founders through every stage of startup growth."
-      />
+      <SectionIntro eyebrow={content.eyebrow} title={content.title} lead={content.lead} />
 
       {/* Desktop: fully drawn rising line with a dashed drop to each stage */}
       <div className="relative mt-14 hidden lg:block">
@@ -121,7 +118,7 @@ export default function StartupJourneySection() {
               strokeDashoffset={1}
             />
           </svg>
-          {stages.map((s, i) => (
+          {content.stages.map((s, i) => (
             <React.Fragment key={s.title}>
               {/* dashed drop from the node to its number */}
               <span
@@ -146,11 +143,11 @@ export default function StartupJourneySection() {
         </div>
 
         <ol className="mt-6 grid grid-cols-5 gap-6">
-          {stages.map((s, i) => (
+          {content.stages.map((s, i) => (
             <li key={s.title} className={`text-center transition-all duration-700 ${i < active ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-30'}`}>
               <span className="text-xs tabular-nums" style={{ color: s.color }}>{String(i + 1).padStart(2, '0')}</span>
-              <h3 className="mt-1 font-['Plus_Jakarta_Sans',sans-serif] text-xl font-semibold tracking-tight text-white">{s.title}</h3>
-              <p className="mx-auto mt-2 max-w-[220px] text-sm leading-[1.55] text-white/65">{s.body}</p>
+              <h3 className="mt-1 font-['Plus_Jakarta_Sans',sans-serif] text-white text-xl font-semibold tracking-tight">{s.title}</h3>
+              <p className="mx-auto mt-2 max-w-[220px] text-white/65 text-sm leading-[1.55]">{s.body}</p>
             </li>
           ))}
         </ol>
@@ -174,8 +171,8 @@ export default function StartupJourneySection() {
                 aria-hidden="true"
               />
               <span className="text-xs tabular-nums" style={{ color: s.color }}>{String(i + 1).padStart(2, '0')}</span>
-              <h3 className="font-['Plus_Jakarta_Sans',sans-serif] text-lg font-semibold tracking-tight text-white">{s.title}</h3>
-              <p className="mt-1 text-sm leading-[1.55] text-white/65">{s.body}</p>
+              <h3 className="font-['Plus_Jakarta_Sans',sans-serif] text-white text-lg font-semibold tracking-tight">{s.title}</h3>
+              <p className="mt-1 text-white/65 text-sm leading-[1.55]">{s.body}</p>
             </li>
           ))}
         </ol>

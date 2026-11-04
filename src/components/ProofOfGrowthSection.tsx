@@ -8,6 +8,7 @@ import { gsap, ScrollTrigger } from '@/lib/gsap';
 import { FadeIn } from './FadeIn';
 import { headingGradient } from './home/SectionIntro';
 import { proofOfGrowth } from '@/lib/homeContent';
+import type { HomePageContent } from '@/lib/sitePagesSanity';
 
 // Portfolio highlights — exactly the approved content: title, one sentence, "Explore Full
 // Portfolio", plus 3–4 real startups once Digital Den confirms them (src/lib/homeContent.ts).
@@ -56,9 +57,9 @@ function StartupCard({ s, i }: { s: Card; i: number }) {
           )}
         </div>
       </div>
-      <h3 className="mt-5 font-['Plus_Jakarta_Sans',sans-serif] text-xl font-medium leading-snug tracking-tight text-white">{s.name}</h3>
-      <p className="mt-2 text-[15px] leading-[1.5] text-white/70">{s.achievement}</p>
-      {s.metric && <p className="mt-3 text-sm font-medium text-purple-200">{s.metric}</p>}
+      <h3 className="mt-5 font-['Plus_Jakarta_Sans',sans-serif] text-white text-xl font-medium leading-snug tracking-tight">{s.name}</h3>
+      <p className="mt-2 text-white/70 text-[15px] leading-[1.5]">{s.achievement}</p>
+      {s.metric && <p className="mt-3 text-purple-200 text-sm font-medium">{s.metric}</p>}
     </>
   );
   return (
@@ -72,7 +73,7 @@ function StartupCard({ s, i }: { s: Card; i: number }) {
   );
 }
 
-export default function ProofOfGrowthSection() {
+export default function ProofOfGrowthSection({ content }: { content: HomePageContent['proof'] }) {
   const startups = proofOfGrowth.slice(0, 4);
   const cards: Card[] =
     startups.length > 0
@@ -120,15 +121,15 @@ export default function ProofOfGrowthSection() {
 
       <div className="relative flex flex-wrap items-end justify-between gap-6">
         <FadeIn animation="fadeIn" delay={0.1}>
-          <p className="mb-4 font-['Plus_Jakarta_Sans',sans-serif] text-[11px] sm:text-xs font-medium uppercase tracking-[0.2em] text-white/45">Portfolio Highlights</p>
+          <p className="mb-4 font-['Plus_Jakarta_Sans',sans-serif] uppercase text-white/45 text-[11px] sm:text-xs font-medium tracking-[0.2em]">{content.eyebrow}</p>
           <h2 className="text-3xl font-medium leading-[110%] tracking-tight sm:text-4xl lg:text-[48px]" style={headingGradient}>
-            Proof of Growth
+            {content.title}
           </h2>
         </FadeIn>
         <FadeIn animation="fadeIn" delay={0.2}>
           <Link href="/portfolio" className="group inline-flex items-center gap-3 pb-1 text-[15px] font-medium text-white">
             <span className="relative">
-              Explore Full Portfolio
+              {content.linkLabel}
               <span className="absolute -bottom-1 left-0 h-px w-full origin-left scale-x-[0.35] bg-gradient-to-r from-purple-400 to-sky-400 transition-transform duration-500 group-hover:scale-x-100" />
             </span>
             <span className="flex h-9 w-9 items-center justify-center rounded-full border border-white/25 transition-all duration-500 group-hover:rotate-45 group-hover:border-transparent group-hover:bg-white group-hover:text-black">
@@ -141,9 +142,9 @@ export default function ProofOfGrowthSection() {
       {/* Kinetic statement */}
       <p
         ref={statementRef}
-        className="relative mt-8 sm:mt-10 max-w-[900px] font-['Plus_Jakarta_Sans',sans-serif] text-[clamp(1.25rem,2vw,1.75rem)] font-medium leading-[1.4] tracking-[-0.02em] text-white"
+        className="relative mt-8 sm:mt-10 max-w-[900px] font-['Plus_Jakarta_Sans',sans-serif] text-white text-[clamp(1.25rem,2vw,1.75rem)] font-medium leading-[1.4] tracking-[-0.02em]"
       >
-        {SENTENCE.split(' ').map((word, i, arr) => {
+        {(content.sentence || SENTENCE).split(' ').map((word, i, arr) => {
           const isOutcome = OUTCOMES.has(word.replace(/[^a-z]/gi, '').toLowerCase());
           return (
             <React.Fragment key={i}>

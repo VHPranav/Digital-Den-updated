@@ -78,14 +78,14 @@ export default function VerticalPage({ slug }: { slug: string }) {
                   {v.needs.map((need) => (
                     <FadeIn key={need.org} animation="fadeIn">
                       <article className="border-b border-white/[0.12] py-10">
-                        <p className="text-xs uppercase tracking-[0.2em] text-white/40">{need.meta}</p>
+                        <p className="uppercase text-white/40 text-xs tracking-[0.2em]">{need.meta}</p>
                         <h4 className="mt-3 text-2xl font-semibold tracking-[-0.025em]">{need.org}</h4>
                         <p className={`mt-4 ${body}`}>
                           <span className="text-white/75">{need.label}: </span>
                           {need.text}
                         </p>
                         {need.tags && (
-                          <p className="mt-5 text-xs uppercase tracking-[0.2em] text-purple-300/70">{need.tags.join('  /  ')}</p>
+                          <p className="mt-5 uppercase text-purple-300/70 text-xs tracking-[0.2em]">{need.tags.join('  /  ')}</p>
                         )}
                         <div className="mt-7">
                           <TextLink onClick={openAction}>{v.needCta}</TextLink>
@@ -104,8 +104,8 @@ export default function VerticalPage({ slug }: { slug: string }) {
                     <FadeIn key={sol.name} animation="fadeIn">
                       <article className="border-b border-white/[0.12] py-10">
                         <div className="flex items-baseline justify-between gap-4">
-                          <p className="text-xs uppercase tracking-[0.2em] text-white/40">{sol.meta}</p>
-                          {sol.badge && <p className="text-xs uppercase tracking-[0.2em] text-purple-300">{sol.badge}</p>}
+                          <p className="uppercase text-white/40 text-xs tracking-[0.2em]">{sol.meta}</p>
+                          {sol.badge && <p className="uppercase text-purple-300 text-xs tracking-[0.2em]">{sol.badge}</p>}
                         </div>
                         <h4 className="mt-3 text-2xl font-semibold tracking-[-0.025em]">{sol.name}</h4>
                         <p className={`mt-4 ${body}`}>
@@ -120,7 +120,7 @@ export default function VerticalPage({ slug }: { slug: string }) {
                           </p>
                         )}
                         {sol.tags && (
-                          <p className="mt-5 text-xs uppercase tracking-[0.2em] text-purple-300/70">{sol.tags.join('  /  ')}</p>
+                          <p className="mt-5 uppercase text-purple-300/70 text-xs tracking-[0.2em]">{sol.tags.join('  /  ')}</p>
                         )}
                         <div className="mt-7">
                           <TextLink onClick={openAction}>{v.solutionCta}</TextLink>

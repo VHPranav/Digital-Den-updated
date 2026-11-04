@@ -5,12 +5,13 @@ import Link from 'next/link';
 import { ArrowUpRight } from 'lucide-react';
 import { FadeIn } from './FadeIn';
 import BorderGlow from './BorderGlow';
+import type { HomePageContent } from '@/lib/sitePagesSanity';
 
 // Four entry points into the ecosystem (final approved copy). Not "pillars":
 // the Platform page owns the three pillars. All four cards share one treatment
 // (photo background + shade) on one aligned row for equal visual weight.
 // `position` = background crop focus.
-const cards: { title: string; body: string; cta: string; href: string; image: string; position?: string }[] = [
+const defaultCards: { title: string; body: string; cta: string; href: string; image: string; position?: string }[] = [
   {
     title: 'Venture Building',
     body: 'Hands-on support that helps founders validate, structure and build stronger ventures ready for growth.',
@@ -44,20 +45,20 @@ const cards: { title: string; body: string; cta: string; href: string; image: st
   },
 ];
 
-export default function FourPillarsSection() {
+export default function FourPillarsSection({ title = 'Explore Digital Den', cards = defaultCards }: { title?: string; cards?: HomePageContent['cards'] }) {
   return (
     <section id="explore-digital-den" className="w-full max-w-[1450px] mx-auto px-4 sm:px-8 lg:px-12 space-y-6">
       <div className="mb-4 max-w-[440px]">
         <FadeIn animation="fadeIn" delay={0.1}>
           <h2
-            className="font-medium text-3xl sm:text-4xl lg:text-[48px] leading-[105%] lg:mb-10 tracking-tight"
+            className="lg:mb-10 font-medium text-3xl sm:text-4xl lg:text-[48px] leading-[105%] tracking-tight"
             style={{
               background: 'linear-gradient(90deg, #FFFFFF 0%, #FFFFFF 30%, #F3E8FF 45%, #D8B4FE 60%, #C084FC 75%, #A855F7 88%, #7E22CE 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
             }}
           >
-            Explore Digital Den
+            {title}
           </h2>
         </FadeIn>
       </div>
@@ -94,10 +95,10 @@ export default function FourPillarsSection() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/35 z-0 rounded-[24px]" />
 
                 <div className="space-y-2.5 z-10 relative">
-                  <h3 className="font-['Plus_Jakarta_Sans',sans-serif] font-semibold text-2xl sm:text-3xl text-white tracking-tight leading-[109%]">
+                  <h3 className="font-['Plus_Jakarta_Sans',sans-serif] text-white font-semibold text-2xl sm:text-3xl tracking-tight leading-[109%]">
                     {card.title}
                   </h3>
-                  <p className="font-normal text-sm sm:text-[15px] leading-[22px] text-white/90">{card.body}</p>
+                  <p className="text-white/90 font-normal text-sm sm:text-[15px] leading-[22px]">{card.body}</p>
                 </div>
               </Link>
             </BorderGlow>

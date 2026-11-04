@@ -38,7 +38,7 @@ export default function UpcomingOpportunitySection() {
             </h2>
           </FadeIn>
           <FadeIn animation="fadeIn" delay={0.25}>
-            <p className="max-w-2xl text-[15px] leading-relaxed text-white/75 sm:text-base">{o.description}</p>
+            <p className="max-w-2xl text-white/75 text-[15px] leading-relaxed sm:text-base">{o.description}</p>
           </FadeIn>
           <FadeIn animation="fadeIn" delay={0.3}>
             <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-white/80">

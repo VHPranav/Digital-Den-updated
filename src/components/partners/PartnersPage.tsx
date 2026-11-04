@@ -89,7 +89,7 @@ export default function PartnersPage() {
                     </h1>
                 </div>
                 <FadeIn animation="slideUp" delay={0.3} className="lg:max-w-sm">
-                  <p className="text-base leading-[1.7] text-white/55">
+                  <p className="text-white/55 text-base leading-[1.7]">
                     We&apos;ve architected a borderless infrastructure that connects local innovation with global
                     capital. Our partners provide the regulatory, financial, and technical tailwinds required for
                     high-stakes venture scaling.
@@ -129,7 +129,7 @@ export default function PartnersPage() {
                   <FadeIn key={index} animation="fadeIn">
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 border-t border-white/[0.12] py-14">
                       <div className="lg:col-span-4">
-                        <p className="text-xs uppercase tracking-[0.22em] text-white/40">
+                        <p className="uppercase text-white/40 text-xs tracking-[0.22em]">
                           <span className="tabular-nums text-white/70">{index}</span> · {label}
                         </p>
                         <h3 className="mt-5 text-2xl sm:text-3xl font-semibold tracking-[-0.025em]">{title}</h3>

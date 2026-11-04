@@ -20,7 +20,7 @@ export default function JoinForm({ fields, submitLabel = 'Submit Application' }:
     return (
       <div className="border-t border-white/15 pt-10">
         <p className="text-2xl font-semibold tracking-[-0.02em]">Application received.</p>
-        <p className="mt-3 max-w-md text-[15px] leading-[1.75] text-white/50">
+        <p className="mt-3 max-w-md text-white/50 text-[15px] leading-[1.75]">
           Thank you. The Digital Den team will be in touch about the next matchmaking cycle.
         </p>
       </div>

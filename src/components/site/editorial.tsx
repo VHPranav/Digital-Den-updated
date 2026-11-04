@@ -1,5 +1,7 @@
 'use client';
 
+import { useLoaderDone } from './SiteLoader';
+
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
@@ -58,13 +60,19 @@ export function ArrowLink({ children, href, onClick }: { children: React.ReactNo
 /** Words fade in from a blur, staggered — plays once on mount. */
 export function BlurWords({ text, delay = 0 }: { text: string; delay?: number }) {
   const [on, setOn] = useState(false);
+  const loaderDone = useLoaderDone();
   useEffect(() => {
-    const id = requestAnimationFrame(() => setOn(true));
-    return () => cancelAnimationFrame(id);
-  }, []);
+    if (!loaderDone) return;
+    let cancelled = false;
+    let frame = 0;
+    document.fonts.ready.then(() => {
+      if (!cancelled) frame = requestAnimationFrame(() => setOn(true));
+    });
+    return () => { cancelled = true; cancelAnimationFrame(frame); };
+  }, [loaderDone]);
   return (
     <>
-      {text.split(' ').map((w, i) => (
+      {text.split(/(\s+)/).map((w, i) => /^\s+$/.test(w) ? w : (
         <span
           key={i}
           className="inline-block"
@@ -76,7 +84,6 @@ export function BlurWords({ text, delay = 0 }: { text: string; delay?: number })
           }}
         >
           {w}
-          {' '}
         </span>
       ))}
     </>

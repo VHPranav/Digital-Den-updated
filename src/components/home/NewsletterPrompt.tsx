@@ -58,11 +58,11 @@ export default function NewsletterPrompt({ triggerId }: { triggerId: string }) {
         <X className="h-4 w-4" />
       </button>
       {done ? (
-        <p className="pr-6 text-[15px] text-purple-200">You&apos;re on the list.</p>
+        <p className="pr-6 text-purple-200 text-[15px]">You&apos;re on the list.</p>
       ) : (
         <>
           <p className="pr-6 text-[15px] font-semibold tracking-tight">Stay informed</p>
-          <p className="mt-1 text-sm leading-[1.5] text-white/60">
+          <p className="mt-1 text-white/60 text-sm leading-[1.5]">
             Subscribe to Digital Den updates for upcoming opportunities, programs, and ecosystem news.
           </p>
           <form

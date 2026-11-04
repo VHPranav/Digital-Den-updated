@@ -40,7 +40,7 @@ export default function EcosystemBentoSection({ onOpenAction }: EcosystemBentoSe
       <div className="text-center max-w-4xl mx-auto space-y-4 mb-16">
         <FadeIn animation="fadeIn" delay={0.1}>
           <h2
-            className="font-medium text-3xl sm:text-4xl lg:text-[42px] leading-[125%] tracking-tight text-center max-w-3xl mx-auto"
+            className="text-center max-w-3xl mx-auto font-medium text-3xl sm:text-4xl lg:text-[42px] leading-[125%] tracking-tight"
             style={{
               background: 'linear-gradient(90deg, #FFFFFF 0%, #FFFFFF 30%, #F3E8FF 45%, #D8B4FE 60%, #C084FC 75%, #A855F7 88%, #7E22CE 100%)',
               WebkitBackgroundClip: 'text',
@@ -54,7 +54,7 @@ export default function EcosystemBentoSection({ onOpenAction }: EcosystemBentoSe
         </FadeIn>
 
         <FadeIn animation="fadeIn" delay={0.2}>
-          <p className="font-medium text-sm sm:text-[16.7px] leading-[22px] text-white/50 text-center">
+          <p className="text-white/50 text-center font-medium text-sm sm:text-[16.7px] leading-[22px]">
             Based on timestamped IoT session logs and varying by location.
           </p>
         </FadeIn>
@@ -98,16 +98,16 @@ export default function EcosystemBentoSection({ onOpenAction }: EcosystemBentoSe
             {/* Bottom Content Split (Two Columns) */}
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6 relative z-10 pt-4">
               <div className="md:col-span-7 space-y-2">
-                <p className="text-xs sm:text-[14.4px] text-white/50">
+                <p className="text-white/50 text-xs sm:text-[14.4px]">
                   Cooperation with Digital Den Group<sup className="text-[11px]">TM</sup>
                 </p>
-                <p className="font-medium text-sm sm:text-[16.7px] leading-[22px] text-white/70">
+                <p className="text-white/70 font-medium text-sm sm:text-[16.7px] leading-[22px]">
                   The <strong className="text-white font-semibold">Global Acceleration Corridor</strong> was developed by Digital Den – in close cooperation with international technology, electronics and venture partners who contributed their expertise in research, cross-border capital, and software manufacturing.
                 </p>
               </div>
 
               <div className="md:col-span-5 flex items-end">
-                <p className="text-xs sm:text-[14.3px] leading-[20px] text-white/50">
+                <p className="text-white/50 text-xs sm:text-[14.3px] leading-[20px]">
                   Digital Den Hubs serve as a high-velocity environment for testing programs and experience — while founders operate independently.
                 </p>
               </div>
@@ -134,8 +134,8 @@ export default function EcosystemBentoSection({ onOpenAction }: EcosystemBentoSe
                 boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.3), inset -0.5px -0.5px 0px rgba(255, 255, 255, 0.15), inset 1px 1px 0px -1px rgba(255, 255, 255, 0.2)',
               }}
             >
-              <h3 className="font-medium text-sm sm:text-[16px] text-white">Frankfurt</h3>
-              <p className="text-xs sm:text-[13px] text-white/70 leading-snug">The next launch is in 2026.</p>
+              <h3 className="text-white font-medium text-sm sm:text-[16px]">Frankfurt</h3>
+              <p className="text-white/70 text-xs sm:text-[13px] leading-snug">The next launch is in 2026.</p>
             </div>
 
             {/* Tile 2: Salzburg / Podgorica */}
@@ -147,7 +147,7 @@ export default function EcosystemBentoSection({ onOpenAction }: EcosystemBentoSe
                 boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.3), inset -0.5px -0.5px 0px rgba(255, 255, 255, 0.15), inset 1px 1px 0px -1px rgba(255, 255, 255, 0.2)',
               }}
             >
-              <h3 className="font-medium text-sm sm:text-[16px] text-white leading-tight">Podgorica HQ</h3>
+              <h3 className="text-white font-medium text-sm sm:text-[16px] leading-tight">Podgorica HQ</h3>
               <div>
                 <div className="flex items-baseline gap-1.5">
                   <span className="font-medium text-base text-white">6</span>
@@ -169,7 +169,7 @@ export default function EcosystemBentoSection({ onOpenAction }: EcosystemBentoSe
                 boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.3), inset -0.5px -0.5px 0px rgba(255, 255, 255, 0.15), inset 1px 1px 0px -1px rgba(255, 255, 255, 0.2)',
               }}
             >
-              <h3 className="font-medium text-sm sm:text-[16px] text-white">Austin Desk</h3>
+              <h3 className="text-white font-medium text-sm sm:text-[16px]">Austin Desk</h3>
               <div>
                 <div className="flex items-baseline gap-1.5">
                   <span className="font-medium text-base text-white">4</span>
@@ -191,7 +191,7 @@ export default function EcosystemBentoSection({ onOpenAction }: EcosystemBentoSe
                 boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.3), inset -0.5px -0.5px 0px rgba(255, 255, 255, 0.15), inset 1px 1px 0px -1px rgba(255, 255, 255, 0.2)',
               }}
             >
-              <h3 className="font-medium text-sm sm:text-[16px] text-white leading-tight">Vienna Desk</h3>
+              <h3 className="text-white font-medium text-sm sm:text-[16px] leading-tight">Vienna Desk</h3>
               <div>
                 <div className="flex items-baseline gap-1.5">
                   <span className="font-medium text-base text-white">12</span>
@@ -213,8 +213,8 @@ export default function EcosystemBentoSection({ onOpenAction }: EcosystemBentoSe
                 boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.3), inset -0.5px -0.5px 0px rgba(255, 255, 255, 0.15), inset 1px 1px 0px -1px rgba(255, 255, 255, 0.2)',
               }}
             >
-              <h3 className="font-medium text-sm sm:text-[16px] text-white">Sarajevo Lab</h3>
-              <p className="text-xs text-white/60">Seed Incubation</p>
+              <h3 className="text-white font-medium text-sm sm:text-[16px]">Sarajevo Lab</h3>
+              <p className="text-white/60 text-xs">Seed Incubation</p>
             </div>
 
             {/* Tile 6: Wien */}
@@ -226,8 +226,8 @@ export default function EcosystemBentoSection({ onOpenAction }: EcosystemBentoSe
                 boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.3), inset -0.5px -0.5px 0px rgba(255, 255, 255, 0.15), inset 1px 1px 0px -1px rgba(255, 255, 255, 0.2)',
               }}
             >
-              <h3 className="font-medium text-sm sm:text-[16px] text-white">London Hub</h3>
-              <p className="text-xs text-white/60">Venture Showcase</p>
+              <h3 className="text-white font-medium text-sm sm:text-[16px]">London Hub</h3>
+              <p className="text-white/60 text-xs">Venture Showcase</p>
             </div>
 
           </div>
@@ -283,7 +283,7 @@ export default function EcosystemBentoSection({ onOpenAction }: EcosystemBentoSe
             }}
           >
             <div className="space-y-4">
-              <h3 className="font-medium text-[16.7px] leading-[22px] text-white">
+              <h3 className="text-white font-medium text-[16.7px] leading-[22px]">
                 Explore Digital Den at live locations
               </h3>
 
@@ -367,7 +367,7 @@ export default function EcosystemBentoSection({ onOpenAction }: EcosystemBentoSe
 
           {/* Bottom Action Strip with Multi-Color Gradient Pill */}
           <div className="pt-6 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-6">
-            <h3 className="font-medium text-sm sm:text-[16.7px] leading-[22px] text-white/60 text-center md:text-left">
+            <h3 className="text-white/60 text-center md:text-left font-medium text-sm sm:text-[16.7px] leading-[22px]">
               Join our partnership network, let&apos;s discuss the opportunities
             </h3>
 

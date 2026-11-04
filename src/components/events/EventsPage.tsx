@@ -249,7 +249,7 @@ export default function EventsPage() {
                 ))}
               </ScrollMarquee>
             </div>
-            <p className="absolute bottom-10 left-6 lg:left-10 text-xs uppercase tracking-[0.3em] text-white/70">Oct 12, 2024 · Scaling Beyond Zero</p>
+            <p className="absolute bottom-10 left-6 lg:left-10 uppercase text-white/70 text-xs tracking-[0.3em]">Oct 12, 2024 · Scaling Beyond Zero</p>
           </section>
 
           {/* ─── STATS ─── */}
@@ -263,7 +263,7 @@ export default function EventsPage() {
                     </span>
                     <span className="pt-2 text-xs text-white/70">{s.unit}</span>
                   </div>
-                  <p className="mt-8 max-w-[12rem] text-[13px] leading-relaxed text-white/50">{s.caption}</p>
+                  <p className="mt-8 max-w-[12rem] text-white/50 text-[13px] leading-relaxed">{s.caption}</p>
                 </div>
               ))}
             </div>
@@ -305,8 +305,8 @@ export default function EventsPage() {
                       <div className={`grid transition-all duration-700 ${active ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
                         <div className="overflow-hidden">
                           <div className="mx-auto flex max-w-2xl flex-col items-center gap-4 pb-6 pt-4 text-center">
-                            <p className="text-lg text-white/85">{e.title}</p>
-                            <p className="text-[14px] leading-relaxed text-white/50">{e.body}</p>
+                            <p className="text-white/85 text-lg">{e.title}</p>
+                            <p className="text-white/50 text-[14px] leading-relaxed">{e.body}</p>
                             <span className="inline-flex items-center gap-2 text-sm text-purple-200">
                               {e.cta} <ArrowUpRight className="h-4 w-4" />
                             </span>
@@ -368,11 +368,11 @@ export default function EventsPage() {
           <section className="mx-auto max-w-[1240px] px-6 pb-40 pt-24 lg:px-10">
             <h2 className={`text-[clamp(3.5rem,10vw,9.5rem)] leading-[0.95] ${italic}`}><SplitWords>Never miss a beat.</SplitWords></h2>
             <div className="mt-16 grid grid-cols-1 items-end gap-10 lg:grid-cols-2">
-              <p className="max-w-sm text-[13px] leading-relaxed text-white/55">
+              <p className="max-w-sm text-white/55 text-[13px] leading-relaxed">
                 Get notified about the next high-stakes loop, summit, or founder mixer. No spam, just pure signal.
               </p>
               {subscribed ? (
-                <p className="justify-self-start text-lg lg:justify-self-end">You&apos;re on the list.</p>
+                <p className="justify-self-start lg:justify-self-end text-lg">You&apos;re on the list.</p>
               ) : (
                 <form
                   onSubmit={(ev) => {

@@ -28,7 +28,7 @@ export default function SectionIntro({
     <div className={`space-y-4 ${centered ? 'mx-auto text-center' : ''} max-w-2xl ${className}`}>
       {eyebrow && (
         <FadeIn animation="fadeIn" delay={0.05}>
-          <p className="font-['Plus_Jakarta_Sans',sans-serif] text-[11px] sm:text-xs font-medium uppercase tracking-[0.2em] text-white/45">
+          <p className="font-['Plus_Jakarta_Sans',sans-serif] uppercase text-white/45 text-[11px] sm:text-xs font-medium tracking-[0.2em]">
             {eyebrow}
           </p>
         </FadeIn>
@@ -39,7 +39,7 @@ export default function SectionIntro({
         </h2>
       </FadeIn>
       <FadeIn animation="fadeIn" delay={0.25}>
-        <p className="text-[15px] sm:text-base leading-relaxed text-white/70">{lead}</p>
+        <p className="text-white/70 text-[15px] sm:text-base leading-relaxed">{lead}</p>
       </FadeIn>
     </div>
   );

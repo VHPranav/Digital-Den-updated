@@ -12,9 +12,11 @@ if (typeof window !== 'undefined') {
 interface HeroSectionProps {
   scrollProgress?: number;
   onOpenAction?: (mode?: 'startup' | 'partner') => void;
+  line1?: string;
+  line2?: string;
 }
 
-export default function HeroSection({ onOpenAction }: HeroSectionProps) {
+export default function HeroSection({ onOpenAction, line1 = 'Your Gateway to', line2 = 'Global Markets' }: HeroSectionProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
   const line1Ref = useRef<HTMLHeadingElement>(null);
@@ -124,13 +126,13 @@ export default function HeroSection({ onOpenAction }: HeroSectionProps) {
             ref={line1Ref}
             className="font-['Plus_Jakarta_Sans',sans-serif] font-medium text-[36px] sm:text-[56px] md:text-[70px] lg:text-[86px] leading-[105%] text-center text-white tracking-tight drop-shadow-2xl max-w-[1050px] mx-auto block w-full"
           >
-            Your Gateway to
+            {line1}
           </h1>
           <h1
             ref={line2Ref}
             className="font-['Plus_Jakarta_Sans',sans-serif] font-medium text-[36px] sm:text-[56px] md:text-[70px] lg:text-[86px] leading-[105%] text-center text-white tracking-tight drop-shadow-2xl max-w-[1050px] mx-auto block w-full bg-clip-text bg-gradient-to-r from-white via-[#f0f4ff] to-white/80"
           >
-            Global Markets
+            {line2}
           </h1>
         </div>
 

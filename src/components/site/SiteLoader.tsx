@@ -67,7 +67,7 @@ export default function SiteLoader() {
         }
       `}</style>
       <p
-        className="font-['Plus_Jakarta_Sans',sans-serif] text-[18px] sm:text-[22px] font-medium tracking-[0.32em] text-white/20"
+        className="font-['Plus_Jakarta_Sans',sans-serif] text-white/20 text-[18px] sm:text-[22px] font-medium tracking-[0.32em]"
         style={{
           transform: leaving ? 'scale(1.06)' : 'scale(1)',
           filter: leaving ? 'blur(8px)' : 'blur(0px)',

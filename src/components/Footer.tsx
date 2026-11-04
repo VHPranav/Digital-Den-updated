@@ -81,36 +81,25 @@ function ContactCard({ it, index }: { it: ContactItem; index: number }) {
   );
 }
 
-const footerNav = [
-  { href: '/platform', label: 'Platform' },
-  { href: '/programs', label: 'Programs' },
-  { href: '/partners', label: 'Partners' },
-  { href: '/opportunities', label: 'Opportunities' },
-  { href: '/services', label: 'Services' },
-  { href: '/portfolio', label: 'Portfolio' },
-  { href: '/events', label: 'Events' },
-];
+function FooterWordmark() {
+  return (
+    <div aria-hidden="true" className="pointer-events-none relative select-none overflow-hidden">
+      <p className="relative -mb-[0.13em] whitespace-nowrap text-center text-transparent [background-clip:text] [-webkit-background-clip:text] bg-gradient-to-b from-white/[0.26] via-white/[0.10] to-transparent text-[20vw] font-medium leading-[0.9] tracking-[-0.07em]">
+        Digital Den
+      </p>
+    </div>
+  );
+}
 
-// Compact site-wide footer for inner pages: navigation, contact/social links, © and Back to top.
+// Compact site-wide footer: contact/social links, legal information and the closing wordmark.
 // (The full "Get in Touch" section stays on the Home Page.)
 export function MinimalFooter() {
   return (
     <footer className="relative z-30 w-full overflow-hidden bg-den text-[#f3f0ea]">
       <div className="h-px w-full bg-gradient-to-r from-transparent via-purple-400/50 to-transparent" />
       <div className="mx-auto max-w-[1450px] px-6 py-12 lg:px-12">
-        <div className="flex flex-col items-center justify-between gap-8 lg:flex-row">
-          <nav aria-label="Footer">
-            <ul className="flex flex-wrap items-center justify-center gap-x-7 gap-y-3 text-[14px] text-white/70">
-              {footerNav.map((n) => (
-                <li key={n.href}>
-                  <Link href={n.href} className="transition-colors hover:text-white">
-                    {n.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-          <ul className="flex items-center gap-3">
+        <div className="flex justify-center sm:justify-start">
+          <ul aria-label="Contact and social links" className="flex flex-wrap items-center justify-center gap-3">
             {items.map((it) => (
               <li key={it.key}>
                 <a
@@ -127,18 +116,23 @@ export function MinimalFooter() {
         </div>
         <div className="mt-10 flex flex-col items-center gap-4 border-t border-white/10 pt-6 text-[13px] text-white/45 sm:flex-row sm:justify-between">
           <p>&copy; {new Date().getFullYear()} Digital Den. All rights reserved.</p>
-          <button
-            type="button"
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="group inline-flex items-center gap-2 text-white/70 transition-colors hover:text-white"
-          >
-            Back to top
-            <span className="flex h-7 w-7 items-center justify-center rounded-full border border-white/25 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:border-white">
-              <ArrowUp className="h-3.5 w-3.5" />
-            </span>
-          </button>
+          <div className="flex flex-wrap items-center justify-center gap-6">
+            {legal.privacy && <Link href={legal.privacy} className="transition-colors hover:text-white">Privacy Policy</Link>}
+            {legal.terms && <Link href={legal.terms} className="transition-colors hover:text-white">Terms of Service</Link>}
+            <button
+              type="button"
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="group inline-flex items-center gap-2 text-white/70 transition-colors hover:text-white"
+            >
+              Back to top
+              <span className="flex h-7 w-7 items-center justify-center rounded-full border border-white/25 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:border-white">
+                <ArrowUp className="h-3.5 w-3.5" />
+              </span>
+            </button>
+          </div>
         </div>
       </div>
+      <FooterWordmark />
     </footer>
   );
 }
@@ -173,9 +167,9 @@ export default function Footer() {
 
           {/* Newsletter */}
           <FadeIn animation="slideUp" delay={0.5} duration={0.9} className="mt-20 flex w-full flex-col items-center">
-            <p className="text-lg font-medium tracking-tight text-white">Subscribe to our newsletter</p>
+            <p className="text-white text-lg font-medium tracking-tight">Subscribe to our newsletter</p>
             {subscribed ? (
-              <p className="mt-6 inline-flex items-center gap-2 rounded-full border border-purple-300/30 bg-purple-500/10 px-5 py-3 text-sm text-purple-100">
+              <p className="mt-6 inline-flex items-center gap-2 rounded-full border border-purple-300/30 bg-purple-500/10 px-5 py-3 text-purple-100 text-sm">
                 <span className="flex h-5 w-5 items-center justify-center rounded-full bg-purple-400 text-[11px] text-white">✓</span>
                 You&apos;re on the list.
               </p>
@@ -242,11 +236,7 @@ export default function Footer() {
       </div>
 
       {/* Digital Den wordmark at the end of the page (kept per DD; large and wide so it reads clearly) */}
-      <div aria-hidden="true" className="pointer-events-none relative select-none overflow-hidden">
-        <p className="relative -mb-[0.13em] whitespace-nowrap text-center text-[20vw] font-medium leading-[0.9] tracking-[-0.07em] text-transparent [background-clip:text] [-webkit-background-clip:text] bg-gradient-to-b from-white/[0.26] via-white/[0.10] to-transparent">
-          Digital Den
-        </p>
-      </div>
+      <FooterWordmark />
     </footer>
   );
 }
