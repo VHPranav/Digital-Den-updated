@@ -91,6 +91,10 @@ export const internationalProjects: InternationalProject[] = [
   },
 ];
 
+export function withoutTrailingPeriod(text: string): string {
+  return text.trimEnd().replace(/\.$/, '');
+}
+
 export function ordered<T extends { order: number }>(items: T[]): T[] {
   return [...items].sort((a, b) => a.order - b.order);
 }

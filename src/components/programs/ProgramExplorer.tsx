@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { gsap } from '@/lib/gsap';
 import Image from 'next/image';
 import { ArrowRight, ArrowUpRight } from 'lucide-react';
-import { hasActiveCall, isOfficialUrl, type OrganizationLogo, type ProgramStatus, type StartupProgram } from '@/lib/programsContent';
+import { withoutTrailingPeriod, hasActiveCall, isOfficialUrl, type OrganizationLogo, type ProgramStatus, type StartupProgram } from '@/lib/programsContent';
 
 type Filter = 'all' | ProgramStatus;
 const statuses: Record<ProgramStatus, { label: string; dot: string }> = {
@@ -42,7 +42,7 @@ export function Logos({ title, logos }: { title: string; logos: OrganizationLogo
   if (!imageLogos.length) return null;
   return (
     <div>
-      <h4 className="mb-5 uppercase text-white/50 text-xl font-medium leading-snug tracking-tight">{title}</h4>
+      <h4 className="mb-5 uppercase text-white/50 text-[1.125rem] font-medium leading-snug tracking-tight">{title}</h4>
       <ul className="flex flex-wrap gap-3">
         {imageLogos.map((logo) => (
           <li key={`${logo.name}-${logo.src}`}>
@@ -73,7 +73,7 @@ function ProgramDetails({ program, now }: { program: StartupProgram; now: number
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-black/10" />
         <div className="absolute inset-x-0 bottom-0 p-6 sm:p-10">
           <StatusBadge status={status} />
-          <h3 className="mt-4 max-w-2xl text-xl font-medium leading-snug tracking-tight">{program.title}</h3>
+          <h3 className="mt-4 max-w-2xl text-[1.125rem] font-medium leading-snug tracking-tight">{withoutTrailingPeriod(program.title)}</h3>
           {program.location && <p className="mt-4 text-white/65 text-[13px] leading-relaxed">{program.location}</p>}
         </div>
       </div>
@@ -84,14 +84,14 @@ function ProgramDetails({ program, now }: { program: StartupProgram; now: number
         </dl>
         {program.benefits.length > 0 && (
           <div>
-            <h4 className="mb-4 uppercase text-white/50 text-xl font-medium leading-snug tracking-tight">Program elements</h4>
+            <h4 className="mb-4 uppercase text-white/50 text-[1.125rem] font-medium leading-snug tracking-tight">Program elements</h4>
             <ul className="space-y-3">{program.benefits.map((benefit) => <li key={benefit} className="flex gap-3 text-[15px] leading-relaxed text-white/75"><ArrowRight aria-hidden="true" className="mt-1 h-4 w-4 shrink-0 text-purple-300" />{benefit}</li>)}</ul>
           </div>
         )}
         <Logos title="Partners & Sponsors" logos={program.partners} />
         {program.gallery.length > 0 && (
           <div>
-            <h4 className="mb-5 uppercase text-white/50 text-xl font-medium leading-snug tracking-tight">Gallery</h4>
+            <h4 className="mb-5 uppercase text-white/50 text-[1.125rem] font-medium leading-snug tracking-tight">Gallery</h4>
             <ul className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3">
               {program.gallery.map((photo) => <li key={photo.src} className="relative aspect-[4/3] w-[85%] shrink-0 snap-start overflow-hidden sm:w-[60%]"><Image src={photo.src} alt={photo.alt} fill sizes="(max-width: 640px) 80vw, 40vw" className="object-cover" /></li>)}
             </ul>
@@ -175,14 +175,14 @@ export default function ProgramExplorer({ programs, now }: { programs: StartupPr
               </div>
               <div className="program-panel-content">
                 {program.location && <p className="mb-4 text-[11px] uppercase tracking-[.18em] text-purple-200">{program.location}</p>}
-                <h3>{program.title}</h3>
+                <h3>{withoutTrailingPeriod(program.title)}</h3>
                 <button type="button" aria-expanded={expanded} aria-controls="selected-program-details" onClick={() => {setActiveId(program.id); setDetailId(expanded ? null : program.id);}} className="program-panel-action cursor-pointer"><span>{expanded ? 'Close details' : 'Explore Program'}</span><span className="program-panel-arrow"><ArrowUpRight className="h-4 w-4" /></span></button>
               </div>
             </article>;
           })}
         </div>
         {detail && <div ref={detailsRef} id="selected-program-details" className="program-expanded-details overflow-hidden mt-8 border border-white/15 bg-[#100d15]" role="region" aria-label={`${detail.title} details`}>
-          <div className="flex items-center justify-between gap-6 border-b border-white/10 p-6 sm:p-10"><h3 className="text-2xl font-medium tracking-tight sm:text-4xl">{detail.title}</h3><button type="button" onClick={() => setDetailId(null)} className="cursor-pointer rounded-full border border-white/25 px-4 py-2 text-sm text-white/70 hover:text-white">Close ×</button></div>
+          <div className="flex items-center justify-between gap-6 border-b border-white/10 p-6 sm:p-10"><h3 className="text-[1.375rem] font-medium tracking-tight sm:text-[2.0625rem]">{withoutTrailingPeriod(detail.title)}</h3><button type="button" onClick={() => setDetailId(null)} className="cursor-pointer rounded-full border border-white/25 px-4 py-2 text-sm text-white/70 hover:text-white">Close ×</button></div>
           <ProgramDetails program={detail} now={now} />
         </div>}
       </> : <p role="status" className="border-y border-white/15 py-16 text-white/60">{filter === 'all' ? 'Program information coming soon.' : `No ${filter} programs to display right now.`}</p>}

@@ -18,6 +18,22 @@ Open the local Studio URL printed by Sanity, sign in with the Digital Den accoun
 changes. To host the Studio on Sanity, run `npm run deploy` from the Studio folder and choose a
 Studio hostname when prompted.
 
+## Reorder programs
+
+In Sanity Studio, open **Startup program** and edit each program's **Display order**.
+Lower numbers appear first. Use distinct numbers and leave gaps so you can insert
+programs later. For example, if Startup Readiness is at `10` and the next two
+programs are at `20` and `30`, change Startup Readiness to `25` and publish it
+to move it into second place.
+
+## Add a project
+
+In Sanity Studio, create a **European & international project** document. Set its
+title, project ID, and **Display order**. Lower numbers appear first. Add the
+project details and any required funder logos and acknowledgement, then publish.
+The Projects carousel includes new published entries in display order without
+any page code changes.
+
 ## Publish Programs page changes
 
 The website is exported as static files for Cloudflare Pages. The Programs page queries the public

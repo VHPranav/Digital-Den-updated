@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import { ArrowLink, BgVideo, BlurWords, Pill, Reveal } from '@/components/site/editorial';
 import PageShell from '@/components/site/PageShell';
@@ -48,37 +48,6 @@ function ImpactPanel({ slide, index, total }: { slide: ImpactSlide; index: numbe
   );
 }
 
-function Letters({ text, mode, baseDelay = 0, step = 0.05 }: { text: string; mode: 'in' | 'out'; baseDelay?: number; step?: number }) {
-  return <>{text.split('').map((ch, n) => <span key={`${mode}-${n}`} className={`inline-block ${mode === 'in' ? 'dd-word-in' : 'dd-word-out'}`} style={{ animationDelay: `${baseDelay + n * step}s` }}>{ch}</span>)}</>;
-}
-
-function RotatingHeadline({ headline }: { headline: string }) {
-  const [i, setI] = useState(0);
-  const [leaving, setLeaving] = useState(false);
-  const clean = headline.replace(/[.,]/g, '').trim();
-  const parts = clean.split(/\s+/);
-  const prefix = parts.slice(0, 1).join(' ');
-  const rotatingWords = parts.slice(1).join(' ').split(/,\s*|\s+and\s+/).filter(Boolean);
-  const words = rotatingWords.length ? rotatingWords : [parts.slice(1).join(' ') || clean];
-
-  useEffect(() => {
-    if (words.length < 2 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const word = words[i % words.length];
-    const inTime = 0.8 + word.length * 0.05;
-    const outTime = 0.55 + word.length * 0.035;
-    const hold = setTimeout(() => setLeaving(true), (inTime + 1.8) * 1000);
-    const swap = setTimeout(() => { setI((n) => (n + 1) % words.length); setLeaving(false); }, (inTime + 1.8 + outTime) * 1000);
-    return () => { clearTimeout(hold); clearTimeout(swap); };
-  }, [i, words.length]);
-
-  return (
-    <h1 data-plain aria-label={headline} className="text-[clamp(2.4rem,6vw,5.75rem)] font-medium leading-[1] tracking-[-0.05em]">
-      <span className="block" aria-hidden="true"><Letters text={prefix} mode="in" baseDelay={0.2} step={0.045} /></span>
-      <span className="block" aria-hidden="true"><span className="relative inline-block"><span className="invisible">{words.reduce((longest, word) => word.length > longest.length ? word : longest, '')}</span><span key={i} className="absolute left-0 top-0 whitespace-nowrap"><Letters text={words[i % words.length]} mode={leaving ? 'out' : 'in'} baseDelay={i === 0 && !leaving ? 0.9 : 0} step={leaving ? 0.035 : 0.05} /></span></span></span>
-    </h1>
-  );
-}
-
 /* ─── Team ─── */
 
 function LinkedInIcon() {
@@ -96,13 +65,13 @@ const REFERENCE_PORTRAITS = [
   'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=800&q=85',
 ];
 
-function TeamGroup({ title, people }: { title: string; people: TeamMember[] }) {
+function TeamGroup({ title, people, centered = false }: { title: string; people: TeamMember[]; centered?: boolean }) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   if (!people.length) return null;
   return (
     <div className="dd-team-group">
       <Reveal><h2 className="text-center text-[clamp(2.25rem,4.5vw,4.5rem)] font-medium leading-none tracking-[-0.045em]">{title}</h2></Reveal>
-      <div className="dd-team-cards" onMouseLeave={() => setActiveIndex(null)}>
+      <div className={centered ? 'dd-team-cards dd-team-cards-centered' : 'dd-team-cards'} onMouseLeave={() => setActiveIndex(null)}>
         {people.map((person, i) => (
           <article key={`${person.name}-${i}`} className={`dd-team-card ${activeIndex === i ? 'is-active' : ''}`} onMouseEnter={() => setActiveIndex(i)} onFocus={() => setActiveIndex(i)} onBlur={() => setActiveIndex(null)} tabIndex={0} aria-label={`${person.name}, ${person.role}`}>
             <Image src={person.photo || REFERENCE_PORTRAITS[i % REFERENCE_PORTRAITS.length]} alt={person.photo ? person.name : 'Temporary reference portrait'} fill sizes="(max-width: 640px) 80vw, (max-width: 1024px) 45vw, 25vw" className="dd-team-portrait" />
@@ -136,10 +105,15 @@ export default function PlatformPage({ content = defaultPlatformPage }: { conten
         <div className={`${BG} text-[#f3f0ea]`}>
           {/* ─── 1. HERO VIDEO ─── */}
           <section className="relative h-[100svh] min-h-[600px] overflow-hidden">
-            <BgVideo src={platformHero.video} poster={platformHero.poster} />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/55" />
+            <div className="absolute inset-0 [&>video]:object-[35%_center]">
+              <BgVideo src={platformHero.video} poster={platformHero.poster} />
+            </div>
+            <div className="absolute inset-0 bg-black/20" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
             <div className="absolute inset-x-0 bottom-0 mx-auto max-w-[1480px] px-6 pb-16 lg:px-10 lg:pb-20">
-              <RotatingHeadline headline={platformHero.headline} />
+              <h1 data-plain className="max-w-[11em] text-balance text-[clamp(2.4rem,6vw,5.75rem)] font-medium leading-[1] tracking-[-0.05em]">
+                {platformHero.headline.trim().replace(/\.$/, '')}
+              </h1>
               <p className="mt-6 max-w-2xl text-white/80 text-[clamp(0.95rem,1.15vw,1.1rem)] leading-[1.6]">{platformHero.body}</p>
               <div className="mt-8 flex flex-wrap gap-8">
                 <ArrowLink onClick={openAction}>{platformHero.primaryCta}</ArrowLink>
@@ -222,14 +196,16 @@ export default function PlatformPage({ content = defaultPlatformPage }: { conten
           <section className={`${BG} relative z-10 py-24 lg:py-32`}>
             <div className="mx-auto max-w-[1480px] space-y-24 px-6 lg:space-y-32 lg:px-10">
               <TeamGroup title={content.teamTitleOperational} people={operationalTeam} />
-              <TeamGroup title={content.teamTitleFounders} people={founders} />
+              <TeamGroup title={content.teamTitleFounders} people={founders} centered />
             </div>
           </section>
 
           {/* ─── 6. FINAL CTA VIDEO (Budva) ─── */}
           <div className="platform-ending">
           <section className="platform-ending-cta relative z-10 overflow-hidden">
-            <BgVideo src={platformClosing.video} poster={platformClosing.poster} />
+            <div className="absolute inset-0 overflow-hidden [&>video]:origin-left [&>video]:scale-[1.12] [&>video]:object-left">
+              <BgVideo src={platformClosing.video} poster={platformClosing.poster} />
+            </div>
             <div className="absolute inset-0 bg-black/20" />
             <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/70 to-transparent" />
             <div className="absolute inset-x-6 bottom-10 lg:bottom-14 lg:left-10 lg:right-auto lg:w-[44rem]">

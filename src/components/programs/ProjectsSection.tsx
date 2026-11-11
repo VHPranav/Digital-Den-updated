@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import { gsap } from '@/lib/gsap';
 import { ArrowUpRight } from 'lucide-react';
-import { hasProjectVisibility, isOfficialUrl, ordered, type InternationalProject } from '@/lib/programsContent';
+import { withoutTrailingPeriod, hasProjectVisibility, isOfficialUrl, ordered, type InternationalProject } from '@/lib/programsContent';
 import { ExternalAction, Logos } from './ProgramExplorer';
 
 function CardDetails({project, open, onToggle}: {project: InternationalProject; open: boolean; onToggle: () => void}) {
@@ -147,7 +147,7 @@ export default function ProjectsSection({ projects: projectItems }: { projects: 
             <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/20 to-transparent" />
             <button type="button" className="absolute inset-0 cursor-pointer" tabIndex={i === activeIndex ? 0 : -1} aria-label={`Open ${project.title} details`} onClick={() => { if (!suppressClick.current) setExpandedId(expandedId === project.id ? null : project.id); }} />
             <div className="project-orbit-copy" style={{opacity: i === activeIndex ? 1 : 0, visibility: i === activeIndex ? 'visible' : 'hidden'}} inert={i !== activeIndex}>
-              <h3 className="text-2xl font-medium tracking-tight text-white sm:text-4xl">{project.title}</h3>
+              <h3 className="text-[1.375rem] font-medium tracking-tight text-white sm:text-[2.0625rem]">{withoutTrailingPeriod(project.title)}</h3>
               <div className="mt-3 flex gap-4 text-xs text-purple-200">{project.status && <span className="capitalize">{project.status}</span>}{project.period && <span>{project.period}</span>}</div>
               <p className="mt-4 max-w-xl text-sm leading-relaxed text-white/70">{hasProjectVisibility(project) && project.description ? project.description : 'Project information coming soon.'}</p>
               {i === activeIndex && <CardDetails key={project.id} project={project} open={expandedId === project.id} onToggle={() => setExpandedId(expandedId === project.id ? null : project.id)} />}

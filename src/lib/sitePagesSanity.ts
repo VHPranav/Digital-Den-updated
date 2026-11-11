@@ -69,12 +69,28 @@ export async function getPlatformPageContent() {
   const record = await query<Partial<PlatformPageContent>>(`*[_type == "platformPage" && _id == "platformPage"][0]{"hero":{video,"poster":poster.asset->url,headline,body,primaryCta,"secondaryCta":{"label":secondaryCtaLabel,"href":secondaryCtaHref}},"transition":{"line1":line1,"line2Before":line2Before,"line2Accent":line2Accent,"scrollLabel":scrollLabel},"impact":impact[]{metric,label,support,"image":image.asset->url,position},"missionVision":{mission,vision},teamTitleOperational,teamTitleFounders,operationalTeam[]{name,role,"photo":photo.asset->url,linkedin},founders[]{name,role,"photo":photo.asset->url,linkedin},"closing":{"video":closingVideo,"poster":closingPoster.asset->url,"title":closingTitle,"body":closingBody,"primaryCta":closingPrimaryCta,"secondaryCta":closingSecondaryCta}}`, defaultPlatformPage);
   return {
     ...defaultPlatformPage, ...record,
-    hero: {...defaultPlatformPage.hero, ...record.hero, poster: record.hero?.poster || defaultPlatformPage.hero.poster, secondaryCta: {...defaultPlatformPage.hero.secondaryCta, ...record.hero?.secondaryCta}},
-    transition: {...defaultPlatformPage.transition, ...record.transition},
+    hero: {
+      ...defaultPlatformPage.hero,
+      ...record.hero,
+      // Keep the new footage and its matching poster together even if Sanity still has the previous assets.
+      video: defaultPlatformHero.video,
+      poster: defaultPlatformHero.poster,
+      secondaryCta: {...defaultPlatformPage.hero.secondaryCta, ...record.hero?.secondaryCta},
+    },
+    transition: {
+      ...defaultPlatformPage.transition,
+      ...record.transition,
+      line2Before: record.transition?.line2Before === 'Built to move innovation ecosystem'
+        ? defaultTransition.line2Before
+        : record.transition?.line2Before ?? defaultTransition.line2Before,
+      line2Accent: record.transition?.line2Accent === 'forward.'
+        ? defaultTransition.line2Accent
+        : record.transition?.line2Accent ?? defaultTransition.line2Accent,
+    },
     impact: record.impact?.length ? record.impact.map((item, i) => ({...defaultPlatformPage.impact[i % defaultPlatformPage.impact.length], ...item, image: item.image || defaultPlatformPage.impact[i % defaultPlatformPage.impact.length].image})) : defaultPlatformPage.impact,
     missionVision: {mission: {...defaultPlatformPage.missionVision.mission, ...record.missionVision?.mission}, vision: {...defaultPlatformPage.missionVision.vision, ...record.missionVision?.vision}},
     operationalTeam: record.operationalTeam?.length ? record.operationalTeam : defaultPlatformPage.operationalTeam,
-    founders: record.founders?.length ? record.founders : defaultPlatformPage.founders,
+    founders: record.founders?.length ? record.founders.slice(0, 2) : defaultPlatformPage.founders,
     closing: {...defaultPlatformPage.closing, ...record.closing, poster: record.closing?.poster || defaultPlatformPage.closing.poster},
   };
 }
