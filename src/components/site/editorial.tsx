@@ -16,7 +16,7 @@ export const EASE = 'cubic-bezier(0.2, 0.7, 0.1, 1)';
 export function BgVideo({ src, poster, cropMark = false }: { src: string; poster: string; cropMark?: boolean }) {
   return (
     <video
-      className={`absolute inset-0 h-full w-full object-cover ${cropMark ? 'origin-left scale-[1.14]' : ''}`}
+      className={`absolute inset-0 h-full w-full object-cover ${cropMark ? 'origin-left scale-[1.14] dd-media-grade' : ''}`}
       src={src}
       poster={poster}
       autoPlay

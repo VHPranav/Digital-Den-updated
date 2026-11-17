@@ -11,36 +11,38 @@ import { useInView } from '@/hooks/use-in-view';
 import { withoutTrailingPeriod, hasActiveCall, ordered, programsCopy as defaultProgramsCopy, type InternationalProject, type StartupProgram } from '@/lib/programsContent';
 import type { ProgramsPageCopy } from '@/lib/sitePagesSanity';
 
-function ReachCountUp({ value }: { value: string }) {
+// Counts 00 → target one visible step at a time once the section is on screen (Nina asked for the
+// earlier "numbers dynamically increase to 03 and 04" effect). Reduced motion shows the final value.
+function ReachCountUp({ value, delay = 0 }: { value: string; delay?: number }) {
   const [ref, inView] = useInView({ triggerOnce: true, rootMargin: '-80px' });
-  const [count, setCount] = useState<string | null>(null);
+  const parts = value.match(/^([^\d.,-]*)(\d+)([^\d.,]*)$/);
+  const [count, setCount] = useState(0);
 
   useEffect(() => {
-    if (!inView || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-    const parts = value.match(/^([^\d.,-]*)(\d+)([^\d.,]*)$/);
-    if (!parts) return;
-    const [, prefix, digits, suffix] = parts;
-    const target = Number(digits);
+    if (!inView || !parts) return;
+    const target = Number(parts[2]);
     if (!Number.isSafeInteger(target) || target === 0) return;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const step = Math.max(80, 600 / target); // whole count takes ~0.6s
+    let timer = 0;
+    const startTimer = window.setTimeout(() => {
+      if (reduced) { setCount(target); return; }
+      let n = 0;
+      timer = window.setInterval(() => {
+        n += 1;
+        setCount(n);
+        if (n >= target) window.clearInterval(timer);
+      }, step);
+    }, reduced ? 0 : 150 + delay * 1000);
+    return () => { window.clearTimeout(startTimer); window.clearInterval(timer); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inView, value, delay]);
 
-    const start = performance.now();
-    let frame = requestAnimationFrame(tick);
-
-    function tick(now: number) {
-      const progress = Math.min((now - start) / 1800, 1);
-      const current = Math.round(target * (1 - (1 - progress) ** 3));
-      setCount(prefix + String(current).padStart(digits.length, '0') + suffix);
-      if (progress < 1) frame = requestAnimationFrame(tick);
-    }
-
-    return () => cancelAnimationFrame(frame);
-  }, [inView, value]);
-
+  const shown = parts ? parts[1] + String(count).padStart(parts[2].length, '0') + parts[3] : value;
   return (
     <span ref={ref}>
       <span className="sr-only">{value}</span>
-      <span aria-hidden="true">{count ?? value}</span>
+      <span aria-hidden="true" key={shown} className="dd-count-tick inline-block">{shown}</span>
     </span>
   );
 }
@@ -83,7 +85,7 @@ export default function ProgramsPage({ programs: programItems, projects, copy = 
           <section className="relative">
             <div className="sticky top-0 h-[100svh] overflow-hidden">
               <BgVideo src={hero.video} poster={hero.poster} cropMark />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/25 to-black/75" />
+              <div className="dd-media-shade absolute inset-0" />
             </div>
             <div className="relative -mt-[100svh]">
               <div className="flex min-h-[100svh] flex-col justify-end px-6 pb-16 pt-32 lg:px-10 lg:pb-20">
@@ -112,8 +114,8 @@ export default function ProgramsPage({ programs: programItems, projects, copy = 
             </div>
           </section>
 
-          <section id="programs" aria-labelledby="programs-title" className={`${PAGE_BG} relative z-10 scroll-mt-20 pb-28 pt-24 lg:pb-40 lg:pt-36`}>
-            <div className="mx-auto mb-12 max-w-[1480px] px-6 lg:mb-16 lg:px-10">
+          <section id="programs" aria-labelledby="programs-title" className={`${PAGE_BG} relative z-10 scroll-mt-20 dd-section`}>
+            <div className="mx-auto max-w-[1480px] px-6 lg:px-10 dd-section-head">
               <Reveal>
                 <h2 id="programs-title" className="dd-h2 max-w-4xl font-medium"><SplitWords>Explore Programs</SplitWords></h2>
               </Reveal>
@@ -121,41 +123,42 @@ export default function ProgramsPage({ programs: programItems, projects, copy = 
             <ProgramExplorer programs={programs} now={now} />
           </section>
 
-          <section id="projects" aria-labelledby="projects-title" className={`${PAGE_BG} relative z-10 scroll-mt-20 px-6 py-28 lg:px-10 lg:py-40`}>
+          <section id="projects" aria-labelledby="projects-title" className={`${PAGE_BG} relative z-10 scroll-mt-20 px-6 lg:px-10 dd-section`}>
             <div className="mx-auto max-w-[1480px]">
-              <Reveal className="mb-14 flex flex-wrap items-end justify-between gap-8 lg:mb-20">
+              <Reveal className="dd-section-head flex flex-wrap items-end justify-between gap-8">
                 <div>
                   <h2 id="projects-title" className="dd-h2 font-medium"><SplitWords>Projects</SplitWords></h2>
                 </div>
               </Reveal>
-              <ProjectsSection projects={projects} />
+              <Reveal delay={0.1}><ProjectsSection projects={projects} /></Reveal>
             </div>
           </section>
 
-          <section aria-labelledby="global-reach-title" className="relative z-10 flex min-h-[100svh] flex-col justify-between overflow-hidden px-6 py-16 lg:px-10 lg:py-20">
+          <section aria-labelledby="global-reach-title" className="relative z-10 flex min-h-[100svh] flex-col justify-between overflow-hidden px-6 dd-section lg:px-10">
             <BgVideo src={globalReach.video} poster={globalReach.poster} cropMark />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/75 via-black/40 to-black/85" />
+            <div className="dd-media-shade absolute inset-0" />
+            {/* Extra shade behind the metrics row so the supporting text reads clearly over the video */}
+            <div className="absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-black/80 via-black/50 to-transparent" />
             <div className="relative max-w-4xl">
-              <Reveal><h2 id="global-reach-title" className="dd-h2 font-medium">{withoutTrailingPeriod(globalReach.title)}</h2></Reveal>
+              <Reveal><h2 id="global-reach-title" className="dd-h2 font-medium"><SplitWords>{withoutTrailingPeriod(globalReach.title)}</SplitWords></h2></Reveal>
             </div>
             <div className="relative mt-24 grid gap-10 border-t border-white/25 pt-10 md:grid-cols-12">
               {globalReach.figures.map((figure, i) => (
                 <Reveal key={figure.label} delay={i * 0.1} className="md:col-span-4">
-                  <p className="text-[clamp(5.5rem,11vw,11rem)] font-medium leading-none tracking-[-0.06em] tabular-nums"><ReachCountUp value={figure.value} /></p>
-                  <p className="mt-4 text-[17px] leading-[1.6]">{figure.label}</p>
-                  <p className="mt-3 max-w-xs text-white/65 text-[14px]">{figure.detail}</p>
+                  <p className="text-[clamp(5.5rem,11vw,11rem)] font-medium leading-none tracking-[-0.06em] tabular-nums"><ReachCountUp value={figure.value} delay={i * 0.12} /></p>
+                  <p className="mt-4 text-[20px] font-medium leading-[1.4] text-white">{figure.label}</p>
+                  <p className="mt-2 max-w-xs text-[16px] leading-[1.6] text-white/85">{figure.detail}</p>
                 </Reveal>
               ))}
-              <Reveal delay={0.2} className="self-end md:col-span-4"><p className="max-w-md text-white/80 text-[13px]">{globalReach.body}</p></Reveal>
+              <Reveal delay={0.2} className="self-end md:col-span-4"><p className="max-w-md text-[17px] leading-[1.65] text-white/90">{globalReach.body}</p></Reveal>
             </div>
           </section>
 
-          <section className={`${PAGE_BG} relative z-10 px-6 pb-36 pt-20 text-center lg:px-10 lg:pb-52 lg:pt-28`}>
+          <section className={`${PAGE_BG} relative z-10 px-6 text-center lg:px-10 dd-section`}>
             <Reveal>
               <h2 className="dd-h2 mx-auto max-w-5xl font-medium"><SplitWords>{withoutTrailingPeriod(closing.title)}</SplitWords></h2>
-              <p className="mx-auto mt-8 max-w-2xl text-white/65 text-[17px] leading-[1.6]">{closing.body}</p>
+              <p className="mx-auto mt-8 max-w-2xl text-[17px] leading-[1.65] text-white/75">{closing.body}</p>
               <div className="mt-12 flex flex-wrap justify-center gap-8 lg:gap-10">
-                <ArrowLink href="#programs">Explore Programs</ArrowLink>
                 <ArrowLink onClick={openAction}>Apply Now</ArrowLink>
               </div>
             </Reveal>

@@ -64,17 +64,20 @@ function withProgramDefaults(records: ProgramRecord[]): StartupProgram[] {
   const titledRecords = records.filter((record): record is ProgramRecord & { title: string } => Boolean(record.title));
   return titledRecords.map((record, index) => {
     const fallback = fallbackPrograms.find((program) => program.id === record.id);
+    // Empty CMS fields come back as null; ignore them so local defaults still show until filled in.
+    const filled = Object.fromEntries(Object.entries(record).filter(([, v]) => v !== null && v !== undefined)) as ProgramRecord;
     return {
       ...fallback,
-      ...record,
+      ...filled,
       id: record.id || fallback?.id || `program-${index + 1}`,
+      title: record.title,
       order: record.order ?? fallback?.order ?? (index + 1) * 10,
-      status: record.status ?? null,
+      status: record.status ?? fallback?.status ?? null,
       image: record.image?.src ? record.image : fallback?.image ?? { src: '/images/programs/readiness.jpg', alt: record.title ?? 'Program' },
       benefits: record.benefits ?? fallback?.benefits ?? [],
       partners: record.partners ?? fallback?.partners ?? [],
       gallery: record.gallery ?? fallback?.gallery ?? [],
-      application: record.application ?? null,
+      application: record.application ?? fallback?.application ?? null,
     };
   });
 }
@@ -83,10 +86,12 @@ function withProjectDefaults(records: ProjectRecord[]): InternationalProject[] {
   const titledRecords = records.filter((record): record is ProjectRecord & { title: string } => Boolean(record.title));
   return titledRecords.map((record, index) => {
     const fallback = fallbackProjects.find((project) => project.id === record.id);
+    const filled = Object.fromEntries(Object.entries(record).filter(([, v]) => v !== null && v !== undefined)) as ProjectRecord;
     return {
       ...fallback,
-      ...record,
+      ...filled,
       id: record.id || fallback?.id || `project-${index + 1}`,
+      title: record.title,
       order: record.order ?? fallback?.order ?? (index + 1) * 10,
       image: record.image?.src ? record.image : fallback?.image,
       partners: record.partners ?? fallback?.partners ?? [],
@@ -107,7 +112,10 @@ export async function getProgramsContent(): Promise<{
     ]);
     return {
       programs: programRecords.length ? withProgramDefaults(programRecords) : fallbackPrograms,
-      projects: projectRecords.length ? withProjectDefaults(projectRecords) : fallbackProjects,
+      // Local preview projects (dummy-*) are shown alongside CMS projects until removed from programsContent.ts.
+      projects: projectRecords.length
+        ? [...withProjectDefaults(projectRecords), ...fallbackProjects.filter((p) => !projectRecords.some((r) => r.id === p.id))]
+        : fallbackProjects,
     };
   } catch (error) {
     console.warn('Unable to load Programs content from Sanity; using the approved local placeholders.', error);

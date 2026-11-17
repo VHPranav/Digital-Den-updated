@@ -3,19 +3,15 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { gsap } from '@/lib/gsap';
 import Image from 'next/image';
+import { createPortal } from 'react-dom';
 import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import { withoutTrailingPeriod, hasActiveCall, isOfficialUrl, type OrganizationLogo, type ProgramStatus, type StartupProgram } from '@/lib/programsContent';
 
-type Filter = 'all' | ProgramStatus;
 const statuses: Record<ProgramStatus, { label: string; dot: string }> = {
   open: { label: 'Open', dot: 'bg-purple-300' },
   ongoing: { label: 'Ongoing', dot: 'bg-amber-200' },
   past: { label: 'Past', dot: 'bg-white/40' },
 };
-const filters: { key: Filter; label: string }[] = [
-  { key: 'all', label: 'All Programs' }, { key: 'open', label: 'Open' },
-  { key: 'ongoing', label: 'Ongoing' }, { key: 'past', label: 'Past' },
-];
 
 function publicStatus(program: StartupProgram, now: number): ProgramStatus | null {
   if (program.status === 'open' && (!now || !hasActiveCall(program, now))) return null;
@@ -105,87 +101,137 @@ function ProgramDetails({ program, now }: { program: StartupProgram; now: number
   );
 }
 
-export default function ProgramExplorer({ programs, now }: { programs: StartupProgram[]; now: number }) {
-  const [filter, setFilter] = useState<Filter>('all');
-  const [activeId, setActiveId] = useState(programs[0]?.id);
-  const [detailId, setDetailId] = useState<string | null>(null);
-  const panelsRef = useRef<HTMLDivElement>(null);
-  const detailsRef = useRef<HTMLDivElement>(null);
-  const matches = (p: StartupProgram, value: Filter) => value === 'all' || publicStatus(p, now) === value;
-  const visible = programs.filter((p) => matches(p, filter));
-  const active = visible.find((p) => p.id === activeId) ?? visible[0];
-  const detail = visible.find((p) => p.id === detailId);
+/* ─── Program details drawer (slides in from the right, like the Gemstrat case studies) ─── */
+
+function DetailsModal({ program, now, onClose }: { program: StartupProgram; now: number; onClose: () => void }) {
+  const panelRef = useRef<HTMLElement>(null);
+  const backdropRef = useRef<HTMLDivElement>(null);
+  const closing = useRef(false);
+
+  const close = React.useCallback(() => {
+    if (closing.current) return;
+    closing.current = true;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    gsap.to(panelRef.current, { xPercent: 100, duration: reduced ? 0 : .45, ease: 'power3.in' });
+    gsap.to(backdropRef.current, { opacity: 0, duration: reduced ? 0 : .45, onComplete: onClose });
+  }, [onClose]);
 
   useEffect(() => {
-    const root = panelsRef.current;
-    if (!root) return;
-    const cards = root.querySelectorAll<HTMLElement>('[data-program-card]');
-    const desktop = window.matchMedia('(min-width: 900px)');
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const animate = () => {
-      if (!desktop.matches) {
-        gsap.set(cards, { clearProps: 'flexGrow' });
-        return;
-      }
-      gsap.to(cards, {
-        flexGrow: (i: number) => visible[i]?.id === active?.id ? 2.8 : 1,
-        duration: reduced.matches ? 0 : .75,
-        ease: 'power3.out',
-        overwrite: 'auto',
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') close(); };
+    window.addEventListener('keydown', onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    panelRef.current?.focus();
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    gsap.fromTo(panelRef.current, { xPercent: 100 }, { xPercent: 0, duration: reduced ? 0 : .6, ease: 'power3.out' });
+    gsap.fromTo(backdropRef.current, { opacity: 0 }, { opacity: 1, duration: reduced ? 0 : .5 });
+    return () => { window.removeEventListener('keydown', onKey); document.body.style.overflow = prev; };
+  }, [close]);
+
+  const status = publicStatus(program, now);
+  return (
+    <div className="fixed inset-0 z-[90]">
+      <div ref={backdropRef} className="absolute inset-0 bg-black/60 backdrop-blur-[6px]" onClick={close} aria-hidden="true" />
+      <aside
+        ref={panelRef}
+        tabIndex={-1}
+        role="dialog"
+        aria-modal="true"
+        aria-label={`${program.title} details`}
+        data-lenis-prevent
+        className="program-drawer absolute inset-y-0 right-0 w-full max-w-[640px] overflow-y-auto border-l border-white/10 bg-[#100d15] outline-none"
+      >
+        <div className="relative aspect-[16/9] w-full overflow-hidden bg-white/5">
+          <Image src={program.image.src} alt={program.image.alt} fill sizes="640px" className="object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#100d15] via-transparent to-black/20" />
+          <button type="button" onClick={close} className="absolute right-0 top-0 flex cursor-pointer items-center gap-3 bg-black/80 px-5 py-3.5 text-[12px] uppercase tracking-[.16em] text-white backdrop-blur hover:bg-black focus-visible:outline-2 focus-visible:outline-purple-300">
+            Close <span aria-hidden="true" className="text-[14px]">✕</span>
+          </button>
+        </div>
+        <div className="px-6 pb-2 pt-6 sm:px-10">
+          <span className="inline-flex rounded-full border border-white/15 bg-white/[0.04] px-3 py-1.5"><StatusBadge status={status} /></span>
+          {program.location && <p className="mt-6 text-[11px] uppercase tracking-[.18em] text-purple-200">{program.location}</p>}
+          <h3 className="dd-h2 mt-3 font-medium">{withoutTrailingPeriod(program.title)}</h3>
+        </div>
+        <div className="program-expanded-details"><ProgramDetails program={program} now={now} /></div>
+      </aside>
+    </div>
+  );
+}
+
+/* ─── Stacked program cards: each card pins and the next one slides over it ─── */
+
+export default function ProgramExplorer({ programs, now }: { programs: StartupProgram[]; now: number }) {
+  const [detailId, setDetailId] = useState<string | null>(null);
+  const detail = programs.find((p) => p.id === detailId);
+  const closeDetail = React.useCallback(() => setDetailId(null), []);
+  const cardsRef = useRef<(HTMLElement | null)[]>([]);
+
+  // As the next card slides over, the one underneath scales down and dims slightly.
+  useEffect(() => {
+    const cards = cardsRef.current.filter(Boolean) as HTMLElement[];
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || cards.length < 2) return;
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const vh = window.innerHeight;
+      cards.forEach((card, i) => {
+        const next = cards[i + 1];
+        const inner = card.firstElementChild as HTMLElement | null;
+        if (!inner) return;
+        if (!next) { inner.style.transform = ''; inner.style.filter = ''; return; }
+        const top = next.getBoundingClientRect().top;
+        const p = Math.min(1, Math.max(0, 1 - (top - vh * 0.12) / (vh * 0.75)));
+        inner.style.transform = `scale(${1 - p * 0.06})`;
+        inner.style.filter = `brightness(${1 - p * 0.45})`;
       });
     };
-    animate();
-    desktop.addEventListener('change', animate);
-    reduced.addEventListener('change', animate);
-    return () => {
-      // Preserve current widths so rapid hover changes continue without snapping.
-      gsap.killTweensOf(cards);
-      desktop.removeEventListener('change', animate);
-      reduced.removeEventListener('change', animate);
-    };
-  }, [active?.id, filter, programs]);
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => { window.removeEventListener('scroll', onScroll); window.removeEventListener('resize', onScroll); cancelAnimationFrame(raf); };
+  }, [programs.length]);
 
-  useEffect(() => {
-    if (!detail || !detailsRef.current) return;
-    const el = detailsRef.current;
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const ctx = gsap.context(() => gsap.fromTo(el, {height: 0, opacity: 0, y: reduced ? 0 : 12}, {height: 'auto', opacity: 1, y: 0, duration: reduced ? 0 : .65, ease: 'power3.out', clearProps: 'height,transform'}), el);
-    return () => ctx.revert();
-  }, [detail?.id]);
+  if (!programs.length) {
+    return <p role="status" className="mx-auto max-w-[1480px] border-y border-white/15 px-6 py-16 text-white/60 lg:px-10">Program information coming soon.</p>;
+  }
 
   return (
     <div className="mx-auto max-w-[1480px] px-6 lg:px-10" data-noreveal>
-      <div role="group" aria-label="Filter programs by status" className="mb-10 flex flex-wrap gap-2">
-        {filters.map(({key, label}) => <button key={key} type="button" aria-pressed={filter === key} onClick={() => {setFilter(key); setDetailId(null);}} className={`cursor-pointer min-h-11 rounded-full border px-5 text-[13px] transition-colors focus-visible:outline-2 focus-visible:outline-purple-300 ${filter === key ? 'border-purple-300 bg-purple-300 text-black' : 'border-white/20 text-white/60 hover:border-purple-300 hover:text-white'}`}>{label}<span className="ml-3 text-[11px] opacity-50">{String(programs.filter(p => matches(p, key)).length).padStart(2, '0')}</span></button>)}
-      </div>
-      {active ? <>
-        <div ref={panelsRef} className="program-panels" aria-label="Startup programs">
-          {visible.map((program, i) => {
-            const selected = active.id === program.id;
-            const expanded = detailId === program.id;
-            return <article key={program.id} data-program-card className={`program-image-panel ${selected ? 'is-selected' : ''}`} onMouseEnter={() => setActiveId(program.id)} onFocus={() => setActiveId(program.id)}>
-              <Image src={program.image.src} alt={program.image.alt} fill sizes="(max-width: 899px) 85vw, 60vw" className="program-panel-photo" />
-              <div className="program-panel-shade" />
-              <div className="program-panel-top"><span className="text-[12px] tabular-nums text-white/65">{String(i + 1).padStart(2, '0')}</span><StatusBadge status={publicStatus(program, now)} /></div>
-              <button type="button" className="program-panel-select" aria-label={`Select ${program.title}`} aria-pressed={selected} onClick={() => setActiveId(program.id)} />
-              <div className="program-panel-preview" aria-hidden={!selected}>
-                <p className="program-panel-preview-label">About the program</p>
-                <p className="program-panel-preview-copy">{program.overview || 'Program details coming soon.'}</p>
-                {(program.duration || program.format) && <p className="program-panel-preview-meta">{[program.duration, program.format].filter(Boolean).join(' · ')}</p>}
-              </div>
-              <div className="program-panel-content">
-                {program.location && <p className="mb-4 text-[11px] uppercase tracking-[.18em] text-purple-200">{program.location}</p>}
-                <h3>{withoutTrailingPeriod(program.title)}</h3>
-                <button type="button" aria-expanded={expanded} aria-controls="selected-program-details" onClick={() => {setActiveId(program.id); setDetailId(expanded ? null : program.id);}} className="program-panel-action cursor-pointer"><span>{expanded ? 'Close details' : 'Explore Program'}</span><span className="program-panel-arrow"><ArrowUpRight className="h-4 w-4" /></span></button>
-              </div>
-            </article>;
-          })}
-        </div>
-        {detail && <div ref={detailsRef} id="selected-program-details" className="program-expanded-details overflow-hidden mt-8 border border-white/15 bg-[#100d15]" role="region" aria-label={`${detail.title} details`}>
-          <div className="flex items-center justify-between gap-6 border-b border-white/10 p-6 sm:p-10"><h3 className="dd-h3 font-medium">{withoutTrailingPeriod(detail.title)}</h3><button type="button" onClick={() => setDetailId(null)} className="cursor-pointer rounded-full border border-white/25 px-4 py-2 text-sm text-white/70 hover:text-white">Close ×</button></div>
-          <ProgramDetails program={detail} now={now} />
-        </div>}
-      </> : <p role="status" className="border-y border-white/15 py-16 text-white/60">{filter === 'all' ? 'Program information coming soon.' : `No ${filter} programs to display right now.`}</p>}
+      <ol className="program-stack" aria-label="Startup programs">
+        {programs.map((program, i) => {
+          const meta = [program.duration, program.format].filter(Boolean).join(' · ');
+          return (
+            <li key={program.id} ref={(el) => { cardsRef.current[i] = el; }} className="program-stack-item" style={{ zIndex: i + 1 }}>
+              <article className="program-stack-card">
+                <div className="program-stack-media">
+                  <Image src={program.image.src} alt={program.image.alt} fill sizes="(max-width: 1023px) 100vw, 50vw" className="dd-media-grade object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
+                </div>
+                <div className="program-stack-body">
+                  {/* Quiet backdrop for the text side: dot grid, soft glow and a large outlined number */}
+                  <div className="program-stack-deco" aria-hidden="true">
+                    <span className="program-stack-number">{String(i + 1).padStart(2, '0')}</span>
+                  </div>
+                  <div className="relative mt-auto pt-6 lg:pt-10">
+                    {program.location && <p className="text-[11px] uppercase tracking-[.18em] text-purple-200">{program.location}</p>}
+                    <h3 className="dd-h2 mt-4 font-medium">{withoutTrailingPeriod(program.title)}</h3>
+                    <p className="program-stack-summary">{program.overview || 'Program details coming soon.'}</p>
+                    {meta && <p className="mt-5 text-[13px] text-white/45">{meta}</p>}
+                    <button type="button" onClick={() => setDetailId(program.id)} className="program-stack-action">
+                      <span>Explore Program</span>
+                      <span className="program-stack-arrow"><ArrowUpRight className="h-4 w-4" /></span>
+                    </button>
+                  </div>
+                </div>
+              </article>
+            </li>
+          );
+        })}
+      </ol>
+      {/* Portal to <body> so the modal sits above the fixed navbar (sections create their own stacking context) */}
+      {detail && createPortal(<DetailsModal program={detail} now={now} onClose={closeDetail} />, document.body)}
     </div>
   );
 }

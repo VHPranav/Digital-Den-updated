@@ -3,31 +3,60 @@
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import { gsap } from '@/lib/gsap';
-import { ArrowUpRight } from 'lucide-react';
 import { withoutTrailingPeriod, hasProjectVisibility, isOfficialUrl, ordered, type InternationalProject } from '@/lib/programsContent';
-import { ExternalAction, Logos } from './ProgramExplorer';
+import { ExternalAction } from './ProgramExplorer';
 
-function CardDetails({project, open, onToggle}: {project: InternationalProject; open: boolean; onToggle: () => void}) {
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    gsap.to(el, {height: open ? 'auto' : 0, opacity: open ? 1 : 0, duration: reduced ? 0 : .5, ease: 'power3.out', overwrite: true});
-    return () => {gsap.killTweensOf(el);};
-  }, [open]);
+const statusLabel: Record<NonNullable<InternationalProject['status']>, string> = { ongoing: 'Ongoing', upcoming: 'Upcoming', past: 'Completed' };
+
+function LogoStrip({ title, logos }: { title: string; logos: InternationalProject['partners'] }) {
+  const items = logos.filter((l) => Boolean(l.src));
+  if (!items.length) return null;
+  return (
+    <div>
+      <p className="mb-3 text-[12px] uppercase tracking-[.16em] text-white/65">{title}</p>
+      <ul className="flex flex-wrap gap-2">
+        {items.map((logo) => {
+          const tile = <span className="relative block h-12 w-36 rounded-lg bg-white"><Image src={logo.src} alt={logo.alt || logo.name} fill sizes="144px" className="object-contain p-2.5" /></span>;
+          return <li key={`${logo.name}-${logo.src}`}>{isOfficialUrl(logo.href) ? <a href={logo.href} target="_blank" rel="noopener noreferrer" aria-label={`${logo.name} (opens in a new tab)`}>{tile}</a> : tile}</li>;
+        })}
+      </ul>
+    </div>
+  );
+}
+
+// Everything Digital Den needs for project visibility, shown on the active card itself.
+function ProjectCopy({ project }: { project: InternationalProject }) {
   const ready = hasProjectVisibility(project);
-  return <>
-    <button type="button" aria-expanded={open} onClick={onToggle} className="mt-6 inline-flex cursor-pointer items-center gap-4 rounded-full border border-purple-200/40 px-5 py-3 text-sm text-purple-200 hover:bg-purple-200 hover:text-black">{open ? 'Close details' : 'Explore project'}<ArrowUpRight className="h-4 w-4" /></button>
-    <div ref={ref} inert={!open} style={{height: 0, opacity: 0, overflow: 'hidden'}}><div className="space-y-6 pt-6">
-      {ready && <><Logos title="Project partners" logos={project.partners} /><Logos title="Funders" logos={project.funders} />
-        {project.acknowledgement && <p className="text-sm leading-relaxed text-white/65">{project.acknowledgement}</p>}
-        {isOfficialUrl(project.officialUrl) && <ExternalAction href={project.officialUrl}>Official project website</ExternalAction>}
-      </>}
-      {!ready && <p className="text-sm text-white/50">Project information coming soon.</p>}
-      {project.id.startsWith('orbit-preview-') && <p className="text-sm text-white/50">Preview only</p>}
-    </div></div>
-  </>;
+  const funders = project.funders.filter((l) => Boolean(l.src));
+  const partners = project.partners.filter((l) => Boolean(l.src));
+  const hasLogos = ready && (funders.length > 0 || partners.length > 0);
+  return (
+    <div className="project-copy-grid">
+      {/* Left: name + description */}
+      <div className="project-copy-left">
+        <h3 className="dd-h2 font-medium text-white">{withoutTrailingPeriod(project.title)}</h3>
+        <p className="mt-4 line-clamp-4 max-w-md text-[15px] leading-[1.65] text-white/80">{ready && project.description ? project.description : 'Project information coming soon.'}</p>
+      </div>
+
+      {/* Right: status, period, funders, partners, acknowledgement, website */}
+      <div className="project-copy-right">
+        <div className="flex flex-wrap items-center gap-2 text-[14px]">
+          {project.status && <span className="rounded-full bg-purple-300 px-4 py-1.5 font-medium text-[#180b26]">{statusLabel[project.status]}</span>}
+          {project.period && <span className="rounded-full border border-white/25 bg-black/25 px-4 py-1.5 text-white/85">{project.period}</span>}
+        </div>
+        <div className="mt-auto">
+          {hasLogos && (
+            <div className="space-y-5">
+              {funders.length > 0 && <LogoStrip title="Funded by" logos={funders} />}
+              {partners.length > 0 && <LogoStrip title="Project partners" logos={partners} />}
+              {project.acknowledgement && <p className="line-clamp-4 text-[13px] leading-relaxed text-white/65">{project.acknowledgement}</p>}
+            </div>
+          )}
+          {isOfficialUrl(project.officialUrl) && <div className={hasLogos ? 'mt-6 border-t border-white/12 pt-5' : ''}><ExternalAction href={project.officialUrl}>Visit project website</ExternalAction></div>}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 // A rounded curved mask, measured from the reference's vertically stretched
@@ -57,14 +86,12 @@ function curvePath(width: number, height: number, distance: number) {
 }
 
 export default function ProjectsSection({ projects: projectItems }: { projects: InternationalProject[] }) {
-  const previews: InternationalProject[] = [1, 2, 3].map(n => ({id: `orbit-preview-${n}`, order: 900 + n, title: `Project preview ${n}`, description: 'Blank project for carousel preview.', partners: [], funders: [], requiresFundingVisibility: false}));
-  const projects = ordered([...projectItems, ...previews]).map((project, index) =>
+  const projects = ordered(projectItems).map((project, index) =>
     index === 0 && !project.image
       ? { ...project, image: { src: '/images/platform/expertise.jpg', alt: 'Reference project image' } }
       : project,
   );
   const [selection, setSelection] = useState(0);
-  const [expandedId, setExpandedId] = useState<string | null>(null);
   const count = projects.length;
   const activeIndex = ((selection % count) + count) % count;
   const orbitRef = useRef<HTMLDivElement>(null);
@@ -114,17 +141,34 @@ export default function ProjectsSection({ projects: projectItems }: { projects: 
     return () => { tween.kill(); };
   }, [selection]);
 
+  // Autoplay: advance every 6s; pause while hovered/focused, off-screen, or for reduced-motion users.
+  const [paused, setPaused] = useState(false);
+  const [onScreen, setOnScreen] = useState(false);
+  useEffect(() => {
+    const root = orbitRef.current;
+    if (!root) return;
+    const io = new IntersectionObserver(([entry]) => setOnScreen(entry.isIntersecting), { threshold: 0.4 });
+    io.observe(root);
+    return () => io.disconnect();
+  }, []);
+  useEffect(() => {
+    if (paused || !onScreen || count < 2 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const timer = window.setTimeout(() => setSelection((value) => value + 1), 6000);
+    return () => window.clearTimeout(timer);
+  }, [paused, onScreen, count, selection]);
+
   const selectCard = (index: number) => {
     if (suppressClick.current) return;
     let delta = index - activeIndex;
     if (delta > count / 2) delta -= count;
     if (delta < -count / 2) delta += count;
-    setExpandedId(null);
     setSelection(value => value + delta);
   };
 
   return <div data-noreveal className="project-orbit">
     <div ref={orbitRef} className="project-orbit-stage" role="region" aria-label="Project carousel" aria-roledescription="carousel" tabIndex={0}
+      onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}
+      onFocus={() => setPaused(true)} onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setPaused(false); }}
       onKeyDown={event => {
         if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
           event.preventDefault(); setSelection(value => value + (event.key === 'ArrowRight' ? 1 : -1));
@@ -143,14 +187,14 @@ export default function ProjectsSection({ projects: projectItems }: { projects: 
       {projects.map((project, i) => <article key={project.id} data-orbit-card className="project-orbit-card" role="group" aria-roledescription="slide" aria-label={`${project.title}, ${i + 1} of ${count}`}>
         <div data-curve className="project-orbit-curve">
           <div className="project-orbit-frame">
-            {project.image ? <Image src={project.image.src} alt={project.image.alt} fill sizes="(max-width:640px) 86vw, 55vw" className="object-cover" draggable={false} /> : <div className="absolute inset-0 bg-gradient-to-br from-[#603388] via-[#2b163d] to-[#100b18]" />}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/20 to-transparent" />
-            <button type="button" className="absolute inset-0 cursor-pointer" tabIndex={i === activeIndex ? 0 : -1} aria-label={`Open ${project.title} details`} onClick={() => { if (!suppressClick.current) setExpandedId(expandedId === project.id ? null : project.id); }} />
-            <div className="project-orbit-copy" style={{opacity: i === activeIndex ? 1 : 0, visibility: i === activeIndex ? 'visible' : 'hidden'}} inert={i !== activeIndex}>
-              <h3 className="dd-h3 font-medium text-white">{withoutTrailingPeriod(project.title)}</h3>
-              <div className="mt-3 flex gap-4 text-xs text-purple-200">{project.status && <span className="capitalize">{project.status}</span>}{project.period && <span>{project.period}</span>}</div>
-              <p className="mt-4 max-w-xl text-sm leading-relaxed text-white/70">{hasProjectVisibility(project) && project.description ? project.description : 'Project information coming soon.'}</p>
-              {i === activeIndex && <CardDetails key={project.id} project={project} open={expandedId === project.id} onToggle={() => setExpandedId(expandedId === project.id ? null : project.id)} />}
+            {/* Split card: clean image on the left, every project detail in the panel on the right */}
+            <div className="project-orbit-media">
+              {project.image ? <Image src={project.image.src} alt={project.image.alt} fill sizes="(max-width:640px) 86vw, 72vw" className="dd-media-grade object-cover" draggable={false} /> : <div className="absolute inset-0 bg-gradient-to-br from-[#603388] via-[#2b163d] to-[#100b18]" />}
+            </div>
+            <div className="project-orbit-panel">
+              <div className="project-orbit-copy" style={{opacity: i === activeIndex ? 1 : 0, visibility: i === activeIndex ? 'visible' : 'hidden'}} inert={i !== activeIndex}>
+                <ProjectCopy project={project} />
+              </div>
             </div>
             {i !== activeIndex && <button type="button" onClick={() => selectCard(i)} aria-label={`Show ${project.title}`} className="absolute inset-0 cursor-pointer" />}
           </div>

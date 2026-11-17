@@ -73,21 +73,93 @@ export const programsCopy = {
 };
 
 export const startupPrograms: StartupProgram[] = [
-  { id: 'acceleration', order: 10, title: 'Startup Readiness Program', status: null, image: { src: '/images/programs/readiness.jpg', alt: 'Startup Readiness Program' }, benefits: [], partners: [], gallery: [], application: null },
+  // DUMMY CONTENT (layout preview only) — replace with Digital Den's approved copy in Sanity.
+  {
+    id: 'acceleration',
+    order: 10,
+    title: 'Startup Readiness Program',
+    status: 'ongoing',
+    image: { src: '/images/programs/readiness.jpg', alt: 'Startup Readiness Program' },
+    overview:
+      'A structured program that helps early-stage founders validate their idea, sharpen the business model and prepare for their first investors and international partners.',
+    location: 'Podgorica, Montenegro',
+    format: 'Hybrid · workshops and 1:1 mentoring',
+    duration: '12 weeks',
+    audience: 'Early-stage founders from Montenegro and the Western Balkans',
+    benefits: [
+      'Weekly workshops on validation, business model and go-to-market',
+      'One-to-one mentoring with experienced founders and experts',
+      'Investor-readiness and pitch preparation',
+      'Introductions to Digital Den partners and international programs',
+    ],
+    partners: [],
+    gallery: [],
+    application: null,
+  },
   { id: 'mtsb-europe', order: 20, title: 'MTSB Europe', status: null, image: { src: '/images/programs/europe.jpg', alt: 'MTSB Europe' }, benefits: [], partners: [], gallery: [], application: null },
   { id: 'mtsb-us', order: 30, title: 'MTSB US', status: null, image: { src: '/images/programs/us.jpg', alt: 'MTSB US' }, benefits: [], partners: [], gallery: [], application: null },
   { id: 'jordan', order: 40, title: 'Jordan Program', status: null, image: { src: '/images/programs/jordan.jpg', alt: 'Jordan Program' }, benefits: [], partners: [], gallery: [], application: null },
 ];
 
+// DUMMY CONTENT (layout preview only) — real project details, logos, acknowledgements and links
+// must come from Digital Den via Sanity. Delete the preview-only projects (dummy-*) before launch.
 export const internationalProjects: InternationalProject[] = [
   {
     id: 'visegrad',
     order: 10,
     title: 'Visegrad Project',
     status: 'ongoing', // The brief confirms that the project has officially started.
-    partners: [],
-    funders: [],
+    period: 'Jan 2026 – Dec 2027',
+    description: 'A regional cooperation project connecting startup support organisations across the Visegrad countries and the Western Balkans to share programs, mentors and market access for founders.',
+    image: { src: '/images/opportunities/featured-poster.jpg', alt: 'Visegrad Project' },
+    partners: [
+      { name: 'NorthHub', src: '/images/projects/logos/partner-north.svg', alt: 'NorthHub', href: 'https://example.com' },
+      { name: 'Adria Labs', src: '/images/projects/logos/partner-adria.svg', alt: 'Adria Labs', href: 'https://example.com' },
+    ],
+    funders: [{ name: 'Visegrad Fund', src: '/images/projects/logos/funder-v4.svg', alt: 'Visegrad Fund', href: 'https://www.visegradfund.org/' }],
+    acknowledgement: 'The project is co-financed by the Governments of Czechia, Hungary, Poland and Slovakia through Visegrad Grants from the International Visegrad Fund.',
+    officialUrl: 'https://www.visegradfund.org/',
     requiresFundingVisibility: true,
+  },
+  {
+    id: 'dummy-eu-bridge',
+    order: 20,
+    title: 'EU Startup Bridge',
+    status: 'ongoing',
+    period: 'Mar 2026 – Feb 2028',
+    description: 'An EU co-funded initiative helping Western Balkan startups prepare for expansion into European markets through soft-landing programs, partner matchmaking and investor days.',
+    image: { src: '/images/programs/europe.jpg', alt: 'EU Startup Bridge' },
+    partners: [{ name: 'BridgeTech', src: '/images/projects/logos/partner-bridge.svg', alt: 'BridgeTech', href: 'https://example.com' }],
+    funders: [{ name: 'Co-funded by the European Union', src: '/images/projects/logos/funder-eu.svg', alt: 'Co-funded by the European Union' }],
+    acknowledgement: 'Funded by the European Union. Views and opinions expressed are those of the author(s) only and do not necessarily reflect those of the European Union.',
+    officialUrl: 'https://example.com',
+    requiresFundingVisibility: true,
+  },
+  {
+    id: 'dummy-digital-health',
+    order: 30,
+    title: 'Digital Health Innovation Lab',
+    status: 'upcoming',
+    period: 'Starts Sep 2026',
+    description: 'A pilot program pairing health-tech startups with regional clinics and institutions to test solutions in real settings and prepare them for wider rollout.',
+    image: { src: '/images/verticals/healthtech.jpg', alt: 'Digital Health Innovation Lab' },
+    partners: [{ name: 'NorthHub', src: '/images/projects/logos/partner-north.svg', alt: 'NorthHub', href: 'https://example.com' }],
+    funders: [],
+    officialUrl: 'https://example.com',
+    requiresFundingVisibility: false,
+  },
+  {
+    id: 'dummy-tourism-tech',
+    order: 40,
+    title: 'Smart Tourism Accelerator',
+    status: 'past',
+    period: '2024 – 2025',
+    description: 'A completed accelerator that supported hospitality and travel-tech startups along the Adriatic coast with mentoring, pilots and investor introductions.',
+    image: { src: '/images/verticals/hospitality.jpg', alt: 'Smart Tourism Accelerator' },
+    partners: [{ name: 'Adria Labs', src: '/images/projects/logos/partner-adria.svg', alt: 'Adria Labs', href: 'https://example.com' }],
+    funders: [],
+    officialUrl: 'https://example.com',
+    requiresFundingVisibility: false,
   },
 ];
 
