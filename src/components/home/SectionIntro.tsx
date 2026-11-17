@@ -34,7 +34,7 @@ export default function SectionIntro({
         </FadeIn>
       )}
       <FadeIn animation="fadeIn" delay={0.15}>
-        <h2 className="font-medium text-3xl sm:text-4xl lg:text-[48px] leading-[110%] tracking-tight" style={headingGradient}>
+        <h2 className="dd-h2 font-medium" style={headingGradient}>
           {title}
         </h2>
       </FadeIn>

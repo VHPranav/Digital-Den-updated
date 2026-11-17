@@ -16,7 +16,7 @@ export default function ServicesPage() {
           <FadeIn animation="fadeIn">
             <Label>Services</Label>
           </FadeIn>
-          <h1 className={`mt-10 max-w-5xl text-[3.5rem] sm:text-7xl lg:text-[8rem] ${display}`}>
+          <h1 className={`dd-h1 mt-10 max-w-5xl ${display}`}>
             <SplitWords>
               Our <span className="gradient-text">services</span>
             </SplitWords>

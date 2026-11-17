@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* Same self-hosted Plus Jakarta Sans files, also registered under their real family name,
+   because many components reference font-['Plus_Jakarta_Sans',sans-serif] directly. */
+@font-face { font-family: "Plus Jakarta Sans"; src: url("/fonts/PlusJakartaSans.woff2") format("woff2"); font-weight: 200 800; font-style: normal; font-display: swap; }
+@font-face { font-family: "Plus Jakarta Sans"; src: url("/fonts/PlusJakartaSans-Italic.woff2") format("woff2"); font-weight: 200 800; font-style: italic; font-display: swap; }
+
 :root {
   --background: #0b0b0c;
   --foreground: #ededed;
@@ -216,3 +221,14 @@ main[data-inner] :is(h1, h2) button {
 .project-orbit-prev { left: 24px; }
 .project-orbit-next { right: 24px; }
 @media(max-width:640px) { .project-orbit-stage { --card-width: 86vw; --card-height: 450px; } .project-orbit-copy { padding: 22px; } .project-orbit-arrow { width: 38px; height: 38px; } .project-orbit-prev { left: 8px; } .project-orbit-next { right: 8px; } }
+
+/* ─── Site-wide heading scale (Nov 2026, client-agreed) ─────────────────────────────────────
+   Use these on every page instead of ad-hoc sizes:
+   .dd-h1  page hero headline           40px → 84px
+   .dd-h2  section title                32px → 48px  (Home section titles)
+   .dd-h3  card / sub-section heading   20px → 26px
+   Big decorative numbers (impact metrics, count-ups) and the footer wordmark are not headings
+   and keep their own sizes. Headings never end with a full stop. */
+.dd-h1 { font-size: clamp(2.5rem, 5.5vw, 5.25rem); line-height: 1.02; letter-spacing: -0.045em; }
+.dd-h2 { font-size: clamp(2rem, 3.4vw, 3rem); line-height: 1.06; letter-spacing: -0.035em; }
+.dd-h3 { font-size: clamp(1.25rem, 1.7vw, 1.625rem); line-height: 1.15; letter-spacing: -0.02em; }

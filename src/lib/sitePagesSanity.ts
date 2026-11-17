@@ -31,7 +31,7 @@ export type HomePageContent = {
 };
 export const defaultHomePage: HomePageContent = {
   heroLine1: 'Your Gateway to', heroLine2: 'Global Markets',
-  positioning: 'A startup launch platform and venture studio connecting founders with the right support, strategic partners, capital and international markets.',
+  positioning: 'A startup launch platform and venture studio connecting founders with the right support, strategic partners, capital and international markets',
   exploreTitle: 'Explore Digital Den',
   cards: [
     { title: 'Venture Building', body: 'Hands-on support that helps founders validate, structure and build stronger ventures ready for growth.', cta: 'See How We Build', href: '/platform', image: '/images/platform/building.jpg', position: '30% center' },

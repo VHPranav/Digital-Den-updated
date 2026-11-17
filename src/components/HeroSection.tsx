@@ -124,13 +124,13 @@ export default function HeroSection({ onOpenAction, line1 = 'Your Gateway to', l
         <div className="w-full flex flex-col items-center justify-center text-center mx-auto" style={{ perspective: '1000px' }}>
           <h1
             ref={line1Ref}
-            className="font-['Plus_Jakarta_Sans',sans-serif] font-medium text-[36px] sm:text-[56px] md:text-[70px] lg:text-[86px] leading-[105%] text-center text-white tracking-tight drop-shadow-2xl max-w-[1050px] mx-auto block w-full"
+            className="dd-h1 font-['Plus_Jakarta_Sans',sans-serif] font-medium text-center text-white drop-shadow-2xl max-w-[1050px] mx-auto block w-full"
           >
             {line1}
           </h1>
           <h1
             ref={line2Ref}
-            className="font-['Plus_Jakarta_Sans',sans-serif] font-medium text-[36px] sm:text-[56px] md:text-[70px] lg:text-[86px] leading-[105%] text-center text-white tracking-tight drop-shadow-2xl max-w-[1050px] mx-auto block w-full bg-clip-text bg-gradient-to-r from-white via-[#f0f4ff] to-white/80"
+            className="dd-h1 font-['Plus_Jakarta_Sans',sans-serif] font-medium text-center text-white drop-shadow-2xl max-w-[1050px] mx-auto block w-full bg-clip-text bg-gradient-to-r from-white via-[#f0f4ff] to-white/80"
           >
             {line2}
           </h1>

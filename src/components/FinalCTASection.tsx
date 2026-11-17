@@ -31,7 +31,7 @@ export default function FinalCTASection({ onOpenAction, content }: FinalCTASecti
             <p className="font-['Plus_Jakarta_Sans',sans-serif] uppercase text-white/45 text-[11px] sm:text-xs font-medium tracking-[0.2em]">{content.eyebrow}</p>
           </FadeIn>
           <FadeIn animation="fadeIn" delay={0.2}>
-            <h2 className="text-3xl font-medium leading-[110%] tracking-tight sm:text-4xl lg:text-[48px]" style={headingGradient}>
+            <h2 className="dd-h2 font-medium" style={headingGradient}>
               {content.title}
             </h2>
           </FadeIn>

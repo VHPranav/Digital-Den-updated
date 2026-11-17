@@ -12,10 +12,11 @@ export const PAGE_BG = 'bg-[#0b0b0c]';
 export const EASE = 'cubic-bezier(0.2, 0.7, 0.1, 1)';
 
 /** Muted, looping background film; the poster shows until the video can play. */
-export function BgVideo({ src, poster }: { src: string; poster: string }) {
+/** `cropMark` zooms 1.14x from the left edge so a generator mark in the bottom-right (x ≈ 89–93%) is never visible. */
+export function BgVideo({ src, poster, cropMark = false }: { src: string; poster: string; cropMark?: boolean }) {
   return (
     <video
-      className="absolute inset-0 h-full w-full object-cover"
+      className={`absolute inset-0 h-full w-full object-cover ${cropMark ? 'origin-left scale-[1.14]' : ''}`}
       src={src}
       poster={poster}
       autoPlay

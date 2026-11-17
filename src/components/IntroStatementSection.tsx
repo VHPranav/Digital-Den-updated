@@ -4,6 +4,7 @@ import React from 'react';
 import { ArrowDown } from 'lucide-react';
 import { TextAnimate } from './TextAnimate';
 import { FadeIn } from './FadeIn';
+import { withoutTrailingPeriod } from '@/lib/programsContent';
 
 interface IntroStatementSectionProps {
   /** Element the "Enter Digital Den" CTA scrolls to (the Home Page). */
@@ -11,7 +12,7 @@ interface IntroStatementSectionProps {
   positioning?: string;
 }
 
-export default function IntroStatementSection({ targetId = 'main-content', positioning = 'A startup launch platform and venture studio connecting founders with the right support, strategic partners, capital and international markets.' }: IntroStatementSectionProps) {
+export default function IntroStatementSection({ targetId = 'main-content', positioning = 'A startup launch platform and venture studio connecting founders with the right support, strategic partners, capital and international markets' }: IntroStatementSectionProps) {
   const handleEnter = () => {
     document.getElementById(targetId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
@@ -27,7 +28,7 @@ export default function IntroStatementSection({ targetId = 'main-content', posit
           delay={0.1}
           className="font-['Plus_Jakarta_Sans',sans-serif] font-medium text-2xl sm:text-4xl lg:text-[44px] leading-[125%] tracking-tight text-white max-w-4xl mx-auto"
         >
-          {positioning}
+          {withoutTrailingPeriod(positioning)}
         </TextAnimate>
 
         {/* CTA */}

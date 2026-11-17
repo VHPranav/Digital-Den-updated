@@ -23,7 +23,7 @@ export default function VerticalPage({ slug }: { slug: string }) {
             <FadeIn animation="fadeIn">
               <Label>{v.eyebrow}</Label>
             </FadeIn>
-            <h1 className={`mt-10 max-w-6xl text-[3.25rem] sm:text-7xl lg:text-[7.5rem] ${display}`}>
+            <h1 className={`dd-h1 mt-10 max-w-6xl ${display}`}>
                 <SplitWords>
                   {v.title} <span className="gradient-text">{v.titleAccent}</span>
                 </SplitWords>
@@ -66,13 +66,13 @@ export default function VerticalPage({ slug }: { slug: string }) {
               <SectionHeader
                 index="01"
                 label="Matchmaking Environment"
-                title="Where needs meet solutions."
+                title="Where needs meet solutions"
               />
 
               <div className="mt-24 grid grid-cols-1 lg:grid-cols-2 gap-x-20 gap-y-20">
                 <div>
                   <div className="flex items-baseline justify-between border-b border-white pb-5">
-                    <h3 className="text-xl font-semibold">{v.needsTitle}</h3>
+                    <h3 className="dd-h3 font-semibold">{v.needsTitle}</h3>
                     {v.needsSubtitle && <span className="text-xs uppercase tracking-[0.22em] text-white/40">{v.needsSubtitle}</span>}
                   </div>
                   {v.needs.map((need) => (
@@ -97,7 +97,7 @@ export default function VerticalPage({ slug }: { slug: string }) {
 
                 <div>
                   <div className="flex items-baseline justify-between border-b border-white pb-5">
-                    <h3 className="text-xl font-semibold">{v.solutionsTitle}</h3>
+                    <h3 className="dd-h3 font-semibold">{v.solutionsTitle}</h3>
                     {v.solutionsSubtitle && <span className="text-xs uppercase tracking-[0.22em] text-white/40">{v.solutionsSubtitle}</span>}
                   </div>
                   {v.solutions.map((sol) => (

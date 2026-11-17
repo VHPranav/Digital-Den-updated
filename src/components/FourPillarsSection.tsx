@@ -51,7 +51,7 @@ export default function FourPillarsSection({ title = 'Explore Digital Den', card
       <div className="mb-4 max-w-[440px]">
         <FadeIn animation="fadeIn" delay={0.1}>
           <h2
-            className="lg:mb-10 font-medium text-3xl sm:text-4xl lg:text-[48px] leading-[105%] tracking-tight"
+            className="dd-h2 lg:mb-10 font-medium"
             style={{
               background: 'linear-gradient(90deg, #FFFFFF 0%, #FFFFFF 30%, #F3E8FF 45%, #D8B4FE 60%, #C084FC 75%, #A855F7 88%, #7E22CE 100%)',
               WebkitBackgroundClip: 'text',
@@ -95,7 +95,7 @@ export default function FourPillarsSection({ title = 'Explore Digital Den', card
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/35 z-0 rounded-[24px]" />
 
                 <div className="space-y-2.5 z-10 relative">
-                  <h3 className="font-['Plus_Jakarta_Sans',sans-serif] text-white font-semibold text-2xl sm:text-3xl tracking-tight leading-[109%]">
+                  <h3 className="dd-h3 font-['Plus_Jakarta_Sans',sans-serif] text-white font-semibold">
                     {card.title}
                   </h3>
                   <p className="text-white/90 font-normal text-sm sm:text-[15px] leading-[22px]">{card.body}</p>

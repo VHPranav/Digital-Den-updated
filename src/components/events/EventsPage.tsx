@@ -165,7 +165,7 @@ export default function EventsPage() {
             <div className="relative z-10 flex h-full justify-center px-6">
               <div className="flex h-full w-fit max-w-full flex-col">
                 <div className="flex flex-1 items-center">
-                  <h1 data-plain className="flex w-fit flex-col text-[clamp(2.9rem,6.2vw,9.25rem)] font-medium leading-[0.98] tracking-[-0.045em]">
+                  <h1 data-plain className="dd-h1 flex w-fit flex-col font-medium">
                     <span className="self-start">
                       <CharReveal text="Architecting" play={ready} delay={0.1} />
                     </span>
@@ -331,7 +331,7 @@ export default function EventsPage() {
               <article key={e.title} className="border-t border-white/10 pb-24 pt-10">
                 <span className="inline-block rounded-full border border-white/20 px-3 py-1 text-[11px] text-white/80">{e.tag}</span>
                 <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
-                  <h3 className="max-w-3xl text-[clamp(1.75rem,3vw,2.5rem)] font-normal leading-[1.1] tracking-[-0.03em]">{e.title}</h3>
+                  <h3 className="dd-h3 max-w-3xl font-normal">{e.title}</h3>
                   <div className="flex items-center gap-6 text-[13px]">
                     <span className="text-white/40">{e.date}</span>
                     <button type="button" onClick={openAction} className="underline underline-offset-4 decoration-white/40 hover:decoration-white">
@@ -366,7 +366,7 @@ export default function EventsPage() {
 
           {/* ─── NEWSLETTER ─── */}
           <section className="mx-auto max-w-[1240px] px-6 pb-40 pt-24 lg:px-10">
-            <h2 className={`text-[clamp(3.5rem,10vw,9.5rem)] leading-[0.95] ${italic}`}><SplitWords>Never miss a beat.</SplitWords></h2>
+            <h2 className={`dd-h2 ${italic}`}><SplitWords>Never miss a beat</SplitWords></h2>
             <div className="mt-16 grid grid-cols-1 items-end gap-10 lg:grid-cols-2">
               <p className="max-w-sm text-white/55 text-[13px] leading-relaxed">
                 Get notified about the next high-stakes loop, summit, or founder mixer. No spam, just pure signal.

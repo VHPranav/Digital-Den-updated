@@ -57,7 +57,7 @@ function StartupCard({ s, i }: { s: Card; i: number }) {
           )}
         </div>
       </div>
-      <h3 className="mt-5 font-['Plus_Jakarta_Sans',sans-serif] text-white text-xl font-medium leading-snug tracking-tight">{s.name}</h3>
+      <h3 className="dd-h3 mt-5 font-['Plus_Jakarta_Sans',sans-serif] text-white font-medium">{s.name}</h3>
       <p className="mt-2 text-white/70 text-[15px] leading-[1.5]">{s.achievement}</p>
       {s.metric && <p className="mt-3 text-purple-200 text-sm font-medium">{s.metric}</p>}
     </>
@@ -122,7 +122,7 @@ export default function ProofOfGrowthSection({ content }: { content: HomePageCon
       <div className="relative flex flex-wrap items-end justify-between gap-6">
         <FadeIn animation="fadeIn" delay={0.1}>
           <p className="mb-4 font-['Plus_Jakarta_Sans',sans-serif] uppercase text-white/45 text-[11px] sm:text-xs font-medium tracking-[0.2em]">{content.eyebrow}</p>
-          <h2 className="text-3xl font-medium leading-[110%] tracking-tight sm:text-4xl lg:text-[48px]" style={headingGradient}>
+          <h2 className="dd-h2 font-medium" style={headingGradient}>
             {content.title}
           </h2>
         </FadeIn>

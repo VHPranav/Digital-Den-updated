@@ -44,7 +44,7 @@ export function Label({ index, children, className = '' }: { index?: string; chi
 }
 
 export const display = 'font-semibold tracking-[-0.045em] leading-[0.95]';
-export const heading = 'text-4xl sm:text-5xl lg:text-[4rem] font-semibold tracking-[-0.035em] leading-[1.04]';
+export const heading = 'dd-h2 font-semibold';
 export const lead = 'text-lg leading-[1.75] text-white/55';
 export const body = 'text-[15px] leading-[1.75] text-white/50';
 

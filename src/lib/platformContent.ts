@@ -12,7 +12,7 @@ export const platformHero = {
 };
 
 export const platformTransition = {
-  line1: 'One platform.',
+  line1: 'One platform',
   line2Before: 'Built to move the innovation ecosystem',
   line2Accent: 'forward',
   scrollLabel: 'Scroll to Explore',

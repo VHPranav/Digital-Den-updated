@@ -102,7 +102,7 @@ export default function ProjectsPage() {
             <FadeIn animation="fadeIn">
               <Label>Project Activities</Label>
             </FadeIn>
-            <h1 className={`mt-10 max-w-5xl text-[3.5rem] sm:text-7xl lg:text-[8rem] ${display}`}>
+            <h1 className={`dd-h1 mt-10 max-w-5xl ${display}`}>
                 <SplitWords>
                   Work in the <span className="gradient-text">field</span>
                 </SplitWords>
@@ -230,7 +230,7 @@ export default function ProjectsPage() {
                   <FadeIn key={title} animation="slideUp" delay={i * 0.08}>
                     <div className="border-t border-white/[0.12] pt-8">
                       <span className="text-sm tabular-nums text-white/30">{String(i + 1).padStart(2, '0')}</span>
-                      <h3 className="mt-6 text-2xl font-semibold tracking-[-0.025em]">{title}</h3>
+                      <h3 className="dd-h3 mt-6 font-semibold">{title}</h3>
                       <p className={`mt-4 ${body}`}>{text}</p>
                     </div>
                   </FadeIn>

@@ -146,7 +146,7 @@ export default function StartupJourneySection({ content }: { content: HomePageCo
           {content.stages.map((s, i) => (
             <li key={s.title} className={`text-center transition-all duration-700 ${i < active ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-30'}`}>
               <span className="text-xs tabular-nums" style={{ color: s.color }}>{String(i + 1).padStart(2, '0')}</span>
-              <h3 className="mt-1 font-['Plus_Jakarta_Sans',sans-serif] text-white text-xl font-semibold tracking-tight">{s.title}</h3>
+              <h3 className="dd-h3 mt-1 font-['Plus_Jakarta_Sans',sans-serif] text-white font-semibold">{s.title}</h3>
               <p className="mx-auto mt-2 max-w-[220px] text-white/65 text-sm leading-[1.55]">{s.body}</p>
             </li>
           ))}

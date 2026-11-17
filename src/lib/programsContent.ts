@@ -56,7 +56,7 @@ export const programsCopy = {
   },
   globalReach: {
     label: 'Global Reach',
-    title: 'From Montenegro to global markets.',
+    title: 'From Montenegro to global markets',
     video: '/videos/programs-band.mp4',
     poster: '/images/programs/band-poster.jpg',
     figures: [
@@ -67,7 +67,7 @@ export const programsCopy = {
   },
   closing: {
     label: 'Your Next Opportunity',
-    title: 'Find your next opportunity.',
+    title: 'Find your next opportunity',
     body: 'Explore Digital Den programs designed to help startups build stronger foundations, access new markets and connect with the right support.',
   },
 };

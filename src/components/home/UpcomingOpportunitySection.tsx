@@ -33,7 +33,7 @@ export default function UpcomingOpportunitySection() {
             </div>
           </FadeIn>
           <FadeIn animation="fadeIn" delay={0.15}>
-            <h2 className="text-3xl font-medium leading-[110%] tracking-tight sm:text-4xl lg:text-[48px]" style={headingGradient}>
+            <h2 className="dd-h2 font-medium" style={headingGradient}>
               {o.title}
             </h2>
           </FadeIn>

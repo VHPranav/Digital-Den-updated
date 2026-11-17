@@ -151,7 +151,7 @@ export default function Footer() {
       <div className="relative mx-auto max-w-[1450px] px-6 lg:px-12">
         <div className="flex flex-col items-center py-24 text-center lg:py-32">
           <FadeIn animation="fadeIn" duration={1}>
-            <h2 className="text-5xl font-medium leading-[1.02] tracking-[-0.03em] sm:text-6xl lg:text-[56px]" style={headingGradient}>
+            <h2 className="dd-h2 font-medium" style={headingGradient}>
               Get in Touch
             </h2>
           </FadeIn>

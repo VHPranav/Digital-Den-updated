@@ -67,7 +67,7 @@ export default function OpportunitiesPage() {
               <FadeIn animation="fadeIn">
                 <Label>Featured Opportunity · Podgorica, Montenegro</Label>
               </FadeIn>
-              <h1 className={`mt-10 max-w-5xl text-[3.25rem] sm:text-7xl lg:text-[7.5rem] ${display}`}>
+              <h1 className={`dd-h1 mt-10 max-w-5xl ${display}`}>
                   <SplitWords>
                     FinTech Innovation Loop <span className="gradient-text">Montenegro</span>
                   </SplitWords>
@@ -122,7 +122,7 @@ export default function OpportunitiesPage() {
                     <Link href={href} className="group block">
                       <Figure src={image} alt={title} sizes="(max-width: 768px) 100vw, 400px" className="aspect-[3/4]" />
                       <div className="mt-8 flex items-center justify-between border-b border-white/[0.12] pb-5">
-                        <h3 className="transition-colors group-hover:text-purple-200 text-2xl font-semibold tracking-[-0.025em]">{title}</h3>
+                        <h3 className="dd-h3 transition-colors group-hover:text-purple-200 font-semibold">{title}</h3>
                         <ArrowUpRight className="h-5 w-5 text-white/40 transition-all duration-300 group-hover:text-white group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
                       </div>
                       <p className={`mt-5 ${body}`}>{text}</p>
@@ -152,7 +152,7 @@ export default function OpportunitiesPage() {
                     <div className="grid grid-cols-[3rem_1fr] gap-6 border-t border-white/[0.12] py-10">
                       <span className="pt-2 text-sm tabular-nums text-white/30">{String(i + 1).padStart(2, '0')}</span>
                       <div>
-                        <h3 className="text-2xl sm:text-3xl font-semibold tracking-[-0.025em]">{title}</h3>
+                        <h3 className="dd-h3 font-semibold">{title}</h3>
                         <p className={`mt-3 ${body}`}>{text}</p>
                       </div>
                     </div>

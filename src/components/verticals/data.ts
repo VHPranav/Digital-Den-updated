@@ -187,7 +187,7 @@ export const verticals: Vertical[] = [
     name: 'Hospitality Tech',
     eyebrow: 'Vertical Focus',
     title: 'Hospitality',
-    titleAccent: 'Architecture.',
+    titleAccent: 'Architecture',
     intro:
       'A dedicated matchmaking environment for the next generation of hospitality in the Mediterranean. We bridge the gap between luxury hotel groups and frontier tech startups focusing on smart booking, guest orchestration, and high-impact sustainable travel.',
     image: '/images/verticals/hospitality.jpg',

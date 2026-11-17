@@ -182,7 +182,7 @@ export default function ProgramExplorer({ programs, now }: { programs: StartupPr
           })}
         </div>
         {detail && <div ref={detailsRef} id="selected-program-details" className="program-expanded-details overflow-hidden mt-8 border border-white/15 bg-[#100d15]" role="region" aria-label={`${detail.title} details`}>
-          <div className="flex items-center justify-between gap-6 border-b border-white/10 p-6 sm:p-10"><h3 className="text-[1.375rem] font-medium tracking-tight sm:text-[2.0625rem]">{withoutTrailingPeriod(detail.title)}</h3><button type="button" onClick={() => setDetailId(null)} className="cursor-pointer rounded-full border border-white/25 px-4 py-2 text-sm text-white/70 hover:text-white">Close ×</button></div>
+          <div className="flex items-center justify-between gap-6 border-b border-white/10 p-6 sm:p-10"><h3 className="dd-h3 font-medium">{withoutTrailingPeriod(detail.title)}</h3><button type="button" onClick={() => setDetailId(null)} className="cursor-pointer rounded-full border border-white/25 px-4 py-2 text-sm text-white/70 hover:text-white">Close ×</button></div>
           <ProgramDetails program={detail} now={now} />
         </div>}
       </> : <p role="status" className="border-y border-white/15 py-16 text-white/60">{filter === 'all' ? 'Program information coming soon.' : `No ${filter} programs to display right now.`}</p>}

@@ -80,7 +80,7 @@ export default function PartnersPage() {
                   <FadeIn animation="fadeIn">
                     <Label>Strategic Alliances</Label>
                   </FadeIn>
-                  <h1 className={`mt-8 text-[3rem] sm:text-7xl lg:text-[6rem] ${display}`}>
+                  <h1 className={`dd-h1 mt-8 ${display}`}>
                       <SplitWords>
                         Global
                         <br />
@@ -102,14 +102,14 @@ export default function PartnersPage() {
           {/* ─── MARKET BRIDGES ─── */}
           <Section>
             <Container>
-              <SectionHeader index="01" label="Market Bridges" title="Two gateways. One network." />
+              <SectionHeader index="01" label="Market Bridges" title="Two gateways. One network" />
               <div className="mt-24 grid grid-cols-1 lg:grid-cols-2 gap-x-16 gap-y-24">
                 {bridges.map(({ title, body: text, hubs, image }, i) => (
                   <FadeIn key={title} animation="slideUp" delay={i * 0.12} className={i === 1 ? 'lg:mt-40' : ''}>
                     <article className="group">
                       <Figure src={image} alt={title} sizes="(max-width: 1024px) 100vw, 580px" className="aspect-[4/5]" />
                       <div className="mt-8 flex items-baseline justify-between gap-6 border-b border-white/[0.12] pb-6">
-                        <h3 className="text-3xl sm:text-4xl font-semibold tracking-[-0.035em]">{title}</h3>
+                        <h3 className="dd-h3 font-semibold">{title}</h3>
                         <span className="hidden sm:block text-xs uppercase tracking-[0.22em] text-white/40">{hubs.join(' · ')}</span>
                       </div>
                       <p className={`mt-6 max-w-lg ${body}`}>{text}</p>
@@ -123,7 +123,7 @@ export default function PartnersPage() {
           {/* ─── PARTNER TIERS ─── */}
           <Section>
             <Container>
-              <SectionHeader index="02" label="The Network" title="Three layers of leverage." />
+              <SectionHeader index="02" label="The Network" title="Three layers of leverage" />
               <div className="mt-24 border-b border-white/[0.12]">
                 {tiers.map(({ index, label, title, partners }) => (
                   <FadeIn key={index} animation="fadeIn">
@@ -132,7 +132,7 @@ export default function PartnersPage() {
                         <p className="uppercase text-white/40 text-xs tracking-[0.22em]">
                           <span className="tabular-nums text-white/70">{index}</span> · {label}
                         </p>
-                        <h3 className="mt-5 text-2xl sm:text-3xl font-semibold tracking-[-0.025em]">{title}</h3>
+                        <h3 className="dd-h3 mt-5 font-semibold">{title}</h3>
                       </div>
                       <ul className="lg:col-span-7 lg:col-start-6 grid grid-cols-1 sm:grid-cols-2 gap-x-12">
                         {partners.map((p, i) => (
@@ -158,7 +158,7 @@ export default function PartnersPage() {
           <Section>
             <Container className="text-center">
               <Label className="justify-center">Alliance</Label>
-              <h2 className={`mt-10 text-5xl sm:text-7xl lg:text-[6.5rem] ${display}`}>
+              <h2 className={`dd-h2 mt-10 ${display}`}>
                 <SplitWords>
                   Become a <span className="gradient-text">Partner</span>
                 </SplitWords>

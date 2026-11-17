@@ -82,14 +82,14 @@ export default function ProgramsPage({ programs: programItems, projects, copy = 
         <div className={`${PAGE_BG} text-[#f3f0ea]`}>
           <section className="relative">
             <div className="sticky top-0 h-[100svh] overflow-hidden">
-              <BgVideo src={hero.video} poster={hero.poster} />
+              <BgVideo src={hero.video} poster={hero.poster} cropMark />
               <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/25 to-black/75" />
             </div>
             <div className="relative -mt-[100svh]">
               <div className="flex min-h-[100svh] flex-col justify-end px-6 pb-16 pt-32 lg:px-10 lg:pb-20">
                 <div className="flex flex-wrap items-end justify-between gap-12">
                   <div>
-                    <h1 data-plain className="text-[clamp(3.25rem,10vw,10rem)] font-medium leading-[0.86] tracking-[-0.065em]">
+                    <h1 data-plain className="dd-h1 font-medium">
                       <span className="block"><BlurWords text={withoutTrailingPeriod(hero.line1)} delay={0.2} /></span>
                       <span className="block font-light italic"><BlurWords text={withoutTrailingPeriod(hero.line2)} delay={0.55} /></span>
                     </h1>
@@ -115,7 +115,7 @@ export default function ProgramsPage({ programs: programItems, projects, copy = 
           <section id="programs" aria-labelledby="programs-title" className={`${PAGE_BG} relative z-10 scroll-mt-20 pb-28 pt-24 lg:pb-40 lg:pt-36`}>
             <div className="mx-auto mb-12 max-w-[1480px] px-6 lg:mb-16 lg:px-10">
               <Reveal>
-                <h2 id="programs-title" className="max-w-4xl text-[clamp(2.75rem,6vw,6rem)] font-medium leading-[0.98] tracking-[-0.05em]"><SplitWords>Explore Programs</SplitWords></h2>
+                <h2 id="programs-title" className="dd-h2 max-w-4xl font-medium"><SplitWords>Explore Programs</SplitWords></h2>
               </Reveal>
             </div>
             <ProgramExplorer programs={programs} now={now} />
@@ -125,7 +125,7 @@ export default function ProgramsPage({ programs: programItems, projects, copy = 
             <div className="mx-auto max-w-[1480px]">
               <Reveal className="mb-14 flex flex-wrap items-end justify-between gap-8 lg:mb-20">
                 <div>
-                  <h2 id="projects-title" className="text-[clamp(2.75rem,5.9vw,6rem)] font-medium leading-[0.92] tracking-[-0.055em]"><SplitWords>Projects</SplitWords></h2>
+                  <h2 id="projects-title" className="dd-h2 font-medium"><SplitWords>Projects</SplitWords></h2>
                 </div>
               </Reveal>
               <ProjectsSection projects={projects} />
@@ -133,10 +133,10 @@ export default function ProgramsPage({ programs: programItems, projects, copy = 
           </section>
 
           <section aria-labelledby="global-reach-title" className="relative z-10 flex min-h-[100svh] flex-col justify-between overflow-hidden px-6 py-16 lg:px-10 lg:py-20">
-            <BgVideo src={globalReach.video} poster={globalReach.poster} />
+            <BgVideo src={globalReach.video} poster={globalReach.poster} cropMark />
             <div className="absolute inset-0 bg-gradient-to-b from-black/75 via-black/40 to-black/85" />
             <div className="relative max-w-4xl">
-              <Reveal><h2 id="global-reach-title" className="text-[clamp(2.75rem,5.9vw,6rem)] font-medium leading-[0.92] tracking-[-0.055em]">{withoutTrailingPeriod(globalReach.title)}</h2></Reveal>
+              <Reveal><h2 id="global-reach-title" className="dd-h2 font-medium">{withoutTrailingPeriod(globalReach.title)}</h2></Reveal>
             </div>
             <div className="relative mt-24 grid gap-10 border-t border-white/25 pt-10 md:grid-cols-12">
               {globalReach.figures.map((figure, i) => (
@@ -152,7 +152,7 @@ export default function ProgramsPage({ programs: programItems, projects, copy = 
 
           <section className={`${PAGE_BG} relative z-10 px-6 pb-36 pt-20 text-center lg:px-10 lg:pb-52 lg:pt-28`}>
             <Reveal>
-              <h2 className="mx-auto max-w-5xl text-[clamp(2.75rem,7vw,7rem)] font-medium leading-[0.92] tracking-[-0.06em]"><SplitWords>{withoutTrailingPeriod(closing.title)}</SplitWords></h2>
+              <h2 className="dd-h2 mx-auto max-w-5xl font-medium"><SplitWords>{withoutTrailingPeriod(closing.title)}</SplitWords></h2>
               <p className="mx-auto mt-8 max-w-2xl text-white/65 text-[17px] leading-[1.6]">{closing.body}</p>
               <div className="mt-12 flex flex-wrap justify-center gap-8 lg:gap-10">
                 <ArrowLink href="#programs">Explore Programs</ArrowLink>

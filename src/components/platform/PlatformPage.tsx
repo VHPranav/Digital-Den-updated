@@ -8,6 +8,7 @@ import { MinimalFooter } from '@/components/Footer';
 import { useScrollProgress } from '@/components/events/motion';
 import { defaultPlatformPage, type PlatformPageContent } from '@/lib/sitePagesSanity';
 import type { ImpactSlide, TeamMember } from '@/lib/platformContent';
+import { withoutTrailingPeriod } from '@/lib/programsContent';
 
 // Platform page (final order, Oct 2026): video hero → "One platform" transition → impact scroll →
 // Mission & Vision → Team → Budva CTA → minimal footer. All copy/images live in
@@ -70,7 +71,7 @@ function TeamGroup({ title, people, centered = false }: { title: string; people:
   if (!people.length) return null;
   return (
     <div className="dd-team-group">
-      <Reveal><h2 className="text-center text-[clamp(2.25rem,4.5vw,4.5rem)] font-medium leading-none tracking-[-0.045em]">{title}</h2></Reveal>
+      <Reveal><h2 className="dd-h2 text-center font-medium">{title}</h2></Reveal>
       <div className={centered ? 'dd-team-cards dd-team-cards-centered' : 'dd-team-cards'} onMouseLeave={() => setActiveIndex(null)}>
         {people.map((person, i) => (
           <article key={`${person.name}-${i}`} className={`dd-team-card ${activeIndex === i ? 'is-active' : ''}`} onMouseEnter={() => setActiveIndex(i)} onFocus={() => setActiveIndex(i)} onBlur={() => setActiveIndex(null)} tabIndex={0} aria-label={`${person.name}, ${person.role}`}>
@@ -79,7 +80,7 @@ function TeamGroup({ title, people, centered = false }: { title: string; people:
             <div className="dd-team-info">
               <div className="dd-team-grid" aria-hidden="true" />
               <div className="relative z-10">
-                <h3 className="text-[clamp(1.2rem,1.8vw,1.8rem)] font-medium tracking-[-0.035em]">{person.name}</h3>
+                <h3 className="dd-h3 font-medium">{person.name}</h3>
                 <p className="mt-2 text-white/65 text-[14px] leading-[1.6]">{person.role}</p>
                 <div className="dd-team-extra">
                   {!person.photo && <p className="uppercase text-white/45 text-[13px] leading-relaxed">Reference image</p>}
@@ -111,7 +112,7 @@ export default function PlatformPage({ content = defaultPlatformPage }: { conten
             <div className="absolute inset-0 bg-black/20" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
             <div className="absolute inset-x-0 bottom-0 mx-auto max-w-[1480px] px-6 pb-16 lg:px-10 lg:pb-20">
-              <h1 data-plain className="max-w-[11em] text-balance text-[clamp(2.4rem,6vw,5.75rem)] font-medium leading-[1] tracking-[-0.05em]">
+              <h1 data-plain className="dd-h1 max-w-[11em] text-balance font-medium">
                 {platformHero.headline.trim().replace(/\.$/, '')}
               </h1>
               <p className="mt-6 max-w-2xl text-white/80 text-[clamp(0.95rem,1.15vw,1.1rem)] leading-[1.6]">{platformHero.body}</p>
@@ -126,8 +127,8 @@ export default function PlatformPage({ content = defaultPlatformPage }: { conten
           <section className={`${BG} relative z-10 flex min-h-[100svh] flex-col justify-center overflow-hidden px-6 lg:px-10`}>
             <div className="relative z-10 mx-auto w-full max-w-[1480px]">
               <Reveal>
-                <p className="text-[clamp(2.4rem,5.2vw,5rem)] font-medium leading-[1.02] tracking-[-0.045em]">{platformTransition.line1}</p>
-                <p className="mt-1 text-white/90 text-[clamp(1.9rem,4.4vw,4.2rem)] font-light leading-[1.05] tracking-[-0.04em]">
+                <p className="dd-h2 font-medium">{withoutTrailingPeriod(platformTransition.line1)}</p>
+                <p className="mt-1 text-white/90 dd-h2 font-light">
                   {platformTransition.line2Before} <span className="font-medium text-purple-400">{platformTransition.line2Accent}</span>
                 </p>
               </Reveal>
@@ -174,7 +175,7 @@ export default function PlatformPage({ content = defaultPlatformPage }: { conten
                 <div key={data.label} className={i === 0 ? 'lg:pr-20' : 'lg:pl-20'}>
                   <Reveal delay={i * 0.1}>
                     <p className="uppercase text-white/55 text-[13px] tracking-[0.3em]">{data.label}</p>
-                    <h2 className="mt-6 text-[clamp(2.75rem,5vw,4.75rem)] font-light leading-[1] tracking-[-0.04em]">
+                    <h2 className="dd-h2 mt-6 font-light">
                       {data.titleLine1}
                       <br />
                       <span className={accent}>{data.titleLine2}</span>
@@ -210,7 +211,7 @@ export default function PlatformPage({ content = defaultPlatformPage }: { conten
             <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/70 to-transparent" />
             <div className="absolute inset-x-6 bottom-10 lg:bottom-14 lg:left-10 lg:right-auto lg:w-[44rem]">
               <Reveal>
-                <h2 className="text-[clamp(2.25rem,3.8vw,3.75rem)] font-medium leading-[1.08] tracking-[-0.035em]">{platformClosing.title}</h2>
+                <h2 className="dd-h2 font-medium">{platformClosing.title}</h2>
                 <p className="mt-5 max-w-xl text-[clamp(1rem,1.3vw,1.2rem)] leading-[1.6] text-white/80">{platformClosing.body}</p>
                 <div className="mt-6 flex flex-wrap gap-3">
                   <button
