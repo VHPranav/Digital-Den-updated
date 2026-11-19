@@ -11,8 +11,7 @@ import { useInView } from '@/hooks/use-in-view';
 import { withoutTrailingPeriod, hasActiveCall, ordered, programsCopy as defaultProgramsCopy, type InternationalProject, type StartupProgram } from '@/lib/programsContent';
 import type { ProgramsPageCopy } from '@/lib/sitePagesSanity';
 
-// Counts 00 → target one visible step at a time once the section is on screen (Nina asked for the
-// earlier "numbers dynamically increase to 03 and 04" effect). Reduced motion shows the final value.
+// Wait for the enclosing Reveal to finish before counting, so the steps are visible.
 function ReachCountUp({ value, delay = 0 }: { value: string; delay?: number }) {
   const [ref, inView] = useInView({ triggerOnce: true, rootMargin: '-80px' });
   const parts = value.match(/^([^\d.,-]*)(\d+)([^\d.,]*)$/);
@@ -23,18 +22,19 @@ function ReachCountUp({ value, delay = 0 }: { value: string; delay?: number }) {
     const target = Number(parts[2]);
     if (!Number.isSafeInteger(target) || target === 0) return;
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const step = Math.max(80, 600 / target); // whole count takes ~0.6s
-    let timer = 0;
+    let frame = 0;
     const startTimer = window.setTimeout(() => {
       if (reduced) { setCount(target); return; }
-      let n = 0;
-      timer = window.setInterval(() => {
-        n += 1;
-        setCount(n);
-        if (n >= target) window.clearInterval(timer);
-      }, step);
-    }, reduced ? 0 : 150 + delay * 1000);
-    return () => { window.clearTimeout(startTimer); window.clearInterval(timer); };
+      const start = performance.now();
+      const tick = (now: number) => {
+        const progress = Math.min((now - start) / 1800, 1);
+        const easedProgress = 1 - (1 - progress) ** 3;
+        setCount(Math.round(target * easedProgress));
+        if (progress < 1) frame = requestAnimationFrame(tick);
+      };
+      frame = requestAnimationFrame(tick);
+    }, reduced ? 0 : 1100 + delay * 1000);
+    return () => { window.clearTimeout(startTimer); cancelAnimationFrame(frame); };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, value, delay]);
 
@@ -42,7 +42,7 @@ function ReachCountUp({ value, delay = 0 }: { value: string; delay?: number }) {
   return (
     <span ref={ref}>
       <span className="sr-only">{value}</span>
-      <span aria-hidden="true" key={shown} className="dd-count-tick inline-block">{shown}</span>
+      <span aria-hidden="true" className="inline-block">{shown}</span>
     </span>
   );
 }
@@ -91,13 +91,14 @@ export default function ProgramsPage({ programs: programItems, projects, copy = 
               <div className="flex min-h-[100svh] flex-col justify-end px-6 pb-16 pt-32 lg:px-10 lg:pb-20">
                 <div className="flex flex-wrap items-end justify-between gap-12">
                   <div>
-                    <h1 data-plain className="dd-h1 font-medium">
-                      <span className="block"><BlurWords text={withoutTrailingPeriod(hero.line1)} delay={0.2} /></span>
-                      <span className="block font-light italic"><BlurWords text={withoutTrailingPeriod(hero.line2)} delay={0.55} /></span>
+                    <h1 data-plain className="dd-h1 whitespace-nowrap font-medium" style={{ fontSize: 'clamp(1.5rem, 6vw, 4.5rem)' }}>
+                      <span><BlurWords text={withoutTrailingPeriod(hero.line1)} delay={0.2} /></span>
+                      {' '}
+                      <span><BlurWords text={withoutTrailingPeriod(hero.line2)} delay={0.55} /></span>
                     </h1>
                   </div>
                   <nav aria-label="On this page" className="mb-3 flex gap-6 text-[13px] text-white/75">
-                    <a href="#programs" className="border-b border-white/30 pb-2 hover:text-white">Startup Programs <span aria-hidden="true">↓</span></a>
+                    <a href="#programs" className="border-b border-white/30 pb-2 hover:text-white">Programs <span aria-hidden="true">↓</span></a>
                     <a href="#projects" className="border-b border-white/30 pb-2 hover:text-white">Projects <span aria-hidden="true">↓</span></a>
                   </nav>
                 </div>
@@ -105,10 +106,11 @@ export default function ProgramsPage({ programs: programItems, projects, copy = 
               <div className="flex min-h-[100svh] items-center px-6 py-24 lg:px-10">
                 <div className="w-full max-w-[46rem]">
                   <ScrubText className="text-[clamp(1.375rem,2.2vw,2.2rem)] font-medium leading-[1.25] tracking-[-0.025em]" parts={[hero.body]} />
-                  <div className="mt-10 flex flex-wrap gap-8">
-                    <ArrowLink href="#programs">Explore Programs</ArrowLink>
-                    {activeCall?.application && <ExternalAction href={activeCall.application.href}>Apply Now</ExternalAction>}
-                  </div>
+                  {activeCall?.application && (
+                    <div className="mt-10 flex flex-wrap gap-8">
+                      <ExternalAction href={activeCall.application.href}>Apply Now</ExternalAction>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -145,7 +147,7 @@ export default function ProgramsPage({ programs: programItems, projects, copy = 
             <div className="relative mt-24 grid gap-10 border-t border-white/25 pt-10 md:grid-cols-12">
               {globalReach.figures.map((figure, i) => (
                 <Reveal key={figure.label} delay={i * 0.1} className="md:col-span-4">
-                  <p className="text-[clamp(5.5rem,11vw,11rem)] font-medium leading-none tracking-[-0.06em] tabular-nums"><ReachCountUp value={figure.value} delay={i * 0.12} /></p>
+                  <p className="text-[clamp(5.5rem,11vw,11rem)] font-medium leading-none tracking-[-0.06em] tabular-nums"><ReachCountUp value={figure.value} delay={i * 0.1} /></p>
                   <p className="mt-4 text-[20px] font-medium leading-[1.4] text-white">{figure.label}</p>
                   <p className="mt-2 max-w-xs text-[16px] leading-[1.6] text-white/85">{figure.detail}</p>
                 </Reveal>

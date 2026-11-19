@@ -61,7 +61,7 @@ export async function getHomePageContent() {
 
 export const defaultPlatformPage = {
   hero: defaultPlatformHero, transition: defaultTransition, impact: defaultImpact, missionVision: defaultMissionVision,
-  teamTitleOperational: 'Operational Team', teamTitleFounders: 'Founders', operationalTeam: defaultOps, founders: defaultFounders,
+  teamTitleOperational: 'Team', teamTitleFounders: 'Founders', operationalTeam: defaultOps, founders: defaultFounders,
   closing: defaultClosing,
 };
 export type PlatformPageContent = typeof defaultPlatformPage;
@@ -69,6 +69,9 @@ export async function getPlatformPageContent() {
   const record = await query<Partial<PlatformPageContent>>(`*[_type == "platformPage" && _id == "platformPage"][0]{"hero":{video,"poster":poster.asset->url,headline,body,primaryCta,"secondaryCta":{"label":secondaryCtaLabel,"href":secondaryCtaHref}},"transition":{"line1":line1,"line2Before":line2Before,"line2Accent":line2Accent,"scrollLabel":scrollLabel},"impact":impact[]{metric,label,support,"image":image.asset->url,position},"missionVision":{mission,vision},teamTitleOperational,teamTitleFounders,operationalTeam[]{name,role,"photo":photo.asset->url,linkedin},founders[]{name,role,"photo":photo.asset->url,linkedin},"closing":{"video":closingVideo,"poster":closingPoster.asset->url,"title":closingTitle,"body":closingBody,"primaryCta":closingPrimaryCta,"secondaryCta":closingSecondaryCta}}`, defaultPlatformPage);
   return {
     ...defaultPlatformPage, ...record,
+    teamTitleOperational: record.teamTitleOperational?.trim() === 'Operational Team'
+      ? defaultPlatformPage.teamTitleOperational
+      : record.teamTitleOperational || defaultPlatformPage.teamTitleOperational,
     hero: {
       ...defaultPlatformPage.hero,
       ...record.hero,

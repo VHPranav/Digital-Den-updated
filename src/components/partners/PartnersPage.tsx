@@ -1,9 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
+import { gsap } from '@/lib/gsap';
 import PageShell from '@/components/site/PageShell';
 import SplitWords from '@/components/site/SplitWords';
-import { Container, Figure, Label, PrimaryButton, Section, SectionHeader } from '@/components/site/ui';
+import { Container, Label, PrimaryButton, Section, SectionHeader } from '@/components/site/ui';
 import { FadeIn } from '@/components/FadeIn';
 import DottedWorldMap from './DottedWorldMap';
 import Image from 'next/image';
@@ -11,21 +12,82 @@ import type { Partner } from '@/lib/partners';
 
 // Content sourced from the Stitch "Partners" screen.
 
-// Nina's copy (12 Nov 2026): same two-card format, new purpose.
+// Nina's approved partnership copy and categories.
 const bridges = [
   {
+    image: '/images/events/networking.jpg',
+    alt: 'People connecting at a rooftop networking event',
     title: 'Who we partner with',
     body: 'Digital Den works with institutions, investors, accelerators, innovation hubs, corporations, universities, faculties and ecosystem organizations that share our goal of creating stronger opportunities for startups, founders and the wider innovation ecosystem.',
     tags: ['Institutions', 'Investors', 'Accelerators', 'Innovation hubs', 'Corporations', 'Ecosystem organizations', 'Universities & academia'],
-    image: '/images/partners/us.jpg',
   },
   {
+    image: '/images/programs/readiness.jpg',
+    alt: 'A workshop discussion around a shared table',
     title: 'How we work together',
     body: 'From startup programs and market access to events, sector initiatives, international projects and strategic collaborations, we build partnerships around shared goals and practical opportunities for impact.',
     tags: ['Programs', 'Market Access', 'Events', 'Projects', 'Strategic Initiatives'],
-    image: '/images/partners/europe.jpg',
   },
 ];
+
+function PartnershipStory() {
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    const media = gsap.matchMedia();
+    media.add('(min-width: 1024px) and (prefers-reduced-motion: no-preference)', () => {
+      const secondImage = root.querySelector('[data-story-image="1"]');
+      const secondChapter = root.querySelector('[data-story-chapter="1"]');
+      gsap.fromTo(secondImage, { opacity: 0 }, {
+        opacity: 1,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: secondChapter,
+          start: 'top 85%',
+          end: 'top 40%',
+          scrub: 0.6,
+          invalidateOnRefresh: true,
+        },
+      });
+    });
+    return () => media.revert();
+  }, []);
+
+  return (
+    <div ref={rootRef} className="mt-16 grid items-start gap-12 lg:mt-24 lg:grid-cols-2 lg:gap-20">
+      <div className="sticky top-28 hidden h-[min(70svh,760px)] overflow-hidden rounded-sm lg:block motion-reduce:hidden">
+        {bridges.map((chapter, index) => (
+          <div key={chapter.title} data-story-image={index} className="absolute inset-0" style={{ opacity: index === 0 ? 1 : 0 }}>
+            <Image src={chapter.image} alt={chapter.alt} fill sizes="50vw" className="object-cover" />
+          </div>
+        ))}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-black/5 to-transparent" />
+      </div>
+      <div className="lg:motion-reduce:col-span-2">
+        {bridges.map((chapter, index) => (
+          <article key={chapter.title} data-story-chapter={index} className="flex flex-col justify-center pb-20 last:pb-0 lg:min-h-[85svh] lg:py-16">
+            <div className="relative mb-10 aspect-[4/3] overflow-hidden lg:hidden motion-reduce:block">
+              <Image src={chapter.image} alt={chapter.alt} fill sizes="(min-width:1024px) 80vw, 100vw" className="object-cover" />
+            </div>
+            <FadeIn animation="slideUp">
+              <h3 className="dd-h2 max-w-md font-medium">{chapter.title}</h3>
+              <p className="mt-7 max-w-xl text-[17px] leading-[1.75] text-white/75">{chapter.body}</p>
+              <ul className="mt-9 flex flex-wrap gap-2.5" aria-label={`${chapter.title} categories`}>
+                {chapter.tags.map((tag) => (
+                  <li key={tag} className="rounded-full border border-purple-300/25 px-4 py-2 text-[13px] text-purple-100">
+                    {tag}
+                  </li>
+                ))}
+              </ul>
+            </FadeIn>
+          </article>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function LogoImg({ p, className = '' }: { p: Partner; className?: string }) {
   return <Image src={p.logo} alt={p.name} fill sizes="200px" draggable={false} className={`object-contain ${className}`} />;
@@ -77,46 +139,27 @@ export default function PartnersPage({ partners }: { partners: Partner[] }) {
             <div className="relative w-full px-6 pt-44 pb-20 md:px-10 xl:px-16 lg:pb-24">
               <div className="flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between">
                 <div>
-                  <FadeIn animation="fadeIn">
-                    <Label className="text-[12px] text-white/65">Strategic Alliances</Label>
-                  </FadeIn>
-                  <h1 className="dd-h1 mt-8 font-medium">
-                      <SplitWords>
-                        Global
-                        <br />
-                        <span className="gradient-text">Ecosystem</span>
-                      </SplitWords>
-                    </h1>
+                  <h1 className="dd-h1 whitespace-nowrap font-medium" style={{ fontSize: 'clamp(1.5rem, 5vw, 5.25rem)' }}>
+                    <SplitWords>
+                      Global <span className="gradient-text">Ecosystem</span>
+                    </SplitWords>
+                  </h1>
                 </div>
                 <FadeIn animation="slideUp" delay={0.3} className="lg:max-w-sm">
                   <p className="text-[17px] leading-[1.65] text-white/75">
-                    We&apos;ve architected a borderless infrastructure that connects local innovation with global
-                    capital. Our partners provide the regulatory, financial, and technical tailwinds required for
-                    high-stakes venture scaling.
+                    From local institutions and companies to regional and international organizations, Digital Den has
+                    developed a broad partner network that supports our work across markets, programs and initiatives.
                   </p>
                 </FadeIn>
               </div>
             </div>
           </section>
 
-          {/* ─── MARKET BRIDGES ─── */}
+          {/* ─── PARTNERSHIPS ─── */}
           <Section>
             <Container>
               <SectionHeader index="01" label="Partnerships" title="Built on shared goals" />
-              <div className="mt-24 grid grid-cols-1 lg:grid-cols-2 gap-x-16 gap-y-24">
-                {bridges.map(({ title, body: text, tags, image }, i) => (
-                  <FadeIn key={title} animation="slideUp" delay={i * 0.12} className={i === 1 ? 'lg:mt-40' : ''}>
-                    <article className="group">
-                      <Figure src={image} alt={title} sizes="(max-width: 1024px) 100vw, 580px" className="aspect-[4/5]" />
-                      <h3 className="dd-h3 mt-8 border-b border-white/[0.12] pb-6 font-semibold">{title}</h3>
-                      <p className="mt-6 max-w-lg text-[17px] leading-[1.65] text-white/75">{text}</p>
-                      <ul className="mt-8 flex max-w-lg flex-wrap gap-2" aria-label={`${title} categories`}>
-                        {tags.map((tag) => <li key={tag} className="rounded-full border border-purple-300/30 bg-purple-300/[0.06] px-4 py-1.5 text-[13px] text-purple-100">{tag}</li>)}
-                      </ul>
-                    </article>
-                  </FadeIn>
-                ))}
-              </div>
+              <PartnershipStory />
             </Container>
           </Section>
 
@@ -124,30 +167,26 @@ export default function PartnersPage({ partners }: { partners: Partner[] }) {
           <section aria-labelledby="partner-network-title" className="relative h-[100svh] min-h-[600px] w-full overflow-hidden">
             <PartnerDriftWall partners={partners} />
             {/* Progressive fade into the page from every edge; clicks pass through to the logos. */}
-            <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-[38%] bg-gradient-to-b from-[#0b0b0c] via-[#0b0b0c]/70 to-transparent" />
-            <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-[38%] bg-gradient-to-t from-[#0b0b0c] via-[#0b0b0c]/70 to-transparent" />
-            <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 left-0 w-[28%] bg-gradient-to-r from-[#0b0b0c] via-[#0b0b0c]/60 to-transparent" />
-            <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 w-[28%] bg-gradient-to-l from-[#0b0b0c] via-[#0b0b0c]/60 to-transparent" />
+            <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-[27%] bg-gradient-to-b from-[#0b0b0c] via-[#0b0b0c]/45 to-transparent" />
+            <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-[27%] bg-gradient-to-t from-[#0b0b0c] via-[#0b0b0c]/45 to-transparent" />
+            <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 left-0 w-[19%] bg-gradient-to-r from-[#0b0b0c] via-[#0b0b0c]/35 to-transparent" />
+            <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 w-[19%] bg-gradient-to-l from-[#0b0b0c] via-[#0b0b0c]/35 to-transparent" />
             <div className="pointer-events-none absolute inset-0 z-20 flex flex-col items-center justify-center px-6 text-center">
               <Label index="02" className="justify-center text-[12px] text-white/65">The Network</Label>
-              <h2 id="partner-network-title" className="dd-h1 mt-6 font-medium [filter:drop-shadow(0_4px_24px_rgba(0,0,0,.85))]"><SplitWords>Partner network</SplitWords></h2>
+              <h2 id="partner-network-title" data-plain className="dd-h1 mt-6 font-medium text-white [filter:drop-shadow(0_4px_24px_rgba(0,0,0,.85))]"><SplitWords>Partner network</SplitWords></h2>
             </div>
           </section>
 
           {/* ─── CTA ─── */}
           <Section bordered={false}>
             <Container className="text-center">
-              <Label className="justify-center">Alliance</Label>
-              <h2 className="dd-h2 mt-10 font-medium">
+              <h2 className="dd-h2 font-medium">
                 <SplitWords>
                   Become a <span className="gradient-text">Partner</span>
                 </SplitWords>
               </h2>
-              <p className="mx-auto mt-8 max-w-xl text-[17px] leading-[1.65] text-white/75">
-                Join an elite network of institutions building the next generation of global technology giants.
-              </p>
               <div className="mt-12 flex justify-center">
-                <PrimaryButton onClick={openAction}>Apply for Alliance</PrimaryButton>
+                <PrimaryButton onClick={openAction}>Join Now</PrimaryButton>
               </div>
             </Container>
           </Section>

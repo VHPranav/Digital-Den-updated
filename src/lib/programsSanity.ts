@@ -101,6 +101,29 @@ function withProjectDefaults(records: ProjectRecord[]): InternationalProject[] {
   });
 }
 
+function moveJordanToProjects(programs: StartupProgram[], projects: InternationalProject[]) {
+  const jordan = programs.find((program) => program.id === 'jordan' || program.title.trim() === 'Jordan Program');
+  const remainingProjects = projects.filter((project) => project.id !== 'bridge');
+  const bridge = projects.find((project) => project.id === 'bridge') ?? fallbackProjects.find((project) => project.id === 'bridge')!;
+  const visegrad = remainingProjects.find((project) => project.id === 'visegrad');
+  const nextOrder = remainingProjects
+    .filter((project) => project.order > (visegrad?.order ?? 10))
+    .reduce((minimum, project) => Math.min(minimum, project.order), Infinity);
+  const order = visegrad?.order ?? 10;
+
+  return {
+    programs: programs.filter((program) => program !== jordan),
+    projects: [...remainingProjects, {
+      ...bridge,
+      title: 'Bridge Project',
+      order: Number.isFinite(nextOrder) ? (order + nextOrder) / 2 : order + 10,
+      image: jordan?.image?.src ? { ...jordan.image, alt: 'Bridge Project' } : bridge.image,
+      description: bridge.description ?? jordan?.overview,
+      partners: bridge.partners.length ? bridge.partners : jordan?.partners ?? [],
+    }],
+  };
+}
+
 export async function getProgramsContent(): Promise<{
   programs: StartupProgram[];
   projects: InternationalProject[];
@@ -110,15 +133,15 @@ export async function getProgramsContent(): Promise<{
       querySanity<ProgramRecord>(programsQuery),
       querySanity<ProjectRecord>(projectsQuery),
     ]);
-    return {
-      programs: programRecords.length ? withProgramDefaults(programRecords) : fallbackPrograms,
+    return moveJordanToProjects(
+      programRecords.length ? withProgramDefaults(programRecords) : fallbackPrograms,
       // Local preview projects (dummy-*) are shown alongside CMS projects until removed from programsContent.ts.
-      projects: projectRecords.length
+      projectRecords.length
         ? [...withProjectDefaults(projectRecords), ...fallbackProjects.filter((p) => !projectRecords.some((r) => r.id === p.id))]
         : fallbackProjects,
-    };
+    );
   } catch (error) {
     console.warn('Unable to load Programs content from Sanity; using the approved local placeholders.', error);
-    return { programs: fallbackPrograms, projects: fallbackProjects };
+    return moveJordanToProjects(fallbackPrograms, fallbackProjects);
   }
 }

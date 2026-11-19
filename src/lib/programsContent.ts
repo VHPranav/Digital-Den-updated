@@ -98,12 +98,20 @@ export const startupPrograms: StartupProgram[] = [
   },
   { id: 'mtsb-europe', order: 20, title: 'MTSB Europe', status: null, image: { src: '/images/programs/europe.jpg', alt: 'MTSB Europe' }, benefits: [], partners: [], gallery: [], application: null },
   { id: 'mtsb-us', order: 30, title: 'MTSB US', status: null, image: { src: '/images/programs/us.jpg', alt: 'MTSB US' }, benefits: [], partners: [], gallery: [], application: null },
-  { id: 'jordan', order: 40, title: 'Jordan Program', status: null, image: { src: '/images/programs/jordan.jpg', alt: 'Jordan Program' }, benefits: [], partners: [], gallery: [], application: null },
 ];
 
 // DUMMY CONTENT (layout preview only) — real project details, logos, acknowledgements and links
 // must come from Digital Den via Sanity. Delete the preview-only projects (dummy-*) before launch.
 export const internationalProjects: InternationalProject[] = [
+  {
+    id: 'bridge',
+    order: 15,
+    title: 'Bridge Project',
+    image: { src: '/images/programs/jordan.jpg', alt: 'Bridge Project' },
+    partners: [],
+    funders: [],
+    requiresFundingVisibility: false,
+  },
   {
     id: 'visegrad',
     order: 10,

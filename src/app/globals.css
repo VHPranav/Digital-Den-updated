@@ -288,8 +288,8 @@ video.dd-media-grade, .dd-media-shade { pointer-events: none; }
 
 /* ─── Partners: logo marquee + filterable wall ─── */
 .drift-wall { position: absolute; inset: 0; overflow: hidden; perspective: 1200px;
-  -webkit-mask-image: linear-gradient(180deg, transparent, #000 14%, #000 86%, transparent), linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
-  -webkit-mask-composite: source-in; mask-image: linear-gradient(180deg, transparent, #000 14%, #000 86%, transparent), linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); mask-composite: intersect; }
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 11%, #000 89%, transparent), linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
+  -webkit-mask-composite: source-in; mask-image: linear-gradient(180deg, transparent, #000 11%, #000 89%, transparent), linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent); mask-composite: intersect; }
 .drift-wall-plane { position: absolute; left: 50%; top: 50%; display: flex; gap: 18px; transform: translate(-50%, -50%); }
 .drift-wall-col { width: 200px; height: 150vh; transform-style: preserve-3d; }
 .drift-wall-col:nth-child(even) { margin-top: 70px; }
