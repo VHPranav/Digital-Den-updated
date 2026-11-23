@@ -11,6 +11,7 @@ const EXIT_MS = 700; // fade/blur out
 // Site-wide "loader finished" flag, so pages can hold their intro animations
 // until the loader leaves. Stays true for client-side navigations afterwards.
 let loaderDone = false;
+let loaderGone = false;
 const listeners = new Set<() => void>();
 const subscribe = (cb: () => void) => {
   listeners.add(cb);
@@ -18,6 +19,10 @@ const subscribe = (cb: () => void) => {
 };
 export function useLoaderDone() {
   return useSyncExternalStore(subscribe, () => loaderDone, () => false);
+}
+
+export function useLoaderGone() {
+  return useSyncExternalStore(subscribe, () => loaderGone, () => false);
 }
 
 /**
@@ -40,7 +45,11 @@ export default function SiteLoader() {
       loaderDone = true;
       listeners.forEach((l) => l());
     }, holdMs);
-    const remove = window.setTimeout(() => setGone(true), holdMs + EXIT_MS + 100);
+    const remove = window.setTimeout(() => {
+      setGone(true);
+      loaderGone = true;
+      listeners.forEach((l) => l());
+    }, holdMs + EXIT_MS + 100);
 
     return () => {
       window.clearTimeout(leave);

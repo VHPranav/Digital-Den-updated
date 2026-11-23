@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { useLoaderGone } from '@/components/site/SiteLoader';
 import PageShell from '@/components/site/PageShell';
 import SplitWords from '@/components/site/SplitWords';
 import { ArrowLink, BgVideo, BlurWords, PAGE_BG, Reveal } from '@/components/site/editorial';
@@ -13,30 +14,38 @@ import type { ProgramsPageCopy } from '@/lib/sitePagesSanity';
 
 // Wait for the enclosing Reveal to finish before counting, so the steps are visible.
 function ReachCountUp({ value, delay = 0 }: { value: string; delay?: number }) {
-  const [ref, inView] = useInView({ triggerOnce: true, rootMargin: '-80px' });
+  const [ref, inView] = useInView({ rootMargin: '-80px' });
+  const loaderGone = useLoaderGone();
+  const completed = useRef(false);
   const parts = value.match(/^([^\d.,-]*)(\d+)([^\d.,]*)$/);
   const [count, setCount] = useState(0);
 
   useEffect(() => {
-    if (!inView || !parts) return;
-    const target = Number(parts[2]);
+    if (!loaderGone || !inView || completed.current) return;
+    const match = value.match(/^([^\d.,-]*)(\d+)([^\d.,]*)$/);
+    if (!match) return;
+    const target = Number(match[2]);
     if (!Number.isSafeInteger(target) || target === 0) return;
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let frame = 0;
     const startTimer = window.setTimeout(() => {
-      if (reduced) { setCount(target); return; }
+      if (reduced) {
+        setCount(target);
+        completed.current = true;
+        return;
+      }
       const start = performance.now();
       const tick = (now: number) => {
         const progress = Math.min((now - start) / 1800, 1);
         const easedProgress = 1 - (1 - progress) ** 3;
         setCount(Math.round(target * easedProgress));
         if (progress < 1) frame = requestAnimationFrame(tick);
+        else completed.current = true;
       };
       frame = requestAnimationFrame(tick);
     }, reduced ? 0 : 1100 + delay * 1000);
     return () => { window.clearTimeout(startTimer); cancelAnimationFrame(frame); };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView, value, delay]);
+  }, [loaderGone, inView, value, delay]);
 
   const shown = parts ? parts[1] + String(count).padStart(parts[2].length, '0') + parts[3] : value;
   return (
