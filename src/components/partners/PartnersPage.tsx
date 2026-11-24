@@ -1,10 +1,9 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
-import { gsap } from '@/lib/gsap';
+import React from 'react';
 import PageShell from '@/components/site/PageShell';
 import SplitWords from '@/components/site/SplitWords';
-import { Container, Label, PrimaryButton, Section, SectionHeader } from '@/components/site/ui';
+import { Container, Label, PrimaryButton, Section } from '@/components/site/ui';
 import { FadeIn } from '@/components/FadeIn';
 import DottedWorldMap from './DottedWorldMap';
 import Image from 'next/image';
@@ -16,14 +15,14 @@ import type { Partner } from '@/lib/partners';
 const bridges = [
   {
     image: '/images/events/networking.jpg',
-    alt: 'People connecting at a rooftop networking event',
+    alt: 'People connecting at a networking event',
     title: 'Who we partner with',
     body: 'Digital Den works with institutions, investors, accelerators, innovation hubs, corporations, universities, faculties and ecosystem organizations that share our goal of creating stronger opportunities for startups, founders and the wider innovation ecosystem.',
     tags: ['Institutions', 'Investors', 'Accelerators', 'Innovation hubs', 'Corporations', 'Ecosystem organizations', 'Universities & academia'],
   },
   {
     image: '/images/programs/readiness.jpg',
-    alt: 'A workshop discussion around a shared table',
+    alt: 'A collaborative workshop around a shared table',
     title: 'How we work together',
     body: 'From startup programs and market access to events, sector initiatives, international projects and strategic collaborations, we build partnerships around shared goals and practical opportunities for impact.',
     tags: ['Programs', 'Market Access', 'Events', 'Projects', 'Strategic Initiatives'],
@@ -31,56 +30,36 @@ const bridges = [
 ];
 
 function PartnershipStory() {
-  const rootRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const root = rootRef.current;
-    if (!root) return;
-    const media = gsap.matchMedia();
-    media.add('(min-width: 1024px) and (prefers-reduced-motion: no-preference)', () => {
-      const secondImage = root.querySelector('[data-story-image="1"]');
-      const secondChapter = root.querySelector('[data-story-chapter="1"]');
-      gsap.fromTo(secondImage, { opacity: 0 }, {
-        opacity: 1,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: secondChapter,
-          start: 'top 85%',
-          end: 'top 40%',
-          scrub: 0.6,
-          invalidateOnRefresh: true,
-        },
-      });
-    });
-    return () => media.revert();
-  }, []);
-
   return (
-    <div ref={rootRef} className="mt-16 grid items-start gap-12 lg:mt-24 lg:grid-cols-2 lg:gap-20">
-      <div className="sticky top-28 hidden h-[min(70svh,760px)] overflow-hidden rounded-sm lg:block motion-reduce:hidden">
-        {bridges.map((chapter, index) => (
-          <div key={chapter.title} data-story-image={index} className="absolute inset-0" style={{ opacity: index === 0 ? 1 : 0 }}>
-            <Image src={chapter.image} alt={chapter.alt} fill sizes="50vw" className="object-cover" />
-          </div>
-        ))}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-black/5 to-transparent" />
+    <div className="grid gap-14 lg:grid-cols-12 lg:gap-12 xl:gap-20">
+      <div className="lg:col-span-4">
+        <div className="lg:sticky lg:top-32">
+          <FadeIn animation="slideUp">
+            <p className="mb-6 text-[12px] uppercase tracking-[0.2em] text-purple-200">Partnerships</p>
+            <h2 className="dd-h2 max-w-md font-medium"><SplitWords>Built on shared goals</SplitWords></h2>
+          </FadeIn>
+        </div>
       </div>
-      <div className="lg:motion-reduce:col-span-2">
-        {bridges.map((chapter, index) => (
-          <article key={chapter.title} data-story-chapter={index} className="flex flex-col justify-center pb-20 last:pb-0 lg:min-h-[85svh] lg:py-16">
-            <div className="relative mb-10 aspect-[4/3] overflow-hidden lg:hidden motion-reduce:block">
-              <Image src={chapter.image} alt={chapter.alt} fill sizes="(min-width:1024px) 80vw, 100vw" className="object-cover" />
-            </div>
-            <FadeIn animation="slideUp">
-              <h3 className="dd-h2 max-w-md font-medium">{chapter.title}</h3>
-              <p className="mt-7 max-w-xl text-[17px] leading-[1.75] text-white/75">{chapter.body}</p>
-              <ul className="mt-9 flex flex-wrap gap-2.5" aria-label={`${chapter.title} categories`}>
-                {chapter.tags.map((tag) => (
-                  <li key={tag} className="rounded-full border border-purple-300/25 px-4 py-2 text-[13px] text-purple-100">
-                    {tag}
-                  </li>
-                ))}
-              </ul>
+      <div className="space-y-16 lg:col-span-8 lg:space-y-20">
+        {bridges.map((chapter) => (
+          <article key={chapter.title} aria-label={chapter.title} className="border-t border-white/15 pt-8 lg:border-l lg:border-t-0 lg:border-purple-300/20 lg:pl-8 lg:pt-0 xl:pl-12">
+            <FadeIn animation="slideUp" className="grid gap-8 md:grid-cols-2 xl:gap-12">
+              <div>
+                <h3 className="dd-h3 max-w-xs font-medium text-white">{chapter.title}</h3>
+                <ul className="mt-7 flex flex-wrap gap-2" aria-label={`${chapter.title} categories`}>
+                  {chapter.tags.map((tag) => (
+                    <li key={tag} className="rounded-full border border-purple-300/25 bg-purple-300/[0.04] px-3 py-2 text-[12px] leading-snug text-purple-100">
+                      {tag}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <div className="relative aspect-[8/5] overflow-hidden rounded-sm">
+                  <Image src={chapter.image} alt={chapter.alt} fill sizes="(min-width:1280px) 320px, (min-width:768px) 40vw, 100vw" className="object-cover" />
+                </div>
+                <p className="mt-5 text-[16px] leading-[1.75] text-white/80">{chapter.body}</p>
+              </div>
             </FadeIn>
           </article>
         ))}
@@ -158,7 +137,6 @@ export default function PartnersPage({ partners }: { partners: Partner[] }) {
           {/* ─── PARTNERSHIPS ─── */}
           <Section>
             <Container>
-              <SectionHeader index="01" label="Partnerships" title="Built on shared goals" />
               <PartnershipStory />
             </Container>
           </Section>

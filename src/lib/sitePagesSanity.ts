@@ -1,6 +1,7 @@
 import { impactSlides as defaultImpact, platformClosing as defaultClosing, platformHero as defaultPlatformHero, platformTransition as defaultTransition, missionVision as defaultMissionVision, operationalTeam as defaultOps, founders as defaultFounders } from '@/lib/platformContent';
 import { programsCopy as defaultProgramsCopy } from '@/lib/programsContent';
 import { contact as defaultContact, legal as defaultLegal } from '@/lib/homeContent';
+import { defaultServicesContent, type ServicesPageContent } from '@/lib/servicesContent';
 
 const API_VERSION = '2025-02-19';
 const PROJECT = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'inise1vg';
@@ -17,6 +18,38 @@ async function query<T>(queryText: string, fallback: T): Promise<T> {
     console.warn('Unable to load page content from Sanity; using approved local content.', error);
     return fallback;
   }
+}
+
+export async function getServicesPageContent(): Promise<ServicesPageContent> {
+  const record = await query<Partial<ServicesPageContent>>(
+    '*[_type == "servicesPage" && _id == "servicesPage"][0]{hero,chapters[]{id,title,description,"image":{"src":image.asset->url,"alt":image.alt},keyServices,extendedServices,addOns,bestFor},glance[]{label,text},closing}',
+    defaultServicesContent,
+  );
+
+  return {
+    hero: {
+      title: record.hero?.title || defaultServicesContent.hero.title,
+      body: record.hero?.body || defaultServicesContent.hero.body,
+    },
+    chapters: defaultServicesContent.chapters.map((fallback) => {
+      const chapter = record.chapters?.find((item) => item.id === fallback.id);
+      return {
+        ...fallback,
+        title: chapter?.title || fallback.title,
+        description: chapter?.description || fallback.description,
+        image: chapter?.image?.src ? chapter.image : fallback.image,
+        keyServices: chapter?.keyServices ?? fallback.keyServices,
+        extendedServices: chapter?.extendedServices ?? fallback.extendedServices,
+        addOns: chapter?.addOns ?? fallback.addOns,
+        bestFor: chapter?.bestFor ?? fallback.bestFor,
+      };
+    }),
+    glance: record.glance?.length ? record.glance : defaultServicesContent.glance,
+    closing: {
+      title: record.closing?.title || defaultServicesContent.closing.title,
+      body: record.closing?.body || defaultServicesContent.closing.body,
+    },
+  };
 }
 
 export type HomeCard = { title: string; body: string; cta: string; href: string; image: string; position?: string };
