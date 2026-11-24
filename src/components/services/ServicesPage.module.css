@@ -41,7 +41,6 @@
   padding: clamp(64px, 8vw, 124px) 40px 0;
   scroll-margin-top: 90px;
 }
-.overview > h2 { margin-bottom: clamp(30px, 5vw, 64px); }
 .serviceStory {
   display: grid;
   grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr);

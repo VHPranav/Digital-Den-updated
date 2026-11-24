@@ -146,8 +146,7 @@ function ServiceOverview({ chapters }: Pick<ServicesPageContent, 'chapters'>) {
   }, [chapters]);
 
   return (
-    <section id="services-overview" aria-labelledby="services-overview-title" className={styles.overview}>
-      <h2 id="services-overview-title" className="dd-h2 font-medium">How we can help</h2>
+    <section id="services-overview" className={styles.overview}>
       <div className={styles.serviceStory}>
         <div className={styles.stickyPanel} aria-hidden="true">
           <div className={styles.serviceImages}>
