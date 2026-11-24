@@ -197,6 +197,10 @@ export default function ServicesPage({ content = defaultServicesContent }: { con
             </div>
           </section>
 
+          <div className={styles.programsClarification}>
+            <p>Our programs follow a <strong>defined structure and timeline.</strong> Our services are tailored around the <strong>specific needs, stage and goals</strong> of each client.</p>
+          </div>
+
           <ServiceOverview chapters={content.chapters} />
 
           <section className={styles.glance} aria-label="Services at a glance">

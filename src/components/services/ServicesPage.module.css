@@ -17,6 +17,24 @@
 .exploreLink { display: inline-flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid #ffffff45; font-size: 13px; transition: border-color .25s, color .25s; }
 .exploreLink:hover { color: var(--accent); border-color: var(--accent); }
 .page a:focus-visible, .page button:focus-visible { outline: 2px solid var(--teal); outline-offset: 6px; }
+.programsClarification {
+  display: grid;
+  place-items: center;
+  min-height: 50vh;
+  padding: 32px 24px;
+  text-align: center;
+  color: #c6c1cd;
+  font-size: clamp(28px, 3.2vw, 44px);
+  line-height: 1.3;
+}
+.programsClarification p { max-width: 34ch; text-wrap: pretty; }
+.programsClarification strong {
+  color: transparent;
+  background: linear-gradient(100deg, #ffffff 8%, #e4d5ff 52%, #c4a0ff 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  font-weight: 600;
+}
 .overview {
   max-width: 1480px;
   margin: auto;
