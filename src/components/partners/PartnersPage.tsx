@@ -1,6 +1,7 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { gsap, ScrollTrigger } from '@/lib/gsap';
 import PageShell from '@/components/site/PageShell';
 import SplitWords from '@/components/site/SplitWords';
 import { Container, Label, PrimaryButton, Section } from '@/components/site/ui';
@@ -14,57 +15,192 @@ import type { Partner } from '@/lib/partners';
 // Nina's approved partnership copy and categories.
 const bridges = [
   {
-    image: '/images/events/networking.jpg',
-    alt: 'People connecting at a networking event',
     title: 'Who we partner with',
     body: 'Digital Den works with institutions, investors, accelerators, innovation hubs, corporations, universities, faculties and ecosystem organizations that share our goal of creating stronger opportunities for startups, founders and the wider innovation ecosystem.',
     tags: ['Institutions', 'Investors', 'Accelerators', 'Innovation hubs', 'Corporations', 'Ecosystem organizations', 'Universities & academia'],
   },
   {
-    image: '/images/programs/readiness.jpg',
-    alt: 'A collaborative workshop around a shared table',
     title: 'How we work together',
     body: 'From startup programs and market access to events, sector initiatives, international projects and strategic collaborations, we build partnerships around shared goals and practical opportunities for impact.',
     tags: ['Programs', 'Market Access', 'Events', 'Projects', 'Strategic Initiatives'],
   },
 ];
 
+// The approved “Universities & academia” category appears as two terms in the statement.
+const academicTerms = ['universities', 'faculties'];
+const partnerPhrases = bridges[0].tags.flatMap((tag) =>
+  tag.includes(' & ') ? academicTerms : [tag.toLowerCase()],
+);
+const podgoricaTime = new Intl.DateTimeFormat('en-GB', {
+  timeZone: 'Europe/Podgorica',
+  hour: '2-digit',
+  minute: '2-digit',
+  hourCycle: 'h23',
+});
+
+function getStatementParts(body: string) {
+  const pattern = new RegExp(`(\\b(?:${partnerPhrases.join('|')})\\b)`, 'gi');
+
+  // Preserve the original whitespace and keep each category phrase on one reveal beat.
+  return body.split(pattern).flatMap((part, index) =>
+    index % 2
+      ? [{ text: part, category: true }]
+      : (part.match(/\s+|\S+/g) ?? []).map((text) => ({ text, category: false })),
+  );
+}
+
 function PartnershipStory() {
+  const [partners, collaboration] = bridges;
+  const root = useRef<HTMLElement>(null);
+  const statement = useRef<HTMLParagraphElement>(null);
+  const pathway = useRef<HTMLElement>(null);
+  const viewport = useRef<HTMLDivElement>(null);
+  const track = useRef<HTMLOListElement>(null);
+  const [time, setTime] = useState('');
+
+  useEffect(() => {
+    function updateTime() {
+      setTime(podgoricaTime.format(new Date()));
+    }
+    updateTime();
+    const interval = window.setInterval(updateTime, 30_000);
+    return () => window.clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    let disposed = false;
+    const context = gsap.context(() => {
+      const media = gsap.matchMedia();
+      media.add('(min-width: 768px) and (prefers-reduced-motion: no-preference)', () => {
+        const scene = pathway.current;
+        const windowEl = viewport.current;
+        const row = track.current;
+        const paragraph = statement.current;
+        if (!scene || !windowEl || !row || !paragraph) return;
+
+        scene.classList.add('partners-kinetic__pathway--animated');
+        const words = Array.from(paragraph.querySelectorAll<HTMLElement>('[data-reveal-word]'));
+        const reveal = gsap.timeline({
+          scrollTrigger: { trigger: paragraph, start: 'top 75%', end: 'bottom 45%', scrub: true },
+        });
+        words.forEach((word, index) => {
+          reveal.fromTo(word, { color: 'rgba(255,255,255,.15)' }, {
+            color: word.hasAttribute('data-category') ? '#d8b4fe' : '#fff',
+            duration: 1,
+            ease: 'none',
+          }, index * 0.65);
+        });
+
+        const items = Array.from(row.children) as HTMLElement[];
+        let centers: number[] = [];
+        let midpoint = 0;
+        let start = 0;
+        let distance = 0;
+        let active: HTMLElement | undefined;
+
+        function measure() {
+          centers = items.map((item) => item.offsetLeft + item.offsetWidth / 2);
+          midpoint = windowEl!.clientWidth / 2;
+          start = midpoint - centers[0];
+          distance = centers[centers.length - 1] - centers[0];
+        }
+
+        function setActive(progress: number) {
+          const center = midpoint - start + progress * distance;
+          const index = centers.reduce((nearest, position, i) =>
+            Math.abs(position - center) < Math.abs(centers[nearest] - center) ? i : nearest, 0);
+          const next = items[index];
+          if (next === active) return;
+          active?.classList.remove('is-active');
+          next.classList.add('is-active');
+          active = next;
+        }
+
+        measure();
+        setActive(0);
+        const travel = gsap.timeline({
+          defaults: { duration: 1, ease: 'none' },
+          scrollTrigger: {
+            trigger: scene,
+            start: 'top top',
+            end: () => `+=${distance}`,
+            pin: true,
+            scrub: true,
+            invalidateOnRefresh: true,
+            onRefreshInit: measure,
+            onRefresh: (trigger) => setActive(trigger.progress),
+            onUpdate: (trigger) => setActive(trigger.progress),
+          },
+        });
+        travel.fromTo(row, { '--track-x': () => `${start}px` }, {
+          '--track-x': () => `${start - distance}px`,
+        }, 0);
+
+        return () => {
+          active?.classList.remove('is-active');
+          scene.classList.remove('partners-kinetic__pathway--animated');
+        };
+      });
+    }, root);
+
+    void document.fonts.ready.then(() => {
+      if (!disposed) ScrollTrigger.refresh();
+    });
+
+    return () => {
+      disposed = true;
+      context.revert();
+    };
+  }, []);
+
   return (
-    <div className="grid gap-14 lg:grid-cols-12 lg:gap-12 xl:gap-20">
-      <div className="lg:col-span-4">
-        <div className="lg:sticky lg:top-32">
-          <FadeIn animation="slideUp">
-            <p className="mb-6 text-[12px] uppercase tracking-[0.2em] text-purple-200">Partnerships</p>
-            <h2 className="dd-h2 max-w-md font-medium"><SplitWords>Built on shared goals</SplitWords></h2>
-          </FadeIn>
+    <section ref={root} data-noreveal className="partners-kinetic" aria-labelledby="partnership-story-title">
+      <header className="sr-only">
+        <p>Partnerships</p>
+        <h2 id="partnership-story-title">Built on shared goals</h2>
+      </header>
+      <article aria-labelledby="partnership-categories-title" className="partners-kinetic__statement">
+        <Container>
+          <div className="flex flex-wrap items-baseline gap-x-8 gap-y-3">
+            <Label as="h2" id="partnership-categories-title" className="text-purple-300">{partners.title}</Label>
+            <p className="min-h-[1.5em] text-[15px] text-white/55 tabular-nums">
+              {time && `Right now, it's ${time} in Podgorica.`}
+            </p>
+          </div>
+          <p ref={statement} className="partners-kinetic__copy font-medium text-[clamp(1.75rem,3.6vw,3.5rem)] leading-[1.15] tracking-[-0.03em]">
+            {getStatementParts(partners.body).map(({ text, category }, index) =>
+              /^\s+$/.test(text) ? text : (
+                <span key={index} data-reveal-word data-category={category || undefined}>
+                  {category ? text.split(' ').map((word, wordIndex) => (
+                    <React.Fragment key={wordIndex}>{wordIndex > 0 && ' '}{word}</React.Fragment>
+                  )) : text}
+                </span>
+              ),
+            )}
+          </p>
+        </Container>
+      </article>
+
+      <article ref={pathway} aria-labelledby="partnership-collaboration-title" className="partners-kinetic__pathway">
+        <Container>
+          <h2 id="partnership-collaboration-title" className="dd-h2 font-medium">{collaboration.title}</h2>
+          <p className="mt-6 max-w-md text-[17px] leading-[1.65] text-white/75">{collaboration.body}</p>
+        </Container>
+        <div ref={viewport} className="partners-kinetic__viewport">
+          <ol ref={track} className="partners-kinetic__track" aria-label="Collaboration areas">
+            {collaboration.tags.map((tag, index) => (
+              <li key={tag} className="partners-kinetic__step">
+                <span aria-hidden="true" className="partners-kinetic__index">{String(index + 1).padStart(2, '0')}</span>
+                <span className="partners-kinetic__name">{tag}</span>
+                {index < collaboration.tags.length - 1 && (
+                  <span aria-hidden="true" className="partners-kinetic__separator">→</span>
+                )}
+              </li>
+            ))}
+          </ol>
         </div>
-      </div>
-      <div className="space-y-16 lg:col-span-8 lg:space-y-20">
-        {bridges.map((chapter) => (
-          <article key={chapter.title} aria-label={chapter.title} className="border-t border-white/15 pt-8 lg:border-l lg:border-t-0 lg:border-purple-300/20 lg:pl-8 lg:pt-0 xl:pl-12">
-            <FadeIn animation="slideUp" className="grid gap-8 md:grid-cols-2 xl:gap-12">
-              <div>
-                <h3 className="dd-h3 max-w-xs font-medium text-white">{chapter.title}</h3>
-                <ul className="mt-7 flex flex-wrap gap-2" aria-label={`${chapter.title} categories`}>
-                  {chapter.tags.map((tag) => (
-                    <li key={tag} className="rounded-full border border-purple-300/25 bg-purple-300/[0.04] px-3 py-2 text-[12px] leading-snug text-purple-100">
-                      {tag}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <div className="relative aspect-[8/5] overflow-hidden rounded-sm">
-                  <Image src={chapter.image} alt={chapter.alt} fill sizes="(min-width:1280px) 320px, (min-width:768px) 40vw, 100vw" className="object-cover" />
-                </div>
-                <p className="mt-5 text-[16px] leading-[1.75] text-white/80">{chapter.body}</p>
-              </div>
-            </FadeIn>
-          </article>
-        ))}
-      </div>
-    </div>
+      </article>
+    </section>
   );
 }
 
@@ -135,11 +271,7 @@ export default function PartnersPage({ partners }: { partners: Partner[] }) {
           </section>
 
           {/* ─── PARTNERSHIPS ─── */}
-          <Section>
-            <Container>
-              <PartnershipStory />
-            </Container>
-          </Section>
+          <PartnershipStory />
 
           {/* ─── PARTNER NETWORK: full-viewport drift wall with the title centred on top ─── */}
           <section aria-labelledby="partner-network-title" className="relative h-[100svh] min-h-[600px] w-full overflow-hidden">

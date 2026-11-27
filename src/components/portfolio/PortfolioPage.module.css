@@ -1,0 +1,52 @@
+.page { background: #0b0b0c; color: #f3f0ea; }
+
+/* Hero logos (motion lives in site/FlowWall) */
+.wallItem { --logo: clamp(84px, 8.5vw, 140px); width: calc(var(--logo) * var(--size)); aspect-ratio: 2 / 1; }
+.wallLogo { position: absolute; inset: 0; filter: grayscale(1) invert(1) contrast(1.4) sepia(.55) saturate(3.2) hue-rotate(215deg) brightness(1.05); }
+.heroBody { margin: 24px auto 0; max-width: 30rem; font-size: 18px; line-height: 1.6; color: rgb(255 255 255 / .78); }
+
+/* Showcase: Cyera-style cards. Deep purple panel, every logo recoloured to one lavender tone. */
+.showcase { position: relative; z-index: 1; max-width: 1088px; margin: 0 auto; padding: 24px 0 160px; }
+.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.item { opacity: 0; translate: 0 24px; transition: opacity .6s ease, translate .6s cubic-bezier(.2,.7,.2,1); transition-delay: var(--d); }
+.item[data-in] { opacity: 1; translate: 0 0; }
+
+.tile { display: flex; flex-direction: column; height: 100%; padding: 10px 10px 30px; border-radius: 20px; color: inherit;
+  background: #121015; border: 1px solid rgb(255 255 255 / .07); transition: border-color .35s, background .35s, translate .35s; }
+.panel { position: relative; aspect-ratio: 330 / 173; border-radius: 12px; overflow: hidden; isolation: isolate;
+  background: radial-gradient(120% 90% at 50% 0%, #4a2577 0%, #2a1442 45%, #170c24 100%); }
+.panel::after { content: ''; position: absolute; inset: 0; background: radial-gradient(60% 60% at 50% 50%, rgb(216 180 254 / .14), transparent 70%); opacity: 0; transition: opacity .4s; }
+/* Works for transparent PNGs and logos on white: greyscale + invert turns dark marks light and the
+   white background black, which the screen blend then drops; sepia/hue-rotate tints it lavender. */
+.logo { position: absolute; left: 50%; top: 50%; width: 56%; height: 50%; translate: -50% -50%; z-index: 1;
+  filter: grayscale(1) invert(1) contrast(1.4) sepia(.55) saturate(3.2) hue-rotate(215deg) brightness(1.05);
+  mix-blend-mode: screen; transition: scale .45s cubic-bezier(.2,.7,.2,1); }
+.chip { position: absolute; top: 12px; right: 12px; z-index: 2; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%;
+  background: #64dfd0; color: #0b0b0c; opacity: 0; scale: .8; transition: opacity .3s, scale .3s; }
+.meta { padding: 16px 10px 0; }
+.sector { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 12px; line-height: 1.4; color: #d8b4fe;
+  background: rgb(216 180 254 / .08); border: 1px solid rgb(216 180 254 / .18); }
+.name { margin-top: 12px; font-size: 18px; line-height: 1.35; font-weight: 500; letter-spacing: -.01em; color: rgb(255 255 255 / .92); }
+.description { margin-top: 6px; font-size: 14px; line-height: 1.6; color: rgb(255 255 255 / .68);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+.tile:hover, .tile:focus-visible { border-color: rgb(216 180 254 / .28); background: #16131b; }
+.tile:hover .panel::after, .tile:focus-visible .panel::after { opacity: 1; }
+.tile:hover .logo, .tile:focus-visible .logo { scale: 1.05; }
+.tile:hover .chip, .tile:focus-visible .chip { opacity: 1; scale: 1; }
+a.tile:focus-visible { outline: 2px solid #64dfd0; outline-offset: 4px; }
+
+/* Final CTA */
+.closing { padding: 120px 24px 160px; text-align: center; background: radial-gradient(ellipse at 50% 100%, #733cc71c, transparent 62%); }
+
+@media (max-width: 1023px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 1136px) { .showcase { padding-left: 24px; padding-right: 24px; } }
+@media (max-width: 639px) {
+  .wallItem { --logo: 56px; }
+  .showcase { padding-top: 56px; padding-bottom: 96px; }
+  .grid { grid-template-columns: 1fr; gap: 18px; }
+  .closing { padding: 80px 24px 110px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .item { opacity: 1; translate: none; transition: none; }
+}

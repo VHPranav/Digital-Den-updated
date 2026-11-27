@@ -29,9 +29,9 @@ export function Section({
   );
 }
 
-export function Label({ index, children, className = '' }: { index?: string; children: React.ReactNode; className?: string }) {
+export function Label({ as: Element = 'div', id, index, children, className = '' }: { as?: 'div' | 'h2'; id?: string; index?: string; children: React.ReactNode; className?: string }) {
   return (
-    <div className={`flex items-center gap-4 text-[11px] font-medium uppercase tracking-[0.28em] text-white/40 ${className}`}>
+    <Element id={id} className={`flex items-center gap-4 text-[11px] font-medium uppercase tracking-[0.28em] text-white/40 ${className}`}>
       {index && (
         <>
           <span className="tabular-nums text-white/70">{index}</span>
@@ -39,7 +39,7 @@ export function Label({ index, children, className = '' }: { index?: string; chi
         </>
       )}
       <span>{children}</span>
-    </div>
+    </Element>
   );
 }
 

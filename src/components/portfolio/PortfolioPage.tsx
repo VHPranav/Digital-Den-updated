@@ -1,158 +1,87 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef } from 'react';
+import Image from 'next/image';
+import { ArrowUpRight } from 'lucide-react';
 import PageShell from '@/components/site/PageShell';
 import SplitWords from '@/components/site/SplitWords';
-import { Container, Figure, Label, PrimaryButton, Section, Tabs, TextLink, body, display, lead } from '@/components/site/ui';
-import { FadeIn } from '@/components/FadeIn';
+import { PrimaryButton } from '@/components/site/ui';
+import FlowWall from '@/components/site/FlowWall';
+import type { PortfolioStartup } from '@/lib/portfolio';
+import styles from './PortfolioPage.module.css';
 
-// Content sourced from the Stitch "Portfolio" screen.
+function StartupTile({ startup }: { startup: PortfolioStartup }) {
+  const inner = (
+    <>
+      <div className={styles.panel}>
+        <span className={styles.logo}>
+          <Image src={startup.logo} alt={`${startup.name} logo`} fill sizes="(max-width: 640px) 70vw, 260px" className="object-contain" />
+        </span>
+        {startup.website && <span className={styles.chip} aria-hidden="true"><ArrowUpRight size={16} /></span>}
+      </div>
+      <div className={styles.meta}>
+        {startup.sector && <p className={styles.sector}>{startup.sector}</p>}
+        <h2 data-plain className={styles.name}>{startup.name}</h2>
+        {startup.description && <p className={styles.description}>{startup.description}</p>}
+      </div>
+    </>
+  );
+  return startup.website ? (
+    <a href={startup.website} target="_blank" rel="noopener noreferrer" aria-label={`${startup.name} website (opens in a new tab)`} className={styles.tile}>{inner}</a>
+  ) : (
+    <article className={styles.tile}>{inner}</article>
+  );
+}
 
-type Category = 'all' | 'ai' | 'saas' | 'fintech' | 'blockchain';
+export default function PortfolioPage({ startups }: { startups: PortfolioStartup[] }) {
+  const gridRef = useRef<HTMLUListElement>(null);
 
-const ventures: { name: string; sector: string; body: string; image: string; categories: Category[] }[] = [
-  {
-    name: 'DataMesh',
-    sector: 'Data Infra',
-    body: 'Next-generation decentralized data fabric for real-time enterprise intelligence. Scaling the future of trustless computation.',
-    image: '/images/portfolio/datamesh.jpg',
-    categories: ['saas', 'blockchain'],
-  },
-  {
-    name: 'EcoTrace',
-    sector: 'ClimateTech',
-    body: 'Carbon accountability platform utilizing computer vision and satellite telemetry. Transforming ESG from reports to reality.',
-    image: '/images/portfolio/ecotrace.jpg',
-    categories: ['ai', 'saas'],
-  },
-  {
-    name: 'PayDen',
-    sector: 'FinTech',
-    body: 'Global liquidity layer for borderless venture capital. Institutional-grade settlements at the speed of the digital economy.',
-    image: '/images/portfolio/payden.jpg',
-    categories: ['fintech', 'blockchain'],
-  },
-  {
-    name: 'NeuralNexus',
-    sector: 'AI / ML',
-    body: 'Self-optimizing cognitive models for automated venture scouting. Predicting market shifts before they enter the zeitgeist.',
-    image: '/images/portfolio/neuralnexus.jpg',
-    categories: ['ai'],
-  },
-  {
-    name: 'VoidOps',
-    sector: 'DevTools',
-    body: 'Zero-latency deployment platform for edge-native applications. Eliminate the cloud tax with hyper-efficient architecture.',
-    image: '/images/portfolio/voidops.jpg',
-    categories: ['saas'],
-  },
-  {
-    name: 'SynthLegal',
-    sector: 'LegalTech',
-    body: 'Automated smart-contract verification and regulatory mapping for global startups. Legal expertise at the speed of code.',
-    image: '/images/portfolio/synthlegal.jpg',
-    categories: ['ai', 'blockchain'],
-  },
-];
-
-const categoryLabels: { key: Category; label: string }[] = [
-  { key: 'all', label: 'All Startups' },
-  { key: 'ai', label: 'Artificial Intelligence' },
-  { key: 'saas', label: 'SaaS' },
-  { key: 'fintech', label: 'FinTech' },
-  { key: 'blockchain', label: 'Blockchain' },
-];
-
-export default function PortfolioPage() {
-  const [category, setCategory] = useState<Category>('all');
-  const visible = ventures.filter((v) => category === 'all' || v.categories.includes(category));
-  const tabs = categoryLabels.map((c) => ({
-    ...c,
-    count: ventures.filter((v) => c.key === 'all' || v.categories.includes(c.key)).length,
-  }));
+  // Fade tiles up as they enter, staggered by column.
+  useEffect(() => {
+    const items = Array.from(gridRef.current?.children ?? []) as HTMLElement[];
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      items.forEach((el) => el.setAttribute('data-in', ''));
+      return;
+    }
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.setAttribute('data-in', '');
+        io.unobserve(entry.target);
+      });
+    }, { rootMargin: '0px 0px -8% 0px' });
+    items.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, [startups]);
 
   return (
-    <PageShell>
+    <PageShell minimalFooter>
       {(openAction) => (
-        <>
-          {/* ─── HERO ─── */}
-          <Container className="pt-44 lg:pt-56 pb-28 lg:pb-40">
-            <FadeIn animation="fadeIn">
-              <Label>The Den Portfolio</Label>
-            </FadeIn>
-            <h1 className={`dd-h1 mt-10 ${display}`}>
-                <SplitWords>
-                  Venture
-                  <br />
-                  <span className="gradient-text">Portfolio</span>
-                </SplitWords>
-              </h1>
-            <div className="mt-16 grid grid-cols-1 lg:grid-cols-12 gap-10">
-              <FadeIn animation="slideUp" delay={0.3} className="lg:col-span-5 lg:col-start-8">
-                <p className={lead}>
-                  Investing in the architects of the next digital era. Our portfolio represents the high-stakes
-                  innovation built within the Den.
-                </p>
-              </FadeIn>
+        <div className={styles.page}>
+          {/* Hero: Nina's copy centred inside a Gemstrat-style flow of the portfolio's logos */}
+          <FlowWall labelledBy="portfolio-title" count={startups.length} itemClassName={styles.wallItem}
+            renderItem={(i) => <span className={styles.wallLogo}><Image src={startups[i].logo} alt="" fill sizes="200px" className="object-contain" /></span>}>
+            <h1 id="portfolio-title" data-plain className="dd-h1 font-medium">Startup Portfolio</h1>
+            <p data-noreveal className={styles.heroBody}>Meet the startups that make up the Digital Den portfolio.</p>
+          </FlowWall>
+
+          <section data-noreveal className={styles.showcase} aria-label="Portfolio startups">
+            <ul ref={gridRef} className={styles.grid}>
+              {startups.map((startup, i) => (
+                <li key={`${startup.name}-${i}`} className={styles.item} style={{ '--d': `${(i % 3) * 90}ms` } as React.CSSProperties}>
+                  <StartupTile startup={startup} />
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          <section className={styles.closing} aria-labelledby="portfolio-cta">
+            <h2 id="portfolio-cta" className="dd-h2 font-medium"><SplitWords>Building something ambitious?</SplitWords></h2>
+            <div className="mt-10 flex justify-center">
+              <PrimaryButton onClick={openAction}>Apply as Startup</PrimaryButton>
             </div>
-          </Container>
-
-          {/* ─── GALLERY ─── */}
-          <Section>
-            <Container>
-              <div className="flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between">
-                <Label index="01">Ventures</Label>
-                <Tabs items={tabs} value={category} onChange={setCategory} />
-              </div>
-
-              <div className="mt-20 grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-24">
-                {visible.map(({ name, sector, body: text, image }, i) => (
-                  <FadeIn
-                    key={`${category}-${name}`}
-                    animation="slideUp"
-                    delay={(i % 2) * 0.12}
-                    className={i % 2 === 1 ? 'md:mt-40' : ''}
-                  >
-                    <article className="group">
-                      <Figure src={image} alt={name} sizes="(max-width: 768px) 100vw, 580px" className="aspect-[4/5]" />
-                      <div className="mt-8 flex items-baseline justify-between gap-6 border-b border-white/[0.12] pb-6">
-                        <h2 className="dd-h2 font-semibold"><SplitWords>{name}</SplitWords></h2>
-                        <span className="text-xs uppercase tracking-[0.22em] text-white/40">{sector}</span>
-                      </div>
-                      <p className={`mt-6 max-w-md ${body}`}>{text}</p>
-                      <div className="mt-8">
-                        <TextLink onClick={openAction}>View Venture</TextLink>
-                      </div>
-                    </article>
-                  </FadeIn>
-                ))}
-              </div>
-            </Container>
-          </Section>
-
-          {/* ─── CTA ─── */}
-          <Section>
-            <Container>
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:items-end">
-                <h2 className={`dd-h2 lg:col-span-8 ${display}`}>
-                  <SplitWords>
-                    Build the next unicorn from the comfort of <span className="gradient-text">the Den</span>
-                  </SplitWords>
-                </h2>
-                <div className="lg:col-span-4">
-                  <p className={lead}>
-                    We are actively seeking visionary founders for our Fall cohort. Bring your thesis, and we&apos;ll
-                    provide the capital, talent, and network.
-                  </p>
-                  <div className="mt-10 flex flex-wrap items-center gap-8">
-                    <PrimaryButton onClick={openAction}>Submit Venture Proposal</PrimaryButton>
-                    <TextLink href="/programs">Explore Programs</TextLink>
-                  </div>
-                </div>
-              </div>
-            </Container>
-          </Section>
-        </>
+          </section>
+        </div>
       )}
     </PageShell>
   );
