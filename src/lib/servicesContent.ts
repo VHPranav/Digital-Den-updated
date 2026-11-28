@@ -60,8 +60,8 @@ export const defaultServicesContent = {
   chapters: serviceChapters,
   glance: [
     { label: 'Who we work with', text: 'Startups · Scaleups · Corporates · Institutions · Academic & Innovation Leaders' },
-    { label: 'Where we work', text: 'Montenegro · Western Balkans · Europe · Global Partner Network' },
-    { label: 'Our focus', text: 'Startups · Innovation · Connections · Global Growth · Impact' },
+    { label: 'Where we work', text: 'Montenegro · Western Balkans · Europe · USA · Middle East' },
+    { label: 'Our focus', text: 'Startups · Innovation · Connections · Global Growth' },
     { label: 'Our approach', text: 'Local understanding. Global capabilities.' },
   ],
   closing: {

@@ -30,6 +30,11 @@
 .description { margin-top: 6px; font-size: 14px; line-height: 1.6; color: rgb(255 255 255 / .68);
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
+.tile:hover .description, .tile:focus-visible .description {
+  -webkit-line-clamp: unset;
+  overflow: visible;
+}
+
 .tile:hover, .tile:focus-visible { border-color: rgb(216 180 254 / .28); background: #16131b; }
 .tile:hover .panel::after, .tile:focus-visible .panel::after { opacity: 1; }
 .tile:hover .logo, .tile:focus-visible .logo { scale: 1.05; }

@@ -44,7 +44,16 @@ export async function getServicesPageContent(): Promise<ServicesPageContent> {
         bestFor: chapter?.bestFor ?? fallback.bestFor,
       };
     }),
-    glance: record.glance?.length ? record.glance : defaultServicesContent.glance,
+    glance: (record.glance?.length ? record.glance : defaultServicesContent.glance).map((item) => {
+      const label = item.label.trim().toLowerCase();
+      if (label === 'where we work') {
+        return { ...item, text: item.text.replace('Global Partner Network', 'USA · Middle East') };
+      }
+      if (label === 'our focus') {
+        return { ...item, text: item.text.split('·').map((part) => part.trim()).filter((part) => part !== 'Impact').join(' · ') };
+      }
+      return item;
+    }),
     closing: {
       title: record.closing?.title || defaultServicesContent.closing.title,
       body: record.closing?.body || defaultServicesContent.closing.body,

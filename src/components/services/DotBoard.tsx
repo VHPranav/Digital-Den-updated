@@ -63,7 +63,7 @@ export default function DotBoard({ words, className = '' }: { words: string[]; c
 
     // Words cycle on their own: hold each one, then shimmer into the next (EXPAND loops back to BUILD).
     const start = performance.now();
-    const WORD_MS = 3200;
+    const WORD_MS = 2400;
 
     const ripple = { at: -10, x: 0, y: 0 };
     const click = (e: PointerEvent) => {
